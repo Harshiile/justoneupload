@@ -1,0 +1,66 @@
+###
+POST http://localhost:3000/api/login
+Content-Type: application/json
+
+{
+    "email":"theharshiile@gmail.com",
+    "password":"Mcintyre@04"
+}
+
+
+### -- Videos from Workspace
+GET http://localhost:3000/api/get/videos?workspace=UCHZ0UZ7PTrabekn_r-owSZg
+
+
+### -- Workspaces from userId
+GET http://localhost:3000/api/get/workspaces?userId=298446e0-745d-4ff5-b34c-d44f45b9e7b5&role=youtuber
+
+
+### -- Workspaces from userId & role
+GET http://localhost:3000/api/get/workspaces?userId=298446e0-745d-4ff5-b34c-d44f45b9e7b5&role=editor
+
+
+
+### -- Delete drive file using fileId
+DELETE http://localhost:3000/api/drive?fileId=1RPPsDba8YrgHFt1aMEFVUZrupZ6csXLe
+
+
+
+### -- Get Youtuber Connecter URL
+GET http://localhost:3000/api/youtube/get/oauth-url
+
+
+### -- User Joining WS via Link
+POST http://localhost:3000/api/service/join/workspace/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsIm5hbWUiOiJIYXJzaGlsIiwidXNlclR5cGUiOiJ5b3V0dWJlciIsImlhdCI6MTc0NzIwODg2NCwiZXhwIjoxNzQ3MjA4ODk0fQ.vVFTXvFyWd-kbzQAVWbI-1Uarepxe906o3U2fyhQteE
+Content-Type: application/json
+
+{
+    "userId":"b8162480-15e2-4480-b087-aa1016c4bd8c"
+}
+
+
+### -- Generate Link
+GET http://localhost:3000/api/service/generate-link?ws=UCHZ0UZ7PTrabekn_r-owSZg
+<<<<<<< HEAD
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsIm5hbWUiOiJIYXJzaGlsIiwidXNlclR5cGUiOiJ5b3V0dWJlciIsImlhdCI6MTc0NzIwODg2NCwiZXhwIjoxNzQ3MjA4ODk0fQ.vVFTXvFyWd-kbzQAVWbI-1Uarepxe906o3U2fyhQteE
+Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsImlhdCI6MTc0NzIwOTAwNCwiZXhwIjoxNzQ3ODEzODA0fQ.TkEGaE26AFOSFFHoJsT5-6xy8L5w8qxtoB18DhaGtCY
+=======
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsIm5hbWUiOiJIYXJzaGlsIiwidXNlclR5cGUiOiJ5b3V0dWJlciIsImlhdCI6MTc0NzIxMTA5MCwiZXhwIjoxNzQ3MjExMTIwfQ.x7VslAfiWFaMIyQZ7JNH46VVpAAvjA1c4pTkbkGf_xU
+Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsImlhdCI6MTc0NzIxMDkxNywiZXhwIjoxNzQ3MjEwOTM3fQ.YXENfoAhZvgiVJR3tVPdX1Xva_7sfDjlXf231a8U2gM
+>>>>>>> master
+
+
+### -- Editor Contribution
+GET http://localhost:3000/api/get/editor-contribution?ws=2f868511-5242-45a9-b305-d0ca1b28b106
+
+
+### -- Upload on Youtube
+POST http://localhost:3000/api/youtube/upload
+Content-Type: application/json
+
+{
+    "workspaceId":"2f868511-5242-45a9-b305-d0ca1b28b106",
+    "videoId":"2516078f-1f5f-426d-bb75-d70af4d14b40"
+}
+
+
