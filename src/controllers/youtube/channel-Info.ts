@@ -7,7 +7,6 @@ import { eq } from 'drizzle-orm'
 import { v4 as uuidv4 } from 'uuid'
 import { JOUError } from '../../lib/error'
 
-
 export const youtubeChannelInfo = async (req: Request, res: Response<APIResponse>) => {
     const yt = google.youtube({ version: 'v3', auth: oauth2Client })
     const { code, userId } = req.query
@@ -50,4 +49,23 @@ export const youtubeChannelInfo = async (req: Request, res: Response<APIResponse
                     message: "Workspace Created",
                 })
         }).catch(_ => { console.log(_.message); throw new JOUError(400, "Workspace Creation Failed") })
+}
+
+
+export const ytConnector = (req: Request, res: Response<APIResponse>) => {
+    const scopes = [
+        'https://www.googleapis.com/auth/youtube.upload',
+        'https://www.googleapis.com/auth/youtube.readonly'
+    ]
+    const url = oauth2Client.generateAuthUrl({
+        access_type: 'offline',
+        prompt: 'consent',
+        scope: scopes
+    })
+    res.json({
+        message: "Youtube Connector URL",
+        data: {
+            url
+        }
+    })
 }

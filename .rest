@@ -41,13 +41,8 @@ Content-Type: application/json
 
 ### -- Generate Link
 GET http://localhost:3000/api/service/generate-link?ws=UCHZ0UZ7PTrabekn_r-owSZg
-<<<<<<< HEAD
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsIm5hbWUiOiJIYXJzaGlsIiwidXNlclR5cGUiOiJ5b3V0dWJlciIsImlhdCI6MTc0NzIwODg2NCwiZXhwIjoxNzQ3MjA4ODk0fQ.vVFTXvFyWd-kbzQAVWbI-1Uarepxe906o3U2fyhQteE
 Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsImlhdCI6MTc0NzIwOTAwNCwiZXhwIjoxNzQ3ODEzODA0fQ.TkEGaE26AFOSFFHoJsT5-6xy8L5w8qxtoB18DhaGtCY
-=======
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsIm5hbWUiOiJIYXJzaGlsIiwidXNlclR5cGUiOiJ5b3V0dWJlciIsImlhdCI6MTc0NzIxMTA5MCwiZXhwIjoxNzQ3MjExMTIwfQ.x7VslAfiWFaMIyQZ7JNH46VVpAAvjA1c4pTkbkGf_xU
-Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsImlhdCI6MTc0NzIxMDkxNywiZXhwIjoxNzQ3MjEwOTM3fQ.YXENfoAhZvgiVJR3tVPdX1Xva_7sfDjlXf231a8U2gM
->>>>>>> master
 
 
 ### -- Editor Contribution
@@ -57,10 +52,11 @@ GET http://localhost:3000/api/get/editor-contribution?ws=2f868511-5242-45a9-b305
 ### -- Upload on Youtube
 POST http://localhost:3000/api/youtube/upload
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsIm5hbWUiOiJIYXJzaGlsIiwidXNlclR5cGUiOiJ5b3V0dWJlciIsImlhdCI6MTc0NzIxODczNiwiZXhwIjoxNzQ3MjE5NjM2fQ.nFtpRYXvNB8JNoxkMBrr4zfjCJYevPS0WtRjus3uEYA
 
 {
-    "workspaceId":"2f868511-5242-45a9-b305-d0ca1b28b106",
-    "videoId":"2516078f-1f5f-426d-bb75-d70af4d14b40"
+    "workspaceId":"UCHZ0UZ7PTrabekn_r-owSZg",
+    "videoId":"7414e1a2-fd11-4a05-9016-082ecbaec322"
 }
 
 

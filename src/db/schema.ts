@@ -9,7 +9,6 @@ export const UserTable = pgTable("user", {
     email: varchar("email"),
     password: varchar("password"),
     userType: userTypeEnum('userType').notNull(),
-    refreshToken: varchar("refreshToken")
 })
 
 

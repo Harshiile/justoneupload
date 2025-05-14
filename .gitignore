@@ -3,3 +3,4 @@ node_modules
 today.task
 public/
 dist/
+.rest

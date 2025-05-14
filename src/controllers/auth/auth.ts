@@ -52,8 +52,7 @@ export const signUser = async (req: Request<{}, {}, User>, res: Response<APIResp
             name,
             email,
             password: hashPassword,
-            userType,
-            refreshToken
+            userType
         }).catch(err => { throw new JOUError(err.status, err.message) })
 
         res
@@ -87,11 +86,6 @@ export const loginUser = async (req: Request<{}, {}, User>, res: Response<APIRes
                 userType: user.userType,
             }
             const { refreshToken, accessToken } = generateTokens(userData)
-            // Store refreshToken in DB
-            // await db.update(UserTable).set({
-            //     refreshToken
-            // }).where(eq(UserTable.id, userData.id)).catch(err => { throw new JOUError(400, "Please Login Again") })
-
             res
                 .status(200)
                 .cookie('auth', refreshToken, {
