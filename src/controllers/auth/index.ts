@@ -1,9 +1,9 @@
 import { loginUser, signUser, logoutUser } from "./auth"
-import { renewAccessToken } from "./token"
+import { RenewAccessToken } from "./token"
 
 export {
     loginUser,
     signUser,
     logoutUser,
-    renewAccessToken
+    RenewAccessToken
 }

@@ -1,13 +1,14 @@
 import { Router, Response, Request } from 'express'
 import { SendMail } from '../controllers/mail'
 import { authorize } from '../middleware/authorize'
-import { loginUser, signUser, logoutUser } from '../controllers/auth'
+import { loginUser, signUser, logoutUser, RenewAccessToken } from '../controllers/auth'
 import { uploadOnYoutube, youtubeChannelInfo, ytConnector } from '../controllers/youtube'
 import { deleteOnDrive, uploadOnDrive } from '../controllers/drive'
 import { getVideosFromWorkSpace } from '../controllers/fetch/video'
 import { getWorkSpaces } from '../controllers/fetch/workspace'
 import { joinWorkSpace, wsLinkGenerate } from '../controllers/service/joinWs'
 import { editorContribution } from '../controllers/fetch/analytics'
+import { FetchMe } from '../controllers/fetch/me'
 
 const router: Router = Router()
 
@@ -19,7 +20,8 @@ router.get('/logout', logoutUser)
 
 // Service
 router.post('/service/join/workspace/:link', authorize, joinWorkSpace);
-router.get('/service/generate-link', authorize, authorize, wsLinkGenerate)
+router.get('/service/generate-link', authorize, wsLinkGenerate)
+router.get('/service/renew', RenewAccessToken)
 
 // Mail-Service
 router.post('/mail/send', authorize, SendMail)
@@ -35,6 +37,7 @@ router.post('/drive/upload', authorize, uploadOnDrive)
 
 // Fetcher
 router.get('/get/videos', authorize, getVideosFromWorkSpace)
+router.get('/get/fetch-me', authorize, FetchMe)
 router.get('/get/workspaces', authorize, getWorkSpaces)
 router.get('/get/editor-contribution', authorize, editorContribution)
 

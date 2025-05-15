@@ -33,6 +33,12 @@ export const generateTokens = (userData: UserData) => {
     return { accessToken, refreshToken }
 }
 
+export const cookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: true
+}
+
 export const signUser = async (req: Request<{}, {}, User>, res: Response<APIResponse>) => {
     const { email, password, userType, name } = req.body
 
@@ -57,16 +63,11 @@ export const signUser = async (req: Request<{}, {}, User>, res: Response<APIResp
 
         res
             .status(200)
-            .cookie('auth', refreshToken, {
-                httpOnly: true,
-                secure: true,
-            })
+            .cookie('acsTkn', accessToken, cookieOptions)
+            .cookie('auth', refreshToken, cookieOptions)
             .json({
                 message: "User Signed In",
-                data: {
-                    userData,
-                    accessToken
-                }
+                data: { userData }
             })
     }
     else throw new JOUError(409, "User Already Exist")
@@ -88,16 +89,11 @@ export const loginUser = async (req: Request<{}, {}, User>, res: Response<APIRes
             const { refreshToken, accessToken } = generateTokens(userData)
             res
                 .status(200)
-                .cookie('auth', refreshToken, {
-                    httpOnly: true,
-                    secure: true
-                })
+                .cookie('acsTkn', accessToken, cookieOptions)
+                .cookie('auth', refreshToken, cookieOptions)
                 .json({
                     message: "User Logged In",
-                    data: {
-                        userData,
-                        accessToken
-                    }
+                    data: { userData }
                 })
         }
         else throw new JOUError(401, "Incorrect Password")

@@ -1,56 +1,43 @@
 import { Request, Response, NextFunction } from 'express'
-import { JwtGenerate, JwtValidate } from '../lib/jwt'
-import { renewAccessToken } from '../controllers/auth'
+import { JOUError } from '../lib/error'
+import { JwtValidate } from '../lib/jwt';
+
 
 export const authorize = async (req: Request, res: Response<APIResponse>, next: NextFunction) => {
-    const accessToken = req.headers['authorization']!.split('Bearer ')[1]
+    const accessToken = req.cookies['acsTkn']
+    const errMsg = "Please Login Again"
+
     if (!accessToken) {
-        // log out - frontend always send accessToken - react state not expires the access token
-        res.json({
-            message: "Middlware - Logout",
-        })
+        console.log('Access Token Undefined');
+        throw new JOUError(401, errMsg)
     }
     else {
         try {
             const userData = JwtValidate(accessToken)
-            console.log('Passed - next()');
+            // User Validated
+            if (typeof (userData) == 'string') throw new JOUError(401, errMsg);
+            req.user = {
+                id: userData.id,
+                name: userData.name,
+                userType: userData.userType
+            }
             next()
         } catch (err) {
             if (err instanceof Error) {
                 if (err.message == 'TokenExpiredError') {
-                    // Access Token Expires - Renew It
-                    const refreshToken = req.cookies['auth']
-                    if (refreshToken) {
-                        try {
-                            const refTkn = JwtValidate(refreshToken);
-                            // RenewToken(userId)
-                            const newAccessToken = typeof (refTkn) != 'string' ? await renewAccessToken(refTkn.id) : null
-                            res.json({
-                                message: "Middlware - Renew Access Token",
-                                data: {
-                                    accessToken: newAccessToken
-                                }
-                            })
-                        } catch (error) {
-                            res.json({
-                                message: "Middlware - LogOut - Ref Token Expires or Corrupted",
-                            })
-                        }
-                    }
-                    else {
-                        res.json({
-                            message: "Middlware - LogOut - Ref Token Expires or Corrupted",
-                        })
-                    }
+                    // Access Token Expires
+                    console.log('Access Token Expires');
+                    return res.status(999).json({
+                        message: "Session Expired"
+                    })
+                    // throw new JOUError(999, "Seesion Expired")
                 }
                 else {
-                    // Logout - Corrupt Access Token
-                    res.json({
-                        message: "Middlware - Logout",
-                    })
+                    // Token Corrupted
+                    console.log('Access Token Corrupted');
+                    throw new JOUError(401, errMsg)
                 }
             }
         }
     }
-
 }

@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import CookieParser from 'cookie-parser'
 import path from 'path'
+import { JOUError } from '../lib/error'
 
 dotenv.config()
 const app = express()
@@ -16,5 +17,11 @@ app.use(cors({
 app.use(CookieParser())
 app.use(express.static(path.resolve('public')));
 app.use('/api', router)
+app.use((err: JOUError, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const statusCode = err.statusCode || 500
+    const message = err.message || 'Server Error'
+
+    res.status(statusCode).json({ message })
+})
 
 export default app
