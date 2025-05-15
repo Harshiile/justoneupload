@@ -50,13 +50,5 @@ GET http://localhost:3000/api/get/editor-contribution?ws=2f868511-5242-45a9-b305
 
 
 ### -- Upload on Youtube
-POST http://localhost:3000/api/youtube/upload
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsIm5hbWUiOiJIYXJzaGlsIiwidXNlclR5cGUiOiJ5b3V0dWJlciIsImlhdCI6MTc0NzIxODczNiwiZXhwIjoxNzQ3MjE5NjM2fQ.nFtpRYXvNB8JNoxkMBrr4zfjCJYevPS0WtRjus3uEYA
-
-{
-    "workspaceId":"UCHZ0UZ7PTrabekn_r-owSZg",
-    "videoId":"7414e1a2-fd11-4a05-9016-082ecbaec322"
-}
-
+GET http://localhost:3000/api/get/ws-metadata/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3b3Jrc3BhY2VJZCI6IlVDSFowVVo3UFRyYWJla25fci1vd1NaZyIsImlhdCI6MTc0NzMwMjQ5NiwiZXhwIjoxNzQ3Mzg4ODk2fQ.xzZr96jPz2XZ_cGNGfki5RpnkpusYY-doOzwMMYg68U
 

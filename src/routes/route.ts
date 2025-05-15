@@ -6,7 +6,7 @@ import { authorize } from '../middleware'
 // Controllers
 import { loginUser, signUser, logoutUser, RenewAccessToken } from '../controllers/auth'
 import { uploadOnDrive } from '../controllers/drive'
-import { getVideosFromWorkSpace, fetchMe, getWorkSpaces, editorContribution } from '../controllers/fetch'
+import { getVideosFromWorkSpace, fetchMe, getWorkSpaces, editorContribution, getWorkspaceDetails } from '../controllers/fetch'
 import { SendMail } from '../controllers/mail'
 import { joinWorkSpace, wsLinkGenerate } from '../controllers/service'
 import { uploadOnYoutube, youtubeChannelInfo, ytConnector } from '../controllers/youtube'
@@ -39,6 +39,7 @@ router.post('/drive/upload', authorize, uploadOnDrive)
 router.get('/get/videos', authorize, getVideosFromWorkSpace)
 router.get('/get/fetch-me', authorize, fetchMe)
 router.get('/get/workspaces', authorize, getWorkSpaces)
+router.get('/get/ws-metadata/:joinLink', authorize, getWorkspaceDetails)
 router.get('/get/editor-contribution', authorize, editorContribution)
 
 

@@ -7,7 +7,67 @@ import { google, youtube_v3 } from 'googleapis';
 import { oauth2Client } from '../../lib/secrets';
 import { GaxiosPromise } from 'googleapis/build/src/apis/abusiveexperiencereport';
 import { JOUError } from '../../lib/error';
+import { JwtValidate } from '../../lib/jwt';
 
+
+// Details about WorkSpace used in Joining Page
+export const getWorkspaceDetails = async (req: Request, res: Response<APIResponse>) => {
+    const joiningLink = req.params.joinLink
+    if (!joiningLink) throw new JOUError(401, "Invalid Link");
+    try {
+        const linkData = JwtValidate(joiningLink);
+        if (typeof (linkData) != 'string') {
+            const [ws] = await db.select(
+                { refreshToken: WorkspaceTable.refreshToken }
+            ).from(WorkspaceTable).where(eq(WorkspaceTable.id, linkData.workspaceId))
+
+            oauth2Client.setCredentials({
+                refresh_token: ws.refreshToken
+            })
+            const youtube = google.youtube({ version: 'v3', auth: oauth2Client })
+
+            const channelRes = await youtube.channels.list({
+                part: ['snippet', 'statistics'],
+                mine: true
+            })
+            const channelData = channelRes.data.items?.[0]
+            if (channelData) {
+                const snippet = channelData?.snippet || {};
+                const statistics = channelData?.statistics || {};
+                const branding = channelData?.brandingSettings?.channel || {};
+                const channelMetaData = {
+                    id: channelData?.id,
+                    name: snippet.title || '',
+                    description: snippet.description || '',
+                    avatar: snippet.thumbnails?.high?.url || '',
+                    userHandle: snippet.customUrl || null,
+                    totalSubscribers: parseInt(statistics.subscriberCount || '0'),
+                    totalVideos: parseInt(statistics.videoCount || '0'),
+                    dateCreated: snippet.publishedAt || '',
+                    tags: branding.keywords ? branding.keywords.split(',').map((tag: string) => tag.trim()) : [],
+                }
+                res.json({
+                    message: "Channel Details",
+                    data: { channelMetaData }
+                })
+            }
+            else throw new JOUError(401, "Invalid Link")
+
+
+        }
+        else throw new JOUError(401, "Invalid Link")
+    }
+    catch (err) {
+        if (err instanceof Error) {
+            console.log(err.message, err.name);
+            if (err.name == 'TokenExpiredError') throw new JOUError(401, "Link is expires")
+            else throw new JOUError(400, "Invalid Link")
+        }
+        else throw new JOUError(400, "Invalid Link")
+    }
+}
+
+// All Workspaces of User
 export const getWorkSpaces = async (req: Request<{}, {}>, res: Response<APIResponse>) => {
     const { userId, role } = req.query;
 
