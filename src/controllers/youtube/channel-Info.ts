@@ -4,9 +4,10 @@ import { oauth2Client } from '../../lib/secrets'
 import { WorkspaceTable } from '../../db/schema'
 import { db } from '../../db'
 import { eq } from 'drizzle-orm'
-import { v4 as uuidv4 } from 'uuid'
 import { JOUError } from '../../lib/error'
 
+
+// Authenticate & Store YT Channel in DB
 export const youtubeChannelInfo = async (req: Request, res: Response<APIResponse>) => {
     const yt = google.youtube({ version: 'v3', auth: oauth2Client })
     const { code, userId } = req.query
@@ -52,6 +53,7 @@ export const youtubeChannelInfo = async (req: Request, res: Response<APIResponse
 }
 
 
+// Youtube Channel Connector Link
 export const ytConnector = (req: Request, res: Response<APIResponse>) => {
     const scopes = [
         'https://www.googleapis.com/auth/youtube.upload',

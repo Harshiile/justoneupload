@@ -8,6 +8,8 @@ import { JOUError } from '../lib/error'
 
 dotenv.config()
 const app = express()
+
+// Apply Middlewares
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors({
@@ -16,7 +18,11 @@ app.use(cors({
 }))
 app.use(CookieParser())
 app.use(express.static(path.resolve('public')));
+
+// Set Routee
 app.use('/api', router)
+
+// Converting Error into Response
 app.use((err: JOUError, req: express.Request, res: express.Response, next: express.NextFunction) => {
     const statusCode = err.statusCode || 500
     const message = err.message || 'Server Error'

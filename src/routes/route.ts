@@ -1,16 +1,17 @@
-import { Router, Response, Request } from 'express'
-import { SendMail } from '../controllers/mail'
-import { authorize } from '../middleware/authorize'
-import { loginUser, signUser, logoutUser, RenewAccessToken } from '../controllers/auth'
-import { uploadOnYoutube, youtubeChannelInfo, ytConnector } from '../controllers/youtube'
-import { deleteOnDrive, uploadOnDrive } from '../controllers/drive'
-import { getVideosFromWorkSpace } from '../controllers/fetch/video'
-import { getWorkSpaces } from '../controllers/fetch/workspace'
-import { joinWorkSpace, wsLinkGenerate } from '../controllers/service/joinWs'
-import { editorContribution } from '../controllers/fetch/analytics'
-import { FetchMe } from '../controllers/fetch/me'
+import express from 'express'
 
-const router: Router = Router()
+// Middleware
+import { authorize } from '../middleware'
+
+// Controllers
+import { loginUser, signUser, logoutUser, RenewAccessToken } from '../controllers/auth'
+import { uploadOnDrive } from '../controllers/drive'
+import { getVideosFromWorkSpace, fetchMe, getWorkSpaces, editorContribution } from '../controllers/fetch'
+import { SendMail } from '../controllers/mail'
+import { joinWorkSpace, wsLinkGenerate } from '../controllers/service'
+import { uploadOnYoutube, youtubeChannelInfo, ytConnector } from '../controllers/youtube'
+
+const router = express.Router()
 
 // User-Auth
 router.post('/login', loginUser)
@@ -32,12 +33,11 @@ router.get('/youtube/get/channel-info', authorize, youtubeChannelInfo)
 router.post('/youtube/upload', authorize, uploadOnYoutube)
 
 // Drive-Service
-router.delete('/drive', authorize, deleteOnDrive)
 router.post('/drive/upload', authorize, uploadOnDrive)
 
 // Fetcher
 router.get('/get/videos', authorize, getVideosFromWorkSpace)
-router.get('/get/fetch-me', authorize, FetchMe)
+router.get('/get/fetch-me', authorize, fetchMe)
 router.get('/get/workspaces', authorize, getWorkSpaces)
 router.get('/get/editor-contribution', authorize, editorContribution)
 

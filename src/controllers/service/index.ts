@@ -1,4 +1,5 @@
-import { joinWorkSpace } from "./joinWs"
+import { joinWorkSpace, wsLinkGenerate } from "./joinWs"
 export {
-    joinWorkSpace
+    joinWorkSpace,
+    wsLinkGenerate
 }

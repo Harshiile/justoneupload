@@ -1,25 +1,19 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import { db } from '../../db';
 import { UserTable, VideoTable, VideoWorkspaceJoinTable, WorkspaceTable } from '../../db/schema';
 import { eq } from 'drizzle-orm';
-import { url } from 'inspector';
 import { oauth2Client } from '../../lib/secrets';
 import { google } from 'googleapis';
 import { drive } from '../../lib/secrets';
 import { JOUError } from '../../lib/error';
 
-const getImageWebLink = async (fileId: string) => {
-    return await drive.files.get({
-        fileId,
-        fields: 'webContentLink, webViewLink'
-    })
-}
 
 export const getVideosFromWorkSpace = async (req: Request, res: Response<APIResponse>) => {
     const { workspace } = req.query;
     if (workspace) {
 
-        // Not Uploaded Videos
+
+        // Non-Uploaded Videos
         const nonUploadedVideos = await db.select({
             id: VideoTable.id,
             title: VideoTable.title,
@@ -36,6 +30,7 @@ export const getVideosFromWorkSpace = async (req: Request, res: Response<APIResp
 
 
 
+
         // Uploaded Videos
         const uploadedVideos = await db.select({
             editor: UserTable.name,
@@ -45,30 +40,29 @@ export const getVideosFromWorkSpace = async (req: Request, res: Response<APIResp
             .leftJoin(UserTable, eq(UserTable.id, VideoWorkspaceJoinTable.editor))
             .where(eq(VideoWorkspaceJoinTable.workspace, workspace.toString()!))
 
+
+
         const [ws] = await db.select({
             refreshToken: WorkspaceTable.refreshToken
         }).from(WorkspaceTable).where(eq(WorkspaceTable.id, workspace.toString()));
 
         if (!ws) throw new JOUError(404, "Workspace not Exist")
 
-        const { refreshToken } = ws
 
+        const { refreshToken } = ws
         oauth2Client.setCredentials({
             refresh_token: refreshToken
         })
-
         const yt = google.youtube({ version: 'v3', auth: oauth2Client })
-
         const videos = uploadedVideos.map(v => v.videoId!)
-
         const videoDetails = await yt.videos.list({
             part: ['snippet', 'contentDetails', 'status', 'statistics'],
             id: videos
         });
 
+        // Fetching Details About Videos Using IDs
         const metadata: VideoMetaData[] = nonUploadedVideos || [];
         const videosMetaDatas = videoDetails?.data?.items;
-
         videosMetaDatas?.forEach(video => {
             const { editor } = uploadedVideos.filter(fv => fv.videoId == video.id)[0]
             metadata.push({

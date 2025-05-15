@@ -6,8 +6,10 @@ import { VideoTable, VideoWorkspaceJoinTable, WorkspaceTable } from '../../db/sc
 import { and, eq, getTableColumns } from 'drizzle-orm'
 import { validate } from 'uuid'
 import { JOUError } from '../../lib/error'
+import { deleteOnDrive } from '../drive'
 
 
+// Fetch File From Drive
 const getFileStreamFromDrive = async (res: Response<APIResponse>, fileId: string) => {
     return drive.files.get(
         {
@@ -22,6 +24,7 @@ const getFileStreamFromDrive = async (res: Response<APIResponse>, fileId: string
         })
         .catch(err => { throw new JOUError(404, "File not Found") })
 }
+
 
 export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string, videoId: string }>, res: Response<APIResponse>) => {
     const { workspaceId, videoId } = req.body
@@ -85,9 +88,13 @@ export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string
                         body: await getFileStreamFromDrive(res, video.thumbnail)
                     }
                 })
-                    .then(resThumbUpload => {
+                    .then(async (resThumbUpload) => {
                         console.log('5. Thumbnail Uploaded');
-                        // 2. Delete entry in VideoTable
+                        // 2. Delete entry in VideoTable & in Drive
+
+                        // Drive deletion
+                        await deleteOnDrive(video.fileId)
+
                         db.delete(VideoTable).where(eq(VideoTable.id, videoId))
                             .then(deltedRes => {
                                 if (deltedRes.rowCount! > 0) {

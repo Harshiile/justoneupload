@@ -3,7 +3,7 @@ import { JOUError } from '../lib/error'
 import { JwtValidate } from '../lib/jwt';
 
 
-export const authorize = async (req: Request, res: Response<APIResponse>, next: NextFunction) => {
+export const authorize = (req: Request, res: Response<APIResponse>, next: NextFunction) => {
     const accessToken = req.cookies['acsTkn']
     const errMsg = "Please Login Again"
 
@@ -27,10 +27,7 @@ export const authorize = async (req: Request, res: Response<APIResponse>, next: 
                 if (err.message == 'TokenExpiredError') {
                     // Access Token Expires
                     console.log('Access Token Expires');
-                    return res.status(999).json({
-                        message: "Session Expired"
-                    })
-                    // throw new JOUError(999, "Seesion Expired")
+                    throw new JOUError(999, "Seesion Expired")
                 }
                 else {
                     // Token Corrupted

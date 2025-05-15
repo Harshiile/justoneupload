@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 
-export const FetchMe = async (req: Request, res: Response<APIResponse>) => {
+// Fetching User on Refresh
+export const fetchMe = async (req: Request, res: Response<APIResponse>) => {
     res.json({
         message: "User Fetched",
         data: {

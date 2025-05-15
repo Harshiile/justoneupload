@@ -1,10 +1,8 @@
 import { Request, Response } from 'express'
-import { JwtValidate } from '../../lib/jwt'
 import { db } from '../../db'
 import { UserTable, VideoWorkspaceJoinTable } from '../../db/schema'
 import { eq, sql } from 'drizzle-orm'
 import { validate } from 'uuid'
-import { count } from 'console'
 import { JOUError } from '../../lib/error'
 
 export const editorContribution = async (req: Request, res: Response<APIResponse>) => {

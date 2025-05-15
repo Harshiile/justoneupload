@@ -6,15 +6,15 @@ import { JOUError } from "../../lib/error"
 import { Request, Response } from 'express'
 import { cookieOptions } from "./auth"
 
+
 export const RenewAccessToken = async (req: Request, res: Response<APIResponse>) => {
     const refreshToken = req.cookies['auth']
-
     if (!refreshToken) throw new JOUError(403, "Please Login Again");
+
     try {
         const refTkn = JwtValidate(refreshToken);
         if (typeof (refTkn) == 'string') throw new JOUError(403, "Please Login Again")
 
-        // RenewToken(userId)
         const [user] = await db.select({
             id: UserTable.id,
             name: UserTable.name,

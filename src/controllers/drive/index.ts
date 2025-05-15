@@ -1,43 +1,41 @@
-import { Request, response, Response } from 'express'
-import { google } from 'googleapis'
+import { Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import busboy from 'busboy'
-import fs from 'fs'
 import { db } from '../../db'
 import { io } from '../../socket';
-import { Video } from '../../types/Video'
 import { VideoTable } from '../../db/schema'
 import { IncomingHttpHeaders } from 'http'
-import path, { dirname } from 'path'
 import { drive } from '../../lib/secrets'
 import { JOUError } from '../../lib/error'
 
+type VideoType = 'public' | 'private' | 'unlisted'
+interface FileName {
+    filename: string,
+    encoding: string,
+    mimeType: string
+}
+
+// Paring Form Fields
 const parseFieldData = (data: string) => {
     if (data == 'true') return true
     else if (data === 'null' || data === 'undefined' || data === '') return null
     return data
 }
-type VideoType = 'public' | 'private' | 'unlisted'
+
+// Parsing Video type
 const parseVideoType = (videoType: string): VideoType => {
     switch (videoType) {
-        case 'public':
-            return 'public'
-            break;
-        case 'private':
-            return 'private'
-            break;
-        case 'unlisted':
-            return 'unlisted'
-            break;
-        default:
-            return 'unlisted'
-            break;
+        case 'public': return 'public'
+        case 'private': return 'private'
+        case 'unlisted': return 'unlisted'
+        default: return 'unlisted'
     }
 }
 
 const DriveUpload = (file: object, filename: FileName, headers: IncomingHttpHeaders) => {
     const [fileName, fileExt] = filename.filename.split('.')
 
+    // Drive Uploading
     return drive.files.create({
         requestBody: {
             name: `${fileName}-${uuidv4()}.${fileExt}`,
@@ -58,7 +56,10 @@ const DriveUpload = (file: object, filename: FileName, headers: IncomingHttpHead
     })
 }
 
+
 export const uploadOnDrive = async (req: Request, res: Response<APIResponse>) => {
+
+    // Fetching other fields
     const fields: Record<string, string | boolean | null> = {
         title: null,
         desc: null,
@@ -69,7 +70,6 @@ export const uploadOnDrive = async (req: Request, res: Response<APIResponse>) =>
         editor: null,
         workspace: null,
     };
-    const uploadPromises: Promise<any>[] = [];
 
     if (req.headers['socket']) {
         const fileIds: {
@@ -79,8 +79,11 @@ export const uploadOnDrive = async (req: Request, res: Response<APIResponse>) =>
             fileId: null,
             thumbnailId: null
         }
+
         const bb = busboy({ headers: req.headers });
+        const uploadPromises: Promise<any>[] = [];
         req.pipe(bb);
+
         bb.on('field', (fieldname, val) => {
             if (val) fields[fieldname] = parseFieldData(val)!
         });
@@ -100,7 +103,7 @@ export const uploadOnDrive = async (req: Request, res: Response<APIResponse>) =>
                 .then(async (_) => {
                     console.log('Video Uploaded, Now Inserting in DB');
 
-                    // DB Uploading
+                    // DB Insertion
                     await db.insert(VideoTable).values({
                         title: fields.title?.toString()!,
                         desc: fields.desc?.toString()!,
@@ -115,6 +118,7 @@ export const uploadOnDrive = async (req: Request, res: Response<APIResponse>) =>
                         workspace: fields.workspace?.toString()!
                     }).then(_ => {
                         console.log('Video Inserted in DB');
+
                         // Send mail to youtuber - workspaceId
 
                         res.json({
@@ -131,25 +135,8 @@ export const uploadOnDrive = async (req: Request, res: Response<APIResponse>) =>
     else throw new JOUError(404, "Socket is not connected")
 }
 
-export const deleteOnDrive = async (req: Request, res: Response<APIResponse>) => {
-    const { fileId } = req.query
-    if (fileId && typeof (fileId) == 'string') {
-        drive.files.delete({ fileId })
-            .then(_ => res.json({
-                message: "File Deleted"
-            }))
-            .catch(err => { throw new JOUError(err.status, "Deletion Failed") })
-    }
-
+// Video Delete
+export const deleteOnDrive = async (fileId: string) => {
+    await drive.files.delete({ fileId }).catch(err => { throw new JOUError(err.status, "Deletion Failed") })
 }
 
-interface FileName {
-    filename: string,
-    encoding: string,
-    mimeType: string
-}
-
-interface Header {
-    'content-length': number,
-    'socket': string
-}

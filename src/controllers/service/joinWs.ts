@@ -6,6 +6,7 @@ import { eq } from 'drizzle-orm'
 import { validate } from 'uuid'
 import { JOUError } from '../../lib/error'
 
+
 export const joinWorkSpace = async (req: Request<{ link: string }, {}, { userId: string }>, res: Response<APIResponse>) => {
     const link = req.params.link
     if (!link) throw new JOUError(400, "Link is not valid")
@@ -37,6 +38,9 @@ export const joinWorkSpace = async (req: Request<{ link: string }, {}, { userId:
     }
     else throw new JOUError(400, "Link is not valid")
 }
+
+
+
 export const wsLinkGenerate = async (req: Request, res: Response<APIResponse>) => {
     const workspaceId = req.query['ws']
     if (!workspaceId) throw new JOUError(404, "WorkSpace Id is not valid")

@@ -14,24 +14,30 @@ export const getWorkSpaces = async (req: Request<{}, {}>, res: Response<APIRespo
     if (!validate(userId)) throw new JOUError(404, "UserId is not valid");
 
     let wsRefTokens = null;
+
     if (typeof (userId) == 'string') {
+
+        // Workspaces for Youtuber
         if (role == 'youtuber') {
             wsRefTokens = await db.select({
                 refToken: WorkspaceTable.refreshToken
             }).from(WorkspaceTable).where(eq(WorkspaceTable.owner, userId))
         }
+
+        // Workspaces for Editor
         else if (role == 'editor') {
             const subQuery = db.select({ workspace: EditorWorkspaceJoinTable.workspace }).from(EditorWorkspaceJoinTable).where(eq(EditorWorkspaceJoinTable.editor, userId));
             wsRefTokens = await db.select({
                 refToken: WorkspaceTable.refreshToken
             }).from(WorkspaceTable).where(inArray(WorkspaceTable.id, subQuery))
         }
+
         else throw new JOUError(404, "Role is not valid");
 
-        let workspaces: Array<youtube_v3.Schema$Channel> = []
         const wsFetcherPromises: GaxiosPromise<youtube_v3.Schema$ChannelListResponse>[] = []
         const youtube = google.youtube({ version: 'v3', auth: oauth2Client })
 
+        // Fetch Details About YT Channels using Ref Tokens
         wsRefTokens?.map(async (ws) => {
             oauth2Client.setCredentials({
                 refresh_token: ws.refToken

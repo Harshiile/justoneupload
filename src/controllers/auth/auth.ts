@@ -14,6 +14,7 @@ interface UserData {
     userType: 'youtuber' | 'editor'
 }
 
+// Checks whether user already exist
 const userExist = async (email: string) => {
     return db.select({
         id: UserTable.id,
@@ -27,6 +28,7 @@ const userExist = async (email: string) => {
         .catch(err => { throw new JOUError(err.status, err.message) })
 }
 
+// Generates Tokens
 export const generateTokens = (userData: UserData) => {
     const accessToken = JwtGenerate(userData, process.env.ACCESS_TOKEN_EXPIRY!)
     const refreshToken = JwtGenerate({ id: userData.id }, process.env.REFRESH_TOKEN_EXPIRY!)
@@ -102,12 +104,9 @@ export const loginUser = async (req: Request<{}, {}, User>, res: Response<APIRes
 }
 
 
-export const logoutUser = async (req: Request, res: Response<APIResponse>) => {
-    res.clearCookie('auth');
-    res.json({
-        message: "User Logged Out",
-        data: {
-            accessToken: null
-        }
-    })
+export const logoutUser = async (_: Request, res: Response<APIResponse>) => {
+    res
+        .clearCookie('auth')
+        .clearCookie('acsTkn')
+        .json({ message: "User Logged Out" })
 }
