@@ -33,7 +33,7 @@ export const youtubeChannelInfo = async (req: Request, res: Response<APIResponse
     if (channels.data.items!.length <= 0) throw new JOUError(404, "No channel associated with given youtube account")
 
     const { id: channelId } = channels.data.items![0]
-
+    const { customUrl } = channels.data.items![0].snippet!
 
     // Checks if ws already exists
     const existingChannel = await db.select().from(WorkspaceTable).where(eq(WorkspaceTable.id, channelId!))
@@ -43,6 +43,7 @@ export const youtubeChannelInfo = async (req: Request, res: Response<APIResponse
         db.insert(WorkspaceTable).values({
             id: channelId?.toString()!,
             owner: userId?.toString(),
+            userHandle: customUrl?.toString(),
             refreshToken: refToken
         }).then(data => {
             data.rowCount! > 0 &&

@@ -1,7 +1,7 @@
 import { editorContribution } from './analytics'
 import { getYoutuberMailFromWorkSpace } from './getMail'
 import { fetchMe } from './me'
-import { getVideosFromWorkSpace } from './video'
+import { getVideosFromWorkSpace, getPendingUploadingVideos } from './video'
 import { getWorkSpaces, getWorkspaceDetails } from './workspace'
 
 export {
@@ -10,5 +10,6 @@ export {
     fetchMe,
     getYoutuberMailFromWorkSpace,
     getWorkSpaces,
-    getWorkspaceDetails
+    getWorkspaceDetails,
+    getPendingUploadingVideos
 }

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { db } from '../../db';
 import { EditorWorkspaceJoinTable, WorkspaceTable } from '../../db/schema';
-import { eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { validate } from 'uuid'
 import { google, youtube_v3 } from 'googleapis';
 import { oauth2Client } from '../../lib/secrets';
@@ -86,7 +86,14 @@ export const getWorkSpaces = async (req: Request<{}, {}>, res: Response<APIRespo
 
         // Workspaces for Editor
         else if (role == 'editor') {
-            const subQuery = db.select({ workspace: EditorWorkspaceJoinTable.workspace }).from(EditorWorkspaceJoinTable).where(eq(EditorWorkspaceJoinTable.editor, userId));
+            const subQuery = db
+                .select({ workspace: EditorWorkspaceJoinTable.workspace })
+                .from(EditorWorkspaceJoinTable)
+                .where(and(
+                    eq(EditorWorkspaceJoinTable.editor, userId),
+                    eq(EditorWorkspaceJoinTable.authorize, true)
+                ));
+
             wsRefTokens = await db.select({
                 refToken: WorkspaceTable.refreshToken
             }).from(WorkspaceTable).where(inArray(WorkspaceTable.id, subQuery))

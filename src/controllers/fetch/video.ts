@@ -1,11 +1,25 @@
 import { Request, Response } from 'express'
 import { db } from '../../db';
 import { UserTable, VideoTable, VideoWorkspaceJoinTable, WorkspaceTable } from '../../db/schema';
-import { eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { oauth2Client } from '../../lib/secrets';
 import { google } from 'googleapis';
-import { drive } from '../../lib/secrets';
 import { JOUError } from '../../lib/error';
+
+
+
+interface VideoMetaData {
+    id: string;
+    title: string;
+    uploadAt?: Date | null;
+    duration: string;
+    publishedAt?: string | null;
+    thumbnail: string | null;
+    videoType: string;
+    views?: string | null;
+    status: string;
+    editor: string | null
+}
 
 
 export const getVideosFromWorkSpace = async (req: Request, res: Response<APIResponse>) => {
@@ -88,15 +102,39 @@ export const getVideosFromWorkSpace = async (req: Request, res: Response<APIResp
 
 }
 
-interface VideoMetaData {
-    id: string;
-    title: string;
-    uploadAt?: Date | null;
-    duration: string;
-    publishedAt?: string | null;
-    thumbnail: string | null;
-    videoType: string;
-    views?: string | null;
-    status: string;
-    editor: string | null
+export const getPendingUploadingVideos = async (req: Request, res: Response<APIResponse>) => {
+    const userId = req.query['id']
+    if (!req.query['type']) throw new JOUError(404, "Video type not found")
+
+    const type = req.query['type'].toString()!
+
+    if (type == 'reviewPending' || type == 'uploadPending') {
+
+        const subQuery = db.select({
+            workspaceId: WorkspaceTable.id,
+        }).from(WorkspaceTable).where(eq(WorkspaceTable.owner, userId?.toString()!))
+
+        const pendingVideos = await db
+            .select({
+                id: VideoTable.id,
+                title: VideoTable.title,
+                videoType: VideoTable.videoType,
+                thumbnail: VideoTable.thumbnail,
+                duration: VideoTable.duration,
+                status: VideoTable.status,
+                willUploadAt: VideoTable.willUploadAt,
+                editor: UserTable.name,
+                userHandle: WorkspaceTable.userHandle
+            })
+            .from(VideoTable)
+            .leftJoin(UserTable, eq(UserTable.id, VideoTable.editor))
+            .leftJoin(WorkspaceTable, eq(WorkspaceTable.id, VideoTable.workspace))
+            .where(and(inArray(VideoTable.workspace, subQuery), eq(VideoTable.status, type)))
+
+        res.json({
+            message: type == 'reviewPending' ? "Pending Videos" : "Uploading Videos",
+            data: { pendingVideos }
+        })
+    }
+    else throw new JOUError(400, "Invalid Type")
 }

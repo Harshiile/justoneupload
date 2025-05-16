@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 import { db } from '../../db'
 import { JwtGenerate, JwtValidate } from '../../lib/jwt'
 import { EditorWorkspaceJoinTable, UserTable, WorkspaceTable } from '../../db/schema'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { validate } from 'uuid'
 import { JOUError } from '../../lib/error'
 
@@ -34,12 +34,24 @@ export const joinWorkSpace = async (req: Request<{ link: string }, {}, { userId:
 
         if (user.role != 'editor') throw new JOUError(400, "Youtuber can't joined any workspace")
 
+        // Mail to youtuber - about editor authority
+
+        const [isUserExist] = await db
+            .select({ id: EditorWorkspaceJoinTable.workspace })
+            .from(EditorWorkspaceJoinTable)
+            .where(and(
+                eq(EditorWorkspaceJoinTable.editor, id),
+                eq(EditorWorkspaceJoinTable.authorize, false)
+            ))
+
+        if (isUserExist) throw new JOUError(400, "Your request is not approve yet")
+
         await db.insert(EditorWorkspaceJoinTable).values({
             editor: id,
             workspace: linkData.workspaceId
         }).catch(err => { throw new JOUError(400, "You already in this Workspace") })
 
-        res.json({ message: "Join Workspace successfully" })
+        res.json({ message: "Your request will send to Youtuber" })
     }
     else throw new JOUError(400, "Link is not valid")
 }

@@ -15,6 +15,7 @@ export const UserTable = pgTable("user", {
 // Channel Details
 export const WorkspaceTable = pgTable("workspace", {
     id: varchar("id").primaryKey(),
+    userHandle: varchar('userHandle'),
     owner: uuid("owner").references(() => UserTable.id, { onDelete: 'cascade' }),
     refreshToken: varchar("refreshToken")
 })
@@ -23,7 +24,8 @@ export const WorkspaceTable = pgTable("workspace", {
 // Many-to-Many Workspace & Editor
 export const EditorWorkspaceJoinTable = pgTable('ws-editor-join', {
     workspace: varchar("workspace").references(() => WorkspaceTable.id, { onDelete: 'cascade' }),
-    editor: uuid("editor").references(() => UserTable.id, { onDelete: 'cascade' })
+    editor: uuid("editor").references(() => UserTable.id, { onDelete: 'cascade' }),
+    authorize: boolean('authorize').$default(() => false)
 }, table => [
     primaryKey({
         name: 'pk-ws-editor-join',
