@@ -1,29 +1,12 @@
 import { Request, Response } from 'express'
 import { google } from 'googleapis'
-import { oauth2Client, drive } from '../../lib/secrets'
+import { oauth2Client } from '../../lib/secrets'
 import { db } from '../../db'
 import { VideoTable, VideoWorkspaceJoinTable, WorkspaceTable } from '../../db/schema'
 import { and, eq, getTableColumns } from 'drizzle-orm'
 import { validate } from 'uuid'
 import { JOUError } from '../../lib/error'
-import { deleteOnDrive } from '../drive'
-
-
-// Fetch File From Drive
-const getFileStreamFromDrive = async (res: Response<APIResponse>, fileId: string) => {
-    return drive.files.get(
-        {
-            fileId,
-            alt: 'media'
-        },
-        {
-            responseType: 'stream'
-        })
-        .then(fileRes => {
-            return fileRes.data
-        })
-        .catch(err => { throw new JOUError(404, "File not Found") })
-}
+import { deleteOnDrive, getFileStreamFromDrive } from '../drive'
 
 
 export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string, videoId: string }>, res: Response<APIResponse>) => {
@@ -53,7 +36,7 @@ export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string
     })
     const yt = google.youtube({ version: 'v3', auth: oauth2Client })
 
-    const videoStream = await getFileStreamFromDrive(res, video.fileId)
+    const videoStream = await getFileStreamFromDrive(video.fileId)
 
     console.log('1. Video Uploading Start ...');
 
@@ -85,7 +68,7 @@ export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string
                 yt.thumbnails.set({
                     videoId: uploadedVideoId!,
                     media: {
-                        body: await getFileStreamFromDrive(res, video.thumbnail)
+                        body: await getFileStreamFromDrive(video.thumbnail)
                     }
                 })
                     .then(async (resThumbUpload) => {

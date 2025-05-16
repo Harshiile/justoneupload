@@ -7,6 +7,8 @@ import { VideoTable } from '../../db/schema'
 import { IncomingHttpHeaders } from 'http'
 import { drive } from '../../lib/secrets'
 import { JOUError } from '../../lib/error'
+import { StreamMethodOptions } from 'googleapis/build/src/apis/abusiveexperiencereport';
+
 
 type VideoType = 'public' | 'private' | 'unlisted'
 interface FileName {
@@ -140,3 +142,67 @@ export const deleteOnDrive = async (fileId: string) => {
     await drive.files.delete({ fileId }).catch(err => { throw new JOUError(err.status, "Deletion Failed") })
 }
 
+
+// Fetch File From Drive
+export const getFileStreamFromDrive = async (fileId: string, RangeObject?: { start: number, end: number }) => {
+    const responseOptions: StreamMethodOptions = RangeObject ? {
+        responseType: 'stream',
+        headers: {
+            Range: `bytes=${RangeObject.start}-${RangeObject.end}`
+        }
+    } : {
+        responseType: 'stream',
+    }
+    return drive.files.get(
+        {
+            fileId,
+            fields: 'size',
+            alt: 'media',
+        }, responseOptions)
+        .then(fileRes => fileRes.data)
+        .catch(err => { throw new JOUError(404, "File not Found") })
+}
+
+
+export const getVideoStream = async (req: Request, res: Response<APIResponse>) => {
+    const fileId = req.query['id']
+    const fileType = req.query['type']
+
+    if (!fileId) throw new JOUError(404, "File id not found");
+    if (!fileType) throw new JOUError(404, "File Type not found");
+
+    let driveStream;
+    if (fileType == 'image') {
+        res.setHeader('Content-Type', 'image/*')
+        driveStream = await getFileStreamFromDrive(fileId!.toString());
+    }
+
+    else if (fileType == 'video') {
+
+        const range = req.headers.range;
+        if (!range) throw new JOUError(416, 'Range header required')
+
+        const metaRes = await drive.files.get({
+            fileId: fileId!.toString(),
+            fields: 'size,mimeType'
+        })
+        const totalSize = Number(metaRes.data.size)
+        const mimeType = metaRes.data.mimeType
+
+        const parts = range.split('bytes=')[1].split('-')
+
+        const start = Number(parts[0]);
+        const end = parts[1] ? Number(parts[1]) : totalSize - 1;
+        const chunkSize = end - start + 1;
+
+        res.status(206);
+        res.setHeader('Content-Type', mimeType!);
+        res.setHeader('Content-Length', chunkSize);
+        res.setHeader('Access-Ranges', 'bytes');
+        res.setHeader('Content-Range', `bytes ${start}-${end}/ ${totalSize}`);
+        driveStream = await getFileStreamFromDrive(fileId!.toString(), { start, end });
+    }
+    driveStream ? driveStream.pipe(res) : res.json({
+        message: "Video Loaded Failed"
+    })
+}

@@ -5,7 +5,7 @@ import { authorize } from '../middleware'
 
 // Controllers
 import { loginUser, signUser, logoutUser, RenewAccessToken } from '../controllers/auth'
-import { uploadOnDrive } from '../controllers/drive'
+import { getVideoStream, uploadOnDrive } from '../controllers/drive'
 import { getVideosFromWorkSpace, fetchMe, getWorkSpaces, editorContribution, getWorkspaceDetails } from '../controllers/fetch'
 import { SendMail } from '../controllers/mail'
 import { joinWorkSpace, wsLinkGenerate } from '../controllers/service'
@@ -37,6 +37,7 @@ router.post('/drive/upload', authorize, uploadOnDrive)
 
 // Fetcher
 router.get('/get/videos', authorize, getVideosFromWorkSpace)
+router.get('/get/stream/file', authorize, getVideoStream)
 router.get('/get/fetch-me', authorize, fetchMe)
 router.get('/get/workspaces', authorize, getWorkSpaces)
 router.get('/get/ws-metadata/:joinLink', authorize, getWorkspaceDetails)
