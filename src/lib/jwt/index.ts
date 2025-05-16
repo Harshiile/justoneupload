@@ -11,6 +11,6 @@ export const JwtValidate = (token: string) => {
     }
 }
 
-export const JwtGenerate = (payload: object, expiry: string) => {
-    return sign(payload, process.env.JWT_SECRET!, { expiresIn: expiry } as SignOptions)
+export const JwtGenerate = (payload: object, expiry?: string) => {
+    return expiry ? sign(payload, process.env.JWT_SECRET!, { expiresIn: expiry } as SignOptions) : sign(payload, process.env.JWT_SECRET!)
 }

@@ -14,7 +14,12 @@ export const joinWorkSpace = async (req: Request<{ link: string }, {}, { userId:
     try {
         linkData = JwtValidate(link);
     }
-    catch (err) { throw new JOUError(401, "Link is expires") }
+    catch (err) {
+        if (err instanceof Error) {
+            if (err.name == 'TokenExpiredError') throw new JOUError(401, "Link is expires")
+        }
+        else throw new JOUError(400, "Link is not valid")
+    }
 
     if (linkData && typeof (linkData) != 'string') {
         // User can signup

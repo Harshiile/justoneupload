@@ -8,7 +8,7 @@ import { loginUser, signUser, logoutUser, RenewAccessToken } from '../controller
 import { getVideoStream, uploadOnDrive } from '../controllers/drive'
 import { getVideosFromWorkSpace, fetchMe, getWorkSpaces, editorContribution, getWorkspaceDetails } from '../controllers/fetch'
 import { SendMail } from '../controllers/mail'
-import { joinWorkSpace, wsLinkGenerate } from '../controllers/service'
+import { fetchDataFromLink, joinWorkSpace, reviewVideoLink, wsLinkGenerate } from '../controllers/service'
 import { uploadOnYoutube, youtubeChannelInfo, ytConnector } from '../controllers/youtube'
 
 const router = express.Router()
@@ -22,6 +22,8 @@ router.get('/logout', logoutUser)
 // Service
 router.post('/service/join/workspace/:link', authorize, joinWorkSpace);
 router.get('/service/generate-link', authorize, wsLinkGenerate)
+router.post('/service/review-video-link', reviewVideoLink)
+// router.get('/service/review-video-link', authorize, reviewVideoLink)
 router.get('/service/renew', RenewAccessToken)
 
 // Mail-Service
@@ -41,6 +43,7 @@ router.get('/get/stream/file', authorize, getVideoStream)
 router.get('/get/fetch-me', authorize, fetchMe)
 router.get('/get/workspaces', authorize, getWorkSpaces)
 router.get('/get/ws-metadata/:joinLink', authorize, getWorkspaceDetails)
+router.get('/get/video-metadata/:link', authorize, fetchDataFromLink)
 router.get('/get/editor-contribution', authorize, editorContribution)
 
 
