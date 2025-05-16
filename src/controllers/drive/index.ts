@@ -178,29 +178,33 @@ export const getVideoStream = async (req: Request, res: Response<APIResponse>) =
     }
 
     else if (fileType == 'video') {
-
         const range = req.headers.range;
-        if (!range) throw new JOUError(416, 'Range header required')
+        if (range) {
+            // If range - User can seek
+            const metaRes = await drive.files.get({
+                fileId: fileId!.toString(),
+                fields: 'size,mimeType'
+            })
+            const totalSize = Number(metaRes.data.size)
+            const mimeType = metaRes.data.mimeType
 
-        const metaRes = await drive.files.get({
-            fileId: fileId!.toString(),
-            fields: 'size,mimeType'
-        })
-        const totalSize = Number(metaRes.data.size)
-        const mimeType = metaRes.data.mimeType
+            const parts = range.split('bytes=')[1].split('-')
 
-        const parts = range.split('bytes=')[1].split('-')
+            const start = Number(parts[0]);
+            const end = parts[1] ? Number(parts[1]) : totalSize - 1;
+            const chunkSize = end - start + 1;
 
-        const start = Number(parts[0]);
-        const end = parts[1] ? Number(parts[1]) : totalSize - 1;
-        const chunkSize = end - start + 1;
-
-        res.status(206);
-        res.setHeader('Content-Type', mimeType!);
-        res.setHeader('Content-Length', chunkSize);
-        res.setHeader('Access-Ranges', 'bytes');
-        res.setHeader('Content-Range', `bytes ${start}-${end}/ ${totalSize}`);
-        driveStream = await getFileStreamFromDrive(fileId!.toString(), { start, end });
+            res.status(206);
+            res.setHeader('Content-Type', mimeType!);
+            res.setHeader('Content-Length', chunkSize);
+            res.setHeader('Accept-Ranges', 'bytes');
+            res.setHeader('Content-Range', `bytes ${start}-${end}/ ${totalSize}`);
+            driveStream = await getFileStreamFromDrive(fileId!.toString(), { start, end });
+        }
+        else {
+            // Range header is null, means User only get video but unable to seek
+            driveStream = await getFileStreamFromDrive(fileId!.toString());
+        }
     }
     driveStream ? driveStream.pipe(res) : res.json({
         message: "Video Loaded Failed"
