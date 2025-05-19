@@ -5,25 +5,6 @@ import { db } from '../../db'
 import { VideoTable } from '../../db/schema'
 import { eq } from 'drizzle-orm'
 
-interface VideoDetails {
-    channelName: string,
-    channelAvatar: string,
-    channelUserHandle: string,
-    videoId: string,
-    videoTitle: string
-}
-
-export const generateVideoReviewLink = async (req: Request<{}, {}, VideoDetails>, res: Response<APIResponse>) => {
-    const videoDetails = req.body
-    res.json({
-        message: "Video Review Link",
-        data: {
-            link: `/review/${JwtGenerate(videoDetails)}`
-        }
-    })
-}
-
-
 export const fetchVideoInformationFromReviewLink = async (req: Request, res: Response<APIResponse>) => {
     const link = req.params.link
     if (!link) throw new JOUError(404, 'Link not found')
@@ -35,8 +16,9 @@ export const fetchVideoInformationFromReviewLink = async (req: Request, res: Res
         const [video] = await db
             .select({ fileId: VideoTable.fileId })
             .from(VideoTable)
-            .where(eq(VideoTable.id, videoDetails.videoId!))
+            .where(eq(VideoTable.fileId, videoDetails.fileId!))
             .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1008`) })
+
 
         if (!video) res.json({
             message: "Video already rejected or approved",

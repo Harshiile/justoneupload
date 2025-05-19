@@ -116,18 +116,18 @@ export const uploadOnDrive = async (req: Request, res: Response<APIResponse>) =>
                         editor: fields.editor?.toString()!,
                         workspace: fields.workspace?.toString()!,
                         thumbnail: fileIds.thumbnailId,
+                        fileId: fileIds.fileId!,
                     }
                     // DB Insertion
                     await db.insert(VideoTable).values({
                         ...mailInput,
-                        fileId: fileIds.fileId!,
                         status: 'reviewPending',
                     })
-                        .then(_ => {
+                        .then(async _ => {
                             console.log('Video Inserted in DB');
 
                             // Send mail to youtuber - workspaceId
-                            SendApprovalMail(mailInput)
+                            await SendApprovalMail(mailInput)
 
                             res.json({
                                 message: "Video Uploaded"
@@ -206,6 +206,7 @@ export const getVideoFromDrive = async (req: Request, res: Response<APIResponse>
             res.setHeader('Content-Length', chunkSize);
             res.setHeader('Accept-Ranges', 'bytes');
             res.setHeader('Content-Range', `bytes ${start}-${end}/ ${totalSize}`);
+
             driveStream = await getFileFromDrive(fileId!.toString(), { start, end });
         }
         else {

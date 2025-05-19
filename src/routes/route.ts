@@ -7,8 +7,8 @@ import { authorize } from '../middleware'
 import { loginUser, signUpUser, logoutUser, renewAccessToken } from '../controllers/auth'
 import { getVideoFromDrive, uploadOnDrive } from '../controllers/drive'
 import { getWorkspaceDetails, getPendingUploadingVideos, getVideosOfWorkSpace, getWorkspacesOfUser, fetchUserOnRefresh } from '../controllers/fetch'
-import { decryptLink, initialWorkspaceJoin, fetchVideoInformationFromReviewLink, finalWorkspaceJoin, generateVideoReviewLink, generateWorkspaceJoinLink } from '../controllers/extra'
-import { uploadOnYoutube, connectYoutubeChannel, youtubeConnecterLink } from '../controllers/youtube'
+import { decryptLink, initialWorkspaceJoin, fetchVideoInformationFromReviewLink, finalWorkspaceJoin, generateWorkspaceJoinLink } from '../controllers/extra'
+import { uploadOnYoutube, connectYoutubeChannel, youtubeConnecterLink, pushVideoOnScheduler } from '../controllers/youtube'
 
 const router = express.Router()
 
@@ -23,7 +23,6 @@ router.post('/workspace/join/initial/:link', authorize, initialWorkspaceJoin);
 router.post('/workspace/join/final', authorize, finalWorkspaceJoin)
 
 router.get('/generate-link/workspace/join', authorize, generateWorkspaceJoinLink)
-router.get('/generate-link/video/review', authorize, generateVideoReviewLink)
 
 router.get('/service/renew', renewAccessToken)
 router.get('/decrypt-link/:link', decryptLink)
@@ -33,6 +32,7 @@ router.get('/decrypt-link/:link', decryptLink)
 router.get('/youtube/connecter-link', authorize, youtubeConnecterLink)
 router.get('/youtube/connect/channel', authorize, connectYoutubeChannel)
 router.post('/youtube/upload', authorize, uploadOnYoutube)
+router.post('/youtube/video/approval', authorize, pushVideoOnScheduler)
 
 // Drive-Service
 router.post('/drive/upload', authorize, uploadOnDrive)

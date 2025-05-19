@@ -3,6 +3,9 @@ import { db } from "../../../db"
 import { EditorWorkspaceJoinTable, UserTable, videoTypeEnum, WorkspaceTable } from "../../../db/schema"
 import { fetchWorkspaceMetadata } from "../../fetch/workspace"
 import { JOUError } from "../../../lib/error"
+import { JwtGenerate } from "../../../lib/jwt"
+import { title } from "process"
+import { SendMail } from "../sendmail"
 
 interface ApprovalInterface {
   title: string
@@ -12,6 +15,7 @@ interface ApprovalInterface {
   isMadeForKids: boolean
   willUploadAt: Date | null
   editor: string
+  fileId: string,
   workspace: string
   thumbnail: string | null
 }
@@ -24,12 +28,8 @@ interface User {
 interface Workspace {
   id: string | null | undefined;
   name: string;
-  description: string;
   avatar: string;
   userHandle: string | null;
-  totalSubscribers: number;
-  totalVideos: number;
-  dateCreated: string;
 }
 
 export const SendApprovalMail = async (VideoData: ApprovalInterface) => {
@@ -58,11 +58,21 @@ export const SendApprovalMail = async (VideoData: ApprovalInterface) => {
 
   const ws = await fetchWorkspaceMetadata(VideoData.workspace)
 
-  console.log(editor);
-  console.log(youtuber);
-  console.log(ws);
+  const htmlText = ApprovalMailTemplate(VideoData, editor, youtuber, ws)
 
-  ApprovalMailTemplate(VideoData, editor, youtuber, ws)
+  await SendMail('theharshiile@gmail.com', htmlText)
+}
+
+const generateReviewUrl = (workspace: Workspace, title: string, fileId: string, willUploadAt: Date | null) => {
+  const videoDetails = {
+    channelAvatar: workspace.avatar,
+    channelName: workspace.name,
+    channelUserHandle: workspace.userHandle,
+    title,
+    fileId,
+    willUploadAt
+  }
+  return `${process.env.FRONTEND_URL}/review/${JwtGenerate(videoDetails)}`
 }
 
 const ApprovalMailTemplate = (VideoData: ApprovalInterface, editor: User, youtuber: User, workspace: Workspace): string => {
@@ -131,19 +141,27 @@ const ApprovalMailTemplate = (VideoData: ApprovalInterface, editor: User, youtub
 
       <div class='section'>
         <h3>👨‍💻 Workspace Details</h3>
-        <p><strong>Channel Name:</strong> ${workspace.name}</p>
-        <p><strong>Handle:</strong> ${workspace.userHandle}</p>
+        <p><strong>Channel Name : </strong> ${workspace.name}</p>
+        <p><strong>Handle : </strong> ${workspace.userHandle}</p>
         <img src=${workspace.avatar} alt='Channel Avatar' class='channel-avatar'>
       </div>
 
       <div class='section'>
         <h3>🧑 Editor Details</h3>
-        <p><strong>Name:</strong>${editor.name}</p>
-        <p><strong>Email:</strong> ${editor.email}</p>
+        <p><strong>Name : </strong>${editor.name}</p>
+        <p><strong>Email : </strong> ${editor.email}</p>
+      </div>
+
+      <div class='section'>
+        <h3>🧑 Video Details</h3>
+        <p><strong>Name : </strong>${VideoData.title}</p>
+        <p><strong>Duration : </strong>${VideoData.duration}</p>
+        <p><strong>Duration : </strong>${VideoData.videoType}</p>
+        <p><strong>Will Upload At : </strong>${VideoData.willUploadAt ? VideoData.willUploadAt : 'Immediate After Approval'}</p>
       </div>
 
       <div class='section' style='text-align: center;'>
-        <a href='https://yourdomain.com/review' class='btn'>Review Video</a>
+        <a href=${generateReviewUrl(workspace, VideoData.title, VideoData.fileId, VideoData.willUploadAt)} class='btn'>Review Video</a>
       </div>
 
     </div>
