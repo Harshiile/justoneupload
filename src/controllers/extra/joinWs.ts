@@ -30,14 +30,16 @@ export const initialWorkspaceJoin = async (req: Request<{ link: string }, {}, { 
         const id = 'b8162480-15e2-4480-b087-aa1016c4bd8c' //Editor
         if (!validate(id)) { throw new JOUError(400, "User Id not valid") }
 
-        const [user] = await db.select({
-            role: UserTable.userType,
-            name: UserTable.name,
-            id: UserTable.id,
-            email: UserTable.email
-        })
+        const [user] = await db
+            .select({
+                role: UserTable.userType,
+                name: UserTable.name,
+                id: UserTable.id,
+                email: UserTable.email
+            })
             .from(UserTable)
             .where(eq(UserTable.id, id))
+            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1005`) })
 
         if (!user) throw new JOUError(404, "User not found")
 
@@ -55,13 +57,15 @@ export const initialWorkspaceJoin = async (req: Request<{ link: string }, {}, { 
 
 
         // 2. Checks if editor already in table
-        await db.insert(EditorWorkspaceJoinTable).values({
-            editor: id?.toString(),
-            workspace: linkData.workspaceId,
-            authorize: false
-        }).catch(err => {
-            if (err.code == '23505') throw new JOUError(400, "You already in this Workspace")
-        })
+        await db
+            .insert(EditorWorkspaceJoinTable).values({
+                editor: id?.toString(),
+                workspace: linkData.workspaceId,
+                authorize: false
+            }).catch(err => {
+                if (err.code == '23505') throw new JOUError(400, "You already in this Workspace")
+                else throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1006`)
+            })
 
 
         // 3. Mail to Youtuber
@@ -88,7 +92,11 @@ export const generateWorkspaceJoinLink = async (req: Request, res: Response<APIR
     const workspaceId = req.query['ws']
     if (!workspaceId) throw new JOUError(404, "WorkSpace Id is not valid")
 
-    const [wsExist] = await db.select().from(WorkspaceTable).where(eq(WorkspaceTable.id, workspaceId.toString()))
+    const [wsExist] = await db
+        .select()
+        .from(WorkspaceTable)
+        .where(eq(WorkspaceTable.id, workspaceId.toString()))
+        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1007`) })
 
     if (!wsExist) throw new JOUError(404, "WorkSpace Is Not Exist")
 

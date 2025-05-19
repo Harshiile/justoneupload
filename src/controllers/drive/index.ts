@@ -122,20 +122,22 @@ export const uploadOnDrive = async (req: Request, res: Response<APIResponse>) =>
                         ...mailInput,
                         fileId: fileIds.fileId!,
                         status: 'reviewPending',
-                    }).then(_ => {
-                        console.log('Video Inserted in DB');
+                    })
+                        .then(_ => {
+                            console.log('Video Inserted in DB');
 
-                        // Send mail to youtuber - workspaceId
-                        SendApprovalMail(mailInput)
+                            // Send mail to youtuber - workspaceId
+                            SendApprovalMail(mailInput)
 
-                        res.json({
-                            message: "Video Uploaded"
+                            res.json({
+                                message: "Video Uploaded"
+                            })
                         })
-                    }).catch(err => { throw new JOUError(err.status, "Video Insertion Failed") })
+                        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1004`) })
                 })
                 .catch(err => {
                     console.error('One or more uploads failed:', err);
-                    res.json({ message: 'Upload failed' });
+                    throw new JOUError(400, 'Upload failed')
                 });
         });
     }

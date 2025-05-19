@@ -25,6 +25,7 @@ export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string
             eq(VideoTable.workspace, workspaceId),
             eq(VideoTable.id, videoId)
         ))
+        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1018`) })
 
     if (!video) throw new JOUError(404, "No Video Found")
 
@@ -78,7 +79,9 @@ export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string
                         // Drive deletion
                         await deleteOnDrive(video.fileId)
 
-                        db.delete(VideoTable).where(eq(VideoTable.id, videoId))
+                        db
+                            .delete(VideoTable)
+                            .where(eq(VideoTable.id, videoId))
                             .then(deltedRes => {
                                 if (deltedRes.rowCount! > 0) {
                                     console.log('6. Video Deleting in VideoTable ...');
@@ -97,7 +100,7 @@ export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string
                                         })
                                 }
                             })
-                            .catch(err => { throw new JOUError(400, "Deletion of Video Failed") })
+                            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1019`) })
                     })
                     .catch(err => { throw new JOUError(err.status, err.message) })
             }

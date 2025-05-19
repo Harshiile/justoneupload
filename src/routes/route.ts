@@ -7,11 +7,10 @@ import { authorize } from '../middleware'
 import { loginUser, signUpUser, logoutUser, renewAccessToken } from '../controllers/auth'
 import { getVideoFromDrive, uploadOnDrive } from '../controllers/drive'
 import { getWorkspaceDetails, getPendingUploadingVideos, getVideosOfWorkSpace, getWorkspacesOfUser, fetchUserOnRefresh } from '../controllers/fetch'
-import { decryptLink, initialWorkspaceJoin, fetchVideoInformationFromReviewLink, finalWorkspaceJoin, generateVideoReviewLink, generateWorkspaceJoinLink } from '../controllers/service'
+import { decryptLink, initialWorkspaceJoin, fetchVideoInformationFromReviewLink, finalWorkspaceJoin, generateVideoReviewLink, generateWorkspaceJoinLink } from '../controllers/extra'
 import { uploadOnYoutube, connectYoutubeChannel, youtubeConnecterLink } from '../controllers/youtube'
 
 const router = express.Router()
-
 
 // User-Auth
 router.post('/login', loginUser)

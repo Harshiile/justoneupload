@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm"
 import { db } from "../../../db"
 import { EditorWorkspaceJoinTable, UserTable, videoTypeEnum, WorkspaceTable } from "../../../db/schema"
 import { fetchWorkspaceMetadata } from "../../fetch/workspace"
+import { JOUError } from "../../../lib/error"
 
 interface ApprovalInterface {
   title: string
@@ -41,7 +42,8 @@ export const SendApprovalMail = async (VideoData: ApprovalInterface) => {
       email: UserTable.email
     })
     .from(UserTable)
-    .where(eq(UserTable.id, VideoData.editor));
+    .where(eq(UserTable.id, VideoData.editor))
+    .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1020`) })
 
   const [youtuber] = await db
     .select({
@@ -50,7 +52,8 @@ export const SendApprovalMail = async (VideoData: ApprovalInterface) => {
     })
     .from(WorkspaceTable)
     .leftJoin(UserTable, eq(UserTable.id, WorkspaceTable.owner))
-    .where(eq(WorkspaceTable.id, VideoData.workspace));
+    .where(eq(WorkspaceTable.id, VideoData.workspace))
+    .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1021`) })
 
 
   const ws = await fetchWorkspaceMetadata(VideoData.workspace)

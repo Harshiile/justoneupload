@@ -25,7 +25,7 @@ const userExist = async (email: string) => {
         .from(UserTable)
         .where(eq(UserTable.email, email))
         .then(([user]) => user)
-        .catch(err => { throw new JOUError(err.status, err.message) })
+        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1001`) })
 }
 
 // Generates Tokens
@@ -61,7 +61,7 @@ export const signUpUser = async (req: Request<{}, {}, User>, res: Response<APIRe
             email,
             password: hashPassword,
             userType
-        }).catch(err => { throw new JOUError(err.status, err.message) })
+        }).catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1002`) })
 
         res
             .status(200)

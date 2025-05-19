@@ -26,36 +26,44 @@ export const getVideosOfWorkSpace = async (req: Request, res: Response<APIRespon
 
 
         // Non-Uploaded Videos
-        const nonUploadedVideos = await db.select({
-            id: VideoTable.id,
-            title: VideoTable.title,
-            duration: VideoTable.duration,
-            uploadAt: VideoTable.willUploadAt,
-            thumbnail: VideoTable.thumbnail,
-            videoType: VideoTable.videoType,
-            status: VideoTable.status,
-            editor: UserTable.name
-        })
+        const nonUploadedVideos = await db
+            .select({
+                id: VideoTable.id,
+                title: VideoTable.title,
+                duration: VideoTable.duration,
+                uploadAt: VideoTable.willUploadAt,
+                thumbnail: VideoTable.thumbnail,
+                videoType: VideoTable.videoType,
+                status: VideoTable.status,
+                editor: UserTable.name
+            })
             .from(VideoTable)
             .leftJoin(UserTable, eq(UserTable.id, VideoTable.editor))
             .where(eq(VideoTable.workspace, workspace.toString()))
+            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1009`) })
 
 
 
         // Uploaded Videos
-        const uploadedVideos = await db.select({
-            editor: UserTable.name,
-            videoId: VideoWorkspaceJoinTable.videoId,
-        })
+        const uploadedVideos = await db
+            .select({
+                editor: UserTable.name,
+                videoId: VideoWorkspaceJoinTable.videoId,
+            })
             .from(VideoWorkspaceJoinTable)
             .leftJoin(UserTable, eq(UserTable.id, VideoWorkspaceJoinTable.editor))
             .where(eq(VideoWorkspaceJoinTable.workspace, workspace.toString()!))
+            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1010`) })
 
 
 
-        const [ws] = await db.select({
-            refreshToken: WorkspaceTable.refreshToken
-        }).from(WorkspaceTable).where(eq(WorkspaceTable.id, workspace.toString()));
+        const [ws] = await db
+            .select({
+                refreshToken: WorkspaceTable.refreshToken
+            })
+            .from(WorkspaceTable)
+            .where(eq(WorkspaceTable.id, workspace.toString()))
+            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1011`) })
 
         if (!ws) throw new JOUError(404, "Workspace not Exist")
 
@@ -107,9 +115,10 @@ export const getPendingUploadingVideos = async (req: Request, res: Response<APIR
 
     if (type == 'reviewPending' || type == 'uploadPending') {
 
-        const subQuery = db.select({
-            workspaceId: WorkspaceTable.id,
-        }).from(WorkspaceTable).where(eq(WorkspaceTable.owner, userId?.toString()!))
+        const subQuery = db
+            .select({ id: WorkspaceTable.id })
+            .from(WorkspaceTable)
+            .where(eq(WorkspaceTable.owner, userId?.toString()!))
 
         const pendingVideos = await db
             .select({
@@ -126,7 +135,11 @@ export const getPendingUploadingVideos = async (req: Request, res: Response<APIR
             .from(VideoTable)
             .leftJoin(UserTable, eq(UserTable.id, VideoTable.editor))
             .leftJoin(WorkspaceTable, eq(WorkspaceTable.id, VideoTable.workspace))
-            .where(and(inArray(VideoTable.workspace, subQuery), eq(VideoTable.status, type)))
+            .where(and(
+                inArray(VideoTable.workspace, subQuery),
+                eq(VideoTable.status, type)
+            ))
+            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1012`) })
 
         res.json({
             message: type == 'reviewPending' ? "Pending Videos" : "Uploading Videos",

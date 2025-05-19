@@ -15,11 +15,15 @@ export const renewAccessToken = async (req: Request, res: Response<APIResponse>)
         const refTkn = JwtValidate(refreshToken);
         if (typeof (refTkn) == 'string') throw new JOUError(403, "Please Login Again")
 
-        const [user] = await db.select({
-            id: UserTable.id,
-            name: UserTable.name,
-            userType: UserTable.userType,
-        }).from(UserTable).where(eq(UserTable.id, refTkn.id)).catch(err => { throw new JOUError(403, "Please Login Again") })
+        const [user] = await db
+            .select({
+                id: UserTable.id,
+                name: UserTable.name,
+                userType: UserTable.userType,
+            })
+            .from(UserTable)
+            .where(eq(UserTable.id, refTkn.id))
+            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1003`) })
 
         if (!user) throw new JOUError(404, "User Not Found")
 

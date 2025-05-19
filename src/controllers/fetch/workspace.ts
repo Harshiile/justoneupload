@@ -11,9 +11,11 @@ import { JwtValidate } from '../../lib/jwt';
 
 
 export const fetchWorkspaceMetadata = async (workspaceId: string) => {
-    const [ws] = await db.select(
-        { refreshToken: WorkspaceTable.refreshToken }
-    ).from(WorkspaceTable).where(eq(WorkspaceTable.id, workspaceId))
+    const [ws] = await db
+        .select({ refreshToken: WorkspaceTable.refreshToken })
+        .from(WorkspaceTable)
+        .where(eq(WorkspaceTable.id, workspaceId))
+        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1013`) })
 
     oauth2Client.setCredentials({
         refresh_token: ws.refreshToken
@@ -82,9 +84,11 @@ export const getWorkspacesOfUser = async (req: Request<{}, {}>, res: Response<AP
 
         // Workspaces for Youtuber
         if (userType == 'youtuber') {
-            wsRefTokens = await db.select({
-                refToken: WorkspaceTable.refreshToken
-            }).from(WorkspaceTable).where(eq(WorkspaceTable.owner, userId))
+            wsRefTokens = await db
+                .select({ refToken: WorkspaceTable.refreshToken })
+                .from(WorkspaceTable)
+                .where(eq(WorkspaceTable.owner, userId))
+                .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1014`) })
         }
 
         // Workspaces for Editor
@@ -95,11 +99,13 @@ export const getWorkspacesOfUser = async (req: Request<{}, {}>, res: Response<AP
                 .where(and(
                     eq(EditorWorkspaceJoinTable.editor, userId),
                     eq(EditorWorkspaceJoinTable.authorize, true)
-                ));
+                ))
 
-            wsRefTokens = await db.select({
-                refToken: WorkspaceTable.refreshToken
-            }).from(WorkspaceTable).where(inArray(WorkspaceTable.id, subQuery))
+            wsRefTokens = await db
+                .select({ refToken: WorkspaceTable.refreshToken })
+                .from(WorkspaceTable)
+                .where(inArray(WorkspaceTable.id, subQuery))
+                .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1015`) })
         }
 
         else throw new JOUError(404, "userType is not valid");

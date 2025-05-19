@@ -32,10 +32,11 @@ export const fetchVideoInformationFromReviewLink = async (req: Request, res: Res
         const videoDetails = JwtValidate(link)
         if (typeof (videoDetails) == 'string') throw new JOUError(400, "Link is not valid");
 
-        const [video] = await db.
-            select({ fileId: VideoTable.fileId }).
-            from(VideoTable).
-            where(eq(VideoTable.id, videoDetails.videoId!))
+        const [video] = await db
+            .select({ fileId: VideoTable.fileId })
+            .from(VideoTable)
+            .where(eq(VideoTable.id, videoDetails.videoId!))
+            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1008`) })
 
         if (!video) res.json({
             message: "Video already rejected or approved",
