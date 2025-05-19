@@ -8,6 +8,7 @@ import { IncomingHttpHeaders } from 'http'
 import { drive } from '../../lib/secrets'
 import { JOUError } from '../../lib/error'
 import { StreamMethodOptions } from 'googleapis/build/src/apis/abusiveexperiencereport';
+import { SendApprovalMail } from '../mail/templates/approval';
 
 
 type VideoType = 'public' | 'private' | 'unlisted'
@@ -105,23 +106,27 @@ export const uploadOnDrive = async (req: Request, res: Response<APIResponse>) =>
                 .then(async (_) => {
                     console.log('Video Uploaded, Now Inserting in DB');
 
-                    // DB Insertion
-                    await db.insert(VideoTable).values({
+                    const mailInput = {
                         title: fields.title?.toString()!,
                         desc: fields.desc?.toString()!,
                         videoType: parseVideoType(fields.videoType?.toString()!),
-                        thumbnail: fileIds.thumbnailId,
-                        fileId: fileIds.fileId!,
                         duration: fields.duration?.toString()!,
                         isMadeForKids: fields.isMadeForKids == null ? false : true,
-                        status: 'reviewPending',
                         willUploadAt: fields.willUploadAt?.toString() ? new Date(fields.willUploadAt?.toString()) : null,
                         editor: fields.editor?.toString()!,
-                        workspace: fields.workspace?.toString()!
+                        workspace: fields.workspace?.toString()!,
+                        thumbnail: fileIds.thumbnailId,
+                    }
+                    // DB Insertion
+                    await db.insert(VideoTable).values({
+                        ...mailInput,
+                        fileId: fileIds.fileId!,
+                        status: 'reviewPending',
                     }).then(_ => {
                         console.log('Video Inserted in DB');
 
                         // Send mail to youtuber - workspaceId
+                        SendApprovalMail(mailInput)
 
                         res.json({
                             message: "Video Uploaded"
@@ -144,7 +149,7 @@ export const deleteOnDrive = async (fileId: string) => {
 
 
 // Fetch File From Drive
-export const getFileStreamFromDrive = async (fileId: string, RangeObject?: { start: number, end: number }) => {
+export const getFileFromDrive = async (fileId: string, RangeObject?: { start: number, end: number }) => {
     const responseOptions: StreamMethodOptions = RangeObject ? {
         responseType: 'stream',
         headers: {
@@ -164,7 +169,7 @@ export const getFileStreamFromDrive = async (fileId: string, RangeObject?: { sta
 }
 
 
-export const getVideoStream = async (req: Request, res: Response<APIResponse>) => {
+export const getVideoFromDrive = async (req: Request, res: Response<APIResponse>) => {
     const fileId = req.query['id']
     const fileType = req.query['type']
 
@@ -174,7 +179,7 @@ export const getVideoStream = async (req: Request, res: Response<APIResponse>) =
     let driveStream;
     if (fileType == 'image') {
         res.setHeader('Content-Type', 'image/*')
-        driveStream = await getFileStreamFromDrive(fileId!.toString());
+        driveStream = await getFileFromDrive(fileId!.toString());
     }
 
     else if (fileType == 'video') {
@@ -199,11 +204,11 @@ export const getVideoStream = async (req: Request, res: Response<APIResponse>) =
             res.setHeader('Content-Length', chunkSize);
             res.setHeader('Accept-Ranges', 'bytes');
             res.setHeader('Content-Range', `bytes ${start}-${end}/ ${totalSize}`);
-            driveStream = await getFileStreamFromDrive(fileId!.toString(), { start, end });
+            driveStream = await getFileFromDrive(fileId!.toString(), { start, end });
         }
         else {
             // Range header is null, means User only get video but unable to seek
-            driveStream = await getFileStreamFromDrive(fileId!.toString());
+            driveStream = await getFileFromDrive(fileId!.toString());
         }
     }
     driveStream ? driveStream.pipe(res) : res.json({

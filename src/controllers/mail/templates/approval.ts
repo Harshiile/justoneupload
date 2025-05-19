@@ -1,139 +1,171 @@
-import { UserMail, VideoMail } from "./types"
+import { eq } from "drizzle-orm"
+import { db } from "../../../db"
+import { EditorWorkspaceJoinTable, UserTable, videoTypeEnum, WorkspaceTable } from "../../../db/schema"
+import { fetchWorkspaceMetadata } from "../../fetch/workspace"
 
-export const ApprovalMailTemplate = (video: VideoMail, editor: UserMail): string => {
-    return `
+interface ApprovalInterface {
+  title: string
+  desc: string | null
+  videoType: 'public' | 'private' | 'unlisted'
+  duration: string
+  isMadeForKids: boolean
+  willUploadAt: Date | null
+  editor: string
+  workspace: string
+  thumbnail: string | null
+}
+
+interface User {
+  name: string | null
+  email: string | null
+}
+
+interface Workspace {
+  id: string | null | undefined;
+  name: string;
+  description: string;
+  avatar: string;
+  userHandle: string | null;
+  totalSubscribers: number;
+  totalVideos: number;
+  dateCreated: string;
+}
+
+export const SendApprovalMail = async (VideoData: ApprovalInterface) => {
+  // I have wsId & editorId, need owner mail(youtuber mail), editor(name,gmail), workspace(name,avatar,userHandle)
+
+  // Get Owner Mail
+  const [editor] = await db
+    .select({
+      name: UserTable.name,
+      email: UserTable.email
+    })
+    .from(UserTable)
+    .where(eq(UserTable.id, VideoData.editor));
+
+  const [youtuber] = await db
+    .select({
+      name: UserTable.name,
+      email: UserTable.email
+    })
+    .from(WorkspaceTable)
+    .leftJoin(UserTable, eq(UserTable.id, WorkspaceTable.owner))
+    .where(eq(WorkspaceTable.id, VideoData.workspace));
+
+
+  const ws = await fetchWorkspaceMetadata(VideoData.workspace)
+
+  console.log(editor);
+  console.log(youtuber);
+  console.log(ws);
+
+  ApprovalMailTemplate(VideoData, editor, youtuber, ws)
+}
+
+const ApprovalMailTemplate = (VideoData: ApprovalInterface, editor: User, youtuber: User, workspace: Workspace): string => {
+  return `
     <!DOCTYPE html>
 <html>
-
 <head>
-    <meta charset='UTF-8'>
-    <title>Video Review Request - JustOneUpload</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f7f7f7;
-            padding: 20px;
-            color: #333;
-        }
-
-        .card {
-            background: #ffffff;
-            border-radius: 10px;
-            padding: 20px;
-            max-width: 600px;
-            margin: auto;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            color: #222;
-            margin-bottom: 10px;
-        }
-
-        .info,
-        .video-details {
-            margin: 15px 0;
-            background: #f1f1f1;
-            padding: 12px;
-            border-radius: 6px;
-        }
-
-        p {
-            line-height: 1.4;
-            margin: 6px 0;
-        }
-
-        .video-thumbnail {
-            text-align: center;
-            margin-top: 15px;
-        }
-
-        .video-thumbnail img {
-            max-width: 100%;
-            border-radius: 8px;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 12px 24px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 15px;
-            transition: background 0.3s ease;
-            text-align: center;
-        }
-
-        .approve {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .approve:hover {
-            background-color: #218838;
-        }
-
-        .reject {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .reject:hover {
-            background-color: #c82333;
-        }
-
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-
-        .footer-note {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #777;
-            text-align: center;
-        }
-    </style>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f6f9fc;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      background-color: #ffffff;
+      width: 100%;
+      max-width: 600px;
+      margin: 30px auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+    .header {
+      background-color: #ff0000;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    .content {
+      padding: 30px;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .channel-avatar {
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #28a745;
+      color: #fff !important;
+      padding: 12px 20px;
+      text-align: center;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #aaa;
+    }
+  </style>
 </head>
-
 <body>
-
-    <div class='card'>
-        <h2>Video Review Request</h2>
-
-        <p><strong>Workspace:</strong> ${video.wsName}</p>
-        <p><strong>Uploaded by:</strong> ${editor.name} (${editor.email})</p>
-
-        <div class='video-details'>
-            <p><strong>Video Title:</strong> ${video.title}</p>
-        </div>
-
-        <div class='video-thumbnail'>
-            <img src='${video.thumbnail}' alt='Video Thumbnail'>
-        </div>
-
-        <div class='info'>
-            <p>The above video has been uploaded by <strong>${editor.name}</strong> for your YouTube channel using
-                <strong>JustOneUpload</strong></p>
-            <p>Please review and approve or reject this video for upload</p>
-        </div>
-
-        <div class='button-group'>
-            <a href='{{approve_url}}' class='btn approve'>✅ Approve Video</a>
-            <a href='{{reject_url}}' class='btn reject'>❌ Reject Video</a>
-        </div>
-
-        <p class='footer-note'>
-            If you do not recognize this upload, you can safely ignore this email<br>
-            This request will expire in 24 hours
-        </p>
+  <div class='container'>
+    <div class='header'>
+      <h2>New Video Uploaded for Review</h2>
     </div>
+    <div class='content'>
 
+      <div class='section'>
+        <h3>👨‍💻 Workspace Details</h3>
+        <p><strong>Channel Name:</strong> ${workspace.name}</p>
+        <p><strong>Handle:</strong> ${workspace.userHandle}</p>
+        <img src=${workspace.avatar} alt='Channel Avatar' class='channel-avatar'>
+      </div>
+
+      <div class='section'>
+        <h3>🧑 Editor Details</h3>
+        <p><strong>Name:</strong>${editor.name}</p>
+        <p><strong>Email:</strong> ${editor.email}</p>
+      </div>
+
+      <div class='section' style='text-align: center;'>
+        <a href='https://yourdomain.com/review' class='btn'>Review Video</a>
+      </div>
+
+    </div>
+    <div class='footer'>
+      You are receiving this email because you're part of the workspace <strong>Harshil</strong>.
+    </div>
+  </div>
 </body>
-
-</html>`
+</html>
+`
 }
+
+
+
+
+
+// editor : { name: 'Joe Carter', email: 'carterinesess@gmail.com' }
+// youtuber : { name: 'Harshil', email: 'carterinesess@gmail.com' }
+// channel : {
+//   id: 'UCHZ0UZ7PTrabekn_r-owSZg',
+//   name: 'Harshil',
+//   description: '20 !',
+//   avatar: 'https://yt3.ggpht.com/ddp99cPb_6PzTlZ9zrcUgBlB3hkvdRJxPyZwDeMV_MbYnMIFjVVFmih4P2N4omaXA3JaQwQ1=s800-c-k-c0x00ffffff-no-rj',
+//   userHandle: '@harshile',
+//   totalSubscribers: 0,
+//   totalVideos: 1,
+//   dateCreated: '2023-07-09T14:16:21.010993Z'
+// }

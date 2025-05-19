@@ -6,8 +6,6 @@ import { oauth2Client } from '../../lib/secrets';
 import { google } from 'googleapis';
 import { JOUError } from '../../lib/error';
 
-
-
 interface VideoMetaData {
     id: string;
     title: string;
@@ -22,7 +20,7 @@ interface VideoMetaData {
 }
 
 
-export const getVideosFromWorkSpace = async (req: Request, res: Response<APIResponse>) => {
+export const getVideosOfWorkSpace = async (req: Request, res: Response<APIResponse>) => {
     const { workspace } = req.query;
     if (workspace) {
 
@@ -41,7 +39,6 @@ export const getVideosFromWorkSpace = async (req: Request, res: Response<APIResp
             .from(VideoTable)
             .leftJoin(UserTable, eq(UserTable.id, VideoTable.editor))
             .where(eq(VideoTable.workspace, workspace.toString()))
-
 
 
 

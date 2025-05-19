@@ -10,50 +10,53 @@ import { JOUError } from '../../lib/error';
 import { JwtValidate } from '../../lib/jwt';
 
 
+export const fetchWorkspaceMetadata = async (workspaceId: string) => {
+    const [ws] = await db.select(
+        { refreshToken: WorkspaceTable.refreshToken }
+    ).from(WorkspaceTable).where(eq(WorkspaceTable.id, workspaceId))
+
+    oauth2Client.setCredentials({
+        refresh_token: ws.refreshToken
+    })
+    const youtube = google.youtube({ version: 'v3', auth: oauth2Client })
+
+    const channelRes = await youtube.channels.list({
+        part: ['snippet', 'statistics'],
+        mine: true
+    })
+    const channelData = channelRes.data.items?.[0]
+    if (channelData) {
+        const snippet = channelData?.snippet || {};
+        const statistics = channelData?.statistics || {};
+        return {
+            id: channelData?.id,
+            name: snippet.title || '',
+            description: snippet.description || '',
+            avatar: snippet.thumbnails?.high?.url || '',
+            userHandle: snippet.customUrl || null,
+            totalSubscribers: parseInt(statistics.subscriberCount || '0'),
+            totalVideos: parseInt(statistics.videoCount || '0'),
+            dateCreated: snippet.publishedAt || '',
+        }
+    }
+    else throw new JOUError(400, "Invalid Link")
+}
+
+
 // Details about WorkSpace used in Joining Page
 export const getWorkspaceDetails = async (req: Request, res: Response<APIResponse>) => {
-    const joiningLink = req.params.joinLink
+    const joiningLink = req.params.link
     if (!joiningLink) throw new JOUError(401, "Invalid Link");
+
     try {
         const linkData = JwtValidate(joiningLink);
         if (typeof (linkData) != 'string') {
-            const [ws] = await db.select(
-                { refreshToken: WorkspaceTable.refreshToken }
-            ).from(WorkspaceTable).where(eq(WorkspaceTable.id, linkData.workspaceId))
 
-            oauth2Client.setCredentials({
-                refresh_token: ws.refreshToken
+            const channelMetaData = await fetchWorkspaceMetadata(linkData.workspaceId).catch(_ => { throw new JOUError(400, "Invalid Link") })
+            res.json({
+                message: "Channel Details",
+                data: { channelMetaData }
             })
-            const youtube = google.youtube({ version: 'v3', auth: oauth2Client })
-
-            const channelRes = await youtube.channels.list({
-                part: ['snippet', 'statistics'],
-                mine: true
-            })
-            const channelData = channelRes.data.items?.[0]
-            if (channelData) {
-                const snippet = channelData?.snippet || {};
-                const statistics = channelData?.statistics || {};
-                const branding = channelData?.brandingSettings?.channel || {};
-                const channelMetaData = {
-                    id: channelData?.id,
-                    name: snippet.title || '',
-                    description: snippet.description || '',
-                    avatar: snippet.thumbnails?.high?.url || '',
-                    userHandle: snippet.customUrl || null,
-                    totalSubscribers: parseInt(statistics.subscriberCount || '0'),
-                    totalVideos: parseInt(statistics.videoCount || '0'),
-                    dateCreated: snippet.publishedAt || '',
-                    tags: branding.keywords ? branding.keywords.split(',').map((tag: string) => tag.trim()) : [],
-                }
-                res.json({
-                    message: "Channel Details",
-                    data: { channelMetaData }
-                })
-            }
-            else throw new JOUError(401, "Invalid Link")
-
-
         }
         else throw new JOUError(401, "Invalid Link")
     }
@@ -68,8 +71,8 @@ export const getWorkspaceDetails = async (req: Request, res: Response<APIRespons
 }
 
 // All Workspaces of User
-export const getWorkSpaces = async (req: Request<{}, {}>, res: Response<APIResponse>) => {
-    const { userId, role } = req.query;
+export const getWorkspacesOfUser = async (req: Request<{}, {}>, res: Response<APIResponse>) => {
+    const { id: userId, userType } = req.user;
 
     if (!validate(userId)) throw new JOUError(404, "UserId is not valid");
 
@@ -78,14 +81,14 @@ export const getWorkSpaces = async (req: Request<{}, {}>, res: Response<APIRespo
     if (typeof (userId) == 'string') {
 
         // Workspaces for Youtuber
-        if (role == 'youtuber') {
+        if (userType == 'youtuber') {
             wsRefTokens = await db.select({
                 refToken: WorkspaceTable.refreshToken
             }).from(WorkspaceTable).where(eq(WorkspaceTable.owner, userId))
         }
 
         // Workspaces for Editor
-        else if (role == 'editor') {
+        else if (userType == 'editor') {
             const subQuery = db
                 .select({ workspace: EditorWorkspaceJoinTable.workspace })
                 .from(EditorWorkspaceJoinTable)
@@ -99,7 +102,7 @@ export const getWorkSpaces = async (req: Request<{}, {}>, res: Response<APIRespo
             }).from(WorkspaceTable).where(inArray(WorkspaceTable.id, subQuery))
         }
 
-        else throw new JOUError(404, "Role is not valid");
+        else throw new JOUError(404, "userType is not valid");
 
         const wsFetcherPromises: GaxiosPromise<youtube_v3.Schema$ChannelListResponse>[] = []
         const youtube = google.youtube({ version: 'v3', auth: oauth2Client })

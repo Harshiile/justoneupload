@@ -1,8 +1,11 @@
-import { joinWorkSpace, wsLinkGenerate } from "./joinWs"
-import { reviewVideoLink, fetchDataFromLink } from "./reviewLink"
+import { finalWorkspaceJoin, initialWorkspaceJoin, generateWorkspaceJoinLink } from "./joinWs"
+import { generateVideoReviewLink, fetchVideoInformationFromReviewLink } from "./reviewLink"
+import { decryptLink } from "./decryptLinks"
 export {
-    joinWorkSpace,
-    wsLinkGenerate,
-    reviewVideoLink,
-    fetchDataFromLink
+    finalWorkspaceJoin,
+    initialWorkspaceJoin,
+    generateWorkspaceJoinLink,
+    generateVideoReviewLink,
+    fetchVideoInformationFromReviewLink,
+    decryptLink
 }

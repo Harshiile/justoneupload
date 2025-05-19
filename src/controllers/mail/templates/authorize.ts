@@ -1,6 +1,35 @@
+import { JwtGenerate } from "../../../lib/jwt"
+import { SendMail } from "../sendmail"
 import { UserMail } from "./types"
 
-export const AuthorizeMailTemplate = (editor: UserMail, wsName: string,): string => {
+export interface AuthorizeInterface {
+    editorId: string
+    editorMail: string
+    editorName: string
+    wsId: string
+    wsName: string
+    wsAvatar: string
+    wsUserHandle: string
+}
+
+const generateAuthorizeURL = (data: AuthorizeInterface, approve: boolean) => {
+    return `${process.env.FRONTEND_URL}/authorize-editor/${JwtGenerate({
+        data,
+        approve
+    })}`
+}
+
+export const SendAuthorizeMail = async (data: AuthorizeInterface) => {
+    const htmlText = AuthorizeMailTemplate(data);
+
+    await SendMail('theharshiile@gmail.com', htmlText)
+}
+
+export const AuthorizeMailTemplate = (data: AuthorizeInterface): string => {
+
+    const approveUrl = generateAuthorizeURL(data, true)
+    const rejectUrl = generateAuthorizeURL(data, false)
+
     return `
     <!DOCTYPE html>
 <html>
@@ -92,8 +121,8 @@ export const AuthorizeMailTemplate = (editor: UserMail, wsName: string,): string
     <div class='card'>
         <h2>Editor Authorization Request</h2>
 
-        <p><strong>Workspace:</strong> ${wsName}</p>
-        <p><strong>Requested by:</strong> ${editor.name} (${editor.email})</p>
+        <p><strong>Workspace:</strong> ${data.wsName}</p>
+        <p><strong>Requested by:</strong> ${data.editorName} (${data.editorMail})</p>
 
         <div class='info'>
             <p>This editor is requesting permission to upload videos to your YouTube channel via <strong>JustOneUpload</strong>.</p>
@@ -101,8 +130,8 @@ export const AuthorizeMailTemplate = (editor: UserMail, wsName: string,): string
         </div>
 
         <div class='button-group'>
-            <a href='{{approve_url}}' class='btn approve'>✅ Approve Editor</a>
-            <a href='{{reject_url}}' class='btn reject'>❌ Reject Editor</a>
+            <a href=${approveUrl} class='btn approve'>✅ Approve Editor</a>
+            <a href=${rejectUrl} class='btn reject'>❌ Reject Editor</a>
         </div>
 
         <p class='footer-note'>

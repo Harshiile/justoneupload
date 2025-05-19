@@ -6,7 +6,7 @@ import { VideoTable, VideoWorkspaceJoinTable, WorkspaceTable } from '../../db/sc
 import { and, eq, getTableColumns } from 'drizzle-orm'
 import { validate } from 'uuid'
 import { JOUError } from '../../lib/error'
-import { deleteOnDrive, getFileStreamFromDrive } from '../drive'
+import { deleteOnDrive, getFileFromDrive } from '../drive'
 
 
 export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string, videoId: string }>, res: Response<APIResponse>) => {
@@ -36,7 +36,7 @@ export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string
     })
     const yt = google.youtube({ version: 'v3', auth: oauth2Client })
 
-    const videoStream = await getFileStreamFromDrive(video.fileId)
+    const videoStream = await getFileFromDrive(video.fileId)
 
     console.log('1. Video Uploading Start ...');
 
@@ -68,7 +68,7 @@ export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string
                 yt.thumbnails.set({
                     videoId: uploadedVideoId!,
                     media: {
-                        body: await getFileStreamFromDrive(video.thumbnail)
+                        body: await getFileFromDrive(video.thumbnail)
                     }
                 })
                     .then(async (resThumbUpload) => {

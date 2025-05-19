@@ -5,9 +5,9 @@ import { pgTable, varchar, uuid, pgEnum, timestamp, primaryKey, boolean } from "
 export const userTypeEnum = pgEnum('userType', ['youtuber', 'editor']);
 export const UserTable = pgTable("user", {
     id: uuid("id").primaryKey().defaultRandom(),
-    name: varchar("name"),
-    email: varchar("email"),
-    password: varchar("password"),
+    name: varchar("name").notNull(),
+    email: varchar("email").notNull(),
+    password: varchar("password").notNull(),
     userType: userTypeEnum('userType').notNull(),
 })
 

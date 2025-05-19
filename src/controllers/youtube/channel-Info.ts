@@ -5,10 +5,11 @@ import { WorkspaceTable } from '../../db/schema'
 import { db } from '../../db'
 import { eq } from 'drizzle-orm'
 import { JOUError } from '../../lib/error'
+import { fetchWorkspaceMetadata } from '../fetch/workspace'
 
 
 // Authenticate & Store YT Channel in DB
-export const youtubeChannelInfo = async (req: Request, res: Response<APIResponse>) => {
+export const connectYoutubeChannel = async (req: Request, res: Response<APIResponse>) => {
     const yt = google.youtube({ version: 'v3', auth: oauth2Client })
     const { code, userId } = req.query
 
@@ -55,7 +56,7 @@ export const youtubeChannelInfo = async (req: Request, res: Response<APIResponse
 
 
 // Youtube Channel Connector Link
-export const ytConnector = (req: Request, res: Response<APIResponse>) => {
+export const youtubeConnecterLink = (req: Request, res: Response<APIResponse>) => {
     const scopes = [
         'https://www.googleapis.com/auth/youtube.upload',
         'https://www.googleapis.com/auth/youtube.readonly'

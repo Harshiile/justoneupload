@@ -7,7 +7,7 @@ import { Request, Response } from 'express'
 import { cookieOptions } from "./auth"
 
 
-export const RenewAccessToken = async (req: Request, res: Response<APIResponse>) => {
+export const renewAccessToken = async (req: Request, res: Response<APIResponse>) => {
     const refreshToken = req.cookies['auth']
     if (!refreshToken) throw new JOUError(403, "Please Login Again");
 

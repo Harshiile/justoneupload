@@ -20,7 +20,7 @@ app.use(CookieParser())
 app.use(express.static(path.resolve('public')));
 
 // Set Routee
-app.use('/api', router)
+app.use('/', router)
 
 // Converting Error into Response
 app.use((err: JOUError, req: express.Request, res: express.Response, next: express.NextFunction) => {

@@ -41,7 +41,7 @@ export const cookieOptions = {
     sameSite: true
 }
 
-export const signUser = async (req: Request<{}, {}, User>, res: Response<APIResponse>) => {
+export const signUpUser = async (req: Request<{}, {}, User>, res: Response<APIResponse>) => {
     const { email, password, userType, name } = req.body
 
     const user = await userExist(email)

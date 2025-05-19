@@ -31,12 +31,7 @@ GET http://localhost:3000/api/youtube/get/oauth-url
 
 
 ### -- User Joining WS via Link
-POST http://localhost:3000/api/service/join/workspace/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsIm5hbWUiOiJIYXJzaGlsIiwidXNlclR5cGUiOiJ5b3V0dWJlciIsImlhdCI6MTc0NzIwODg2NCwiZXhwIjoxNzQ3MjA4ODk0fQ.vVFTXvFyWd-kbzQAVWbI-1Uarepxe906o3U2fyhQteE
-Content-Type: application/json
-
-{
-    "userId":"b8162480-15e2-4480-b087-aa1016c4bd8c"
-}
+POST http://localhost:3000/api/service/join/workspace/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3b3Jrc3BhY2VJZCI6IlVDSFowVVo3UFRyYWJla25fci1vd1NaZyIsImlhdCI6MTc0NzQ1MjU1MiwiZXhwIjoxNzQ3NTM4OTUyfQ.36RpJV07ANvj4_gnna37SSdN1zhCAT5cyXfjRo33k9g
 
 
 ### -- Generate Link

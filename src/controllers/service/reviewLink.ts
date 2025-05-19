@@ -13,7 +13,7 @@ interface VideoDetails {
     videoTitle: string
 }
 
-export const reviewVideoLink = async (req: Request<{}, {}, VideoDetails>, res: Response<APIResponse>) => {
+export const generateVideoReviewLink = async (req: Request<{}, {}, VideoDetails>, res: Response<APIResponse>) => {
     const videoDetails = req.body
     res.json({
         message: "Video Review Link",
@@ -24,7 +24,7 @@ export const reviewVideoLink = async (req: Request<{}, {}, VideoDetails>, res: R
 }
 
 
-export const fetchDataFromLink = async (req: Request, res: Response<APIResponse>) => {
+export const fetchVideoInformationFromReviewLink = async (req: Request, res: Response<APIResponse>) => {
     const link = req.params.link
     if (!link) throw new JOUError(404, 'Link not found')
 

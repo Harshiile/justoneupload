@@ -1,7 +1,7 @@
-import { youtubeChannelInfo, ytConnector } from "./channel-Info"
+import { connectYoutubeChannel, youtubeConnecterLink } from "./channel-Info"
 import { uploadOnYoutube } from './uploadVideo'
 export {
-    youtubeChannelInfo,
-    ytConnector,
+    connectYoutubeChannel,
+    youtubeConnecterLink,
     uploadOnYoutube
 }

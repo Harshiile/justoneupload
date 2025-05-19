@@ -10,3 +10,10 @@ export interface VideoMail {
     thumbnail: string,
     wsName: string
 }
+
+export interface WorkSpace {
+    id: string,
+    name: string,
+    avatar: string,
+    userHandle: string
+}

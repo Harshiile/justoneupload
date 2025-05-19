@@ -1,15 +1,11 @@
-import { editorContribution } from './analytics'
-import { getYoutuberMailFromWorkSpace } from './getMail'
-import { fetchMe } from './me'
-import { getVideosFromWorkSpace, getPendingUploadingVideos } from './video'
-import { getWorkSpaces, getWorkspaceDetails } from './workspace'
+import { fetchUserOnRefresh } from './userFetcher'
+import { getVideosOfWorkSpace, getPendingUploadingVideos } from './videos'
+import { getWorkspacesOfUser, getWorkspaceDetails } from './workspace'
 
 export {
-    editorContribution,
-    getVideosFromWorkSpace,
-    fetchMe,
-    getYoutuberMailFromWorkSpace,
-    getWorkSpaces,
+    fetchUserOnRefresh,
+    getVideosOfWorkSpace,
+    getWorkspacesOfUser,
     getWorkspaceDetails,
     getPendingUploadingVideos
 }

@@ -4,48 +4,51 @@ import express from 'express'
 import { authorize } from '../middleware'
 
 // Controllers
-import { loginUser, signUser, logoutUser, RenewAccessToken } from '../controllers/auth'
-import { getVideoStream, uploadOnDrive } from '../controllers/drive'
-import { getVideosFromWorkSpace, fetchMe, getWorkSpaces, editorContribution, getWorkspaceDetails, getPendingUploadingVideos } from '../controllers/fetch'
-import { SendMail } from '../controllers/mail'
-import { fetchDataFromLink, joinWorkSpace, reviewVideoLink, wsLinkGenerate } from '../controllers/service'
-import { uploadOnYoutube, youtubeChannelInfo, ytConnector } from '../controllers/youtube'
+import { loginUser, signUpUser, logoutUser, renewAccessToken } from '../controllers/auth'
+import { getVideoFromDrive, uploadOnDrive } from '../controllers/drive'
+import { getWorkspaceDetails, getPendingUploadingVideos, getVideosOfWorkSpace, getWorkspacesOfUser, fetchUserOnRefresh } from '../controllers/fetch'
+import { decryptLink, initialWorkspaceJoin, fetchVideoInformationFromReviewLink, finalWorkspaceJoin, generateVideoReviewLink, generateWorkspaceJoinLink } from '../controllers/service'
+import { uploadOnYoutube, connectYoutubeChannel, youtubeConnecterLink } from '../controllers/youtube'
 
 const router = express.Router()
 
+
 // User-Auth
 router.post('/login', loginUser)
-router.post('/signup', signUser)
+router.post('/signup', signUpUser)
 router.get('/logout', logoutUser)
 
 
 // Service
-router.post('/service/join/workspace/:link', authorize, joinWorkSpace);
-router.get('/service/generate-link', authorize, wsLinkGenerate)
-router.post('/service/review-video-link', reviewVideoLink)
-// router.get('/service/review-video-link', authorize, reviewVideoLink)
-router.get('/service/renew', RenewAccessToken)
+router.post('/workspace/join/initial/:link', authorize, initialWorkspaceJoin);
+router.post('/workspace/join/final', authorize, finalWorkspaceJoin)
 
-// Mail-Service
-router.post('/mail/send', authorize, SendMail)
+router.get('/generate-link/workspace/join', authorize, generateWorkspaceJoinLink)
+router.get('/generate-link/video/review', authorize, generateVideoReviewLink)
+
+router.get('/service/renew', renewAccessToken)
+router.get('/decrypt-link/:link', decryptLink)
+
 
 // Youtube-Service
-router.get('/youtube/get/oauth-url', authorize, ytConnector)
-router.get('/youtube/get/channel-info', authorize, youtubeChannelInfo)
+router.get('/youtube/connecter-link', authorize, youtubeConnecterLink)
+router.get('/youtube/connect/channel', authorize, connectYoutubeChannel)
 router.post('/youtube/upload', authorize, uploadOnYoutube)
 
 // Drive-Service
 router.post('/drive/upload', authorize, uploadOnDrive)
 
 // Fetcher
-router.get('/get/videos', authorize, getVideosFromWorkSpace)
-router.get('/get/stream/file', authorize, getVideoStream)
-router.get('/get/fetch-me', authorize, fetchMe)
-router.get('/get/workspaces', authorize, getWorkSpaces)
-router.get('/get/ws-metadata/:joinLink', authorize, getWorkspaceDetails)
-router.get('/get/video-metadata/:link', authorize, fetchDataFromLink)
-router.get('/get/editor-contribution', authorize, editorContribution)
-router.get('/get/pending-videos', getPendingUploadingVideos)
+router.get('/get/user/workspace/videos', authorize, getVideosOfWorkSpace)
+router.get('/get/user/workspaces', authorize, getWorkspacesOfUser)
+router.get('/get/user/refresh', authorize, fetchUserOnRefresh)
+router.get('/get/user/videos', authorize, getPendingUploadingVideos)
+
+router.get('/get/file-stream', authorize, getVideoFromDrive)
+
+router.get('/get/workspace/metadata/:link', authorize, getWorkspaceDetails)
+router.get('/get/video/metadata/:link', authorize, fetchVideoInformationFromReviewLink)
+
 
 
 export default router
