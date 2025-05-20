@@ -1,10 +1,9 @@
 import { eq } from "drizzle-orm"
 import { db } from "../../../db"
-import { EditorWorkspaceJoinTable, UserTable, videoTypeEnum, WorkspaceTable } from "../../../db/schema"
+import { UserTable, WorkspaceTable } from "../../../db/schema"
 import { fetchWorkspaceMetadata } from "../../fetch/workspace"
 import { JOUError } from "../../../lib/error"
 import { JwtGenerate } from "../../../lib/jwt"
-import { title } from "process"
 import { SendMail } from "../sendmail"
 
 interface ApprovalInterface {
@@ -25,11 +24,16 @@ interface User {
   email: string | null
 }
 
-interface Workspace {
+export interface WorkspaceMail {
   id: string | null | undefined;
   name: string;
   avatar: string;
   userHandle: string | null;
+}
+export interface VideoMetaDataMail {
+  title: string
+  willUploadAt: Date | null
+  fileId: string
 }
 
 export const SendApprovalMail = async (VideoData: ApprovalInterface) => {
@@ -58,24 +62,25 @@ export const SendApprovalMail = async (VideoData: ApprovalInterface) => {
 
   const ws = await fetchWorkspaceMetadata(VideoData.workspace)
 
-  const htmlText = ApprovalMailTemplate(VideoData, editor, youtuber, ws)
+  const htmlText = ApprovalMailTemplate(VideoData, editor, ws)
 
   await SendMail('theharshiile@gmail.com', htmlText)
 }
 
-const generateReviewUrl = (workspace: Workspace, title: string, fileId: string, willUploadAt: Date | null) => {
+export const generateReviewUrl = (workspace: WorkspaceMail, video: VideoMetaDataMail) => {
   const videoDetails = {
     channelAvatar: workspace.avatar,
     channelName: workspace.name,
     channelUserHandle: workspace.userHandle,
-    title,
-    fileId,
-    willUploadAt
+    channelId: workspace.id,
+    title: video.title,
+    fileId: video.fileId,
+    willUploadAt: video.willUploadAt
   }
   return `${process.env.FRONTEND_URL}/review/${JwtGenerate(videoDetails)}`
 }
 
-const ApprovalMailTemplate = (VideoData: ApprovalInterface, editor: User, youtuber: User, workspace: Workspace): string => {
+const ApprovalMailTemplate = (VideoData: ApprovalInterface, editor: User, workspace: WorkspaceMail): string => {
   return `
     <!DOCTYPE html>
 <html>
@@ -161,7 +166,7 @@ const ApprovalMailTemplate = (VideoData: ApprovalInterface, editor: User, youtub
       </div>
 
       <div class='section' style='text-align: center;'>
-        <a href=${generateReviewUrl(workspace, VideoData.title, VideoData.fileId, VideoData.willUploadAt)} class='btn'>Review Video</a>
+        <a href=${generateReviewUrl(workspace, { title: VideoData.title, fileId: VideoData.fileId, willUploadAt: VideoData.willUploadAt })} class='btn'>Review Video</a>
       </div>
 
     </div>

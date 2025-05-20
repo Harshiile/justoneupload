@@ -35,7 +35,8 @@ export const getVideosOfWorkSpace = async (req: Request, res: Response<APIRespon
                 thumbnail: VideoTable.thumbnail,
                 videoType: VideoTable.videoType,
                 status: VideoTable.status,
-                editor: UserTable.name
+                editor: UserTable.name,
+                fileId: VideoTable.fileId
             })
             .from(VideoTable)
             .leftJoin(UserTable, eq(UserTable.id, VideoTable.editor))
@@ -96,7 +97,6 @@ export const getVideosOfWorkSpace = async (req: Request, res: Response<APIRespon
                 editor
             })
         })
-
         res.json({
             message: "Videos from workspace",
             data: {

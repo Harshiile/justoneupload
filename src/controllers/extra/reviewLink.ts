@@ -4,6 +4,7 @@ import { JOUError } from '../../lib/error'
 import { db } from '../../db'
 import { VideoTable } from '../../db/schema'
 import { eq } from 'drizzle-orm'
+import { WorkspaceMail, VideoMetaDataMail, generateReviewUrl } from '../mail/templates/approval'
 
 export const fetchVideoInformationFromReviewLink = async (req: Request, res: Response<APIResponse>) => {
     const link = req.params.link
@@ -14,7 +15,10 @@ export const fetchVideoInformationFromReviewLink = async (req: Request, res: Res
         if (typeof (videoDetails) == 'string') throw new JOUError(400, "Link is not valid");
 
         const [video] = await db
-            .select({ fileId: VideoTable.fileId })
+            .select({
+                fileId: VideoTable.fileId,
+                workspaceId: VideoTable.workspace
+            })
             .from(VideoTable)
             .where(eq(VideoTable.fileId, videoDetails.fileId!))
             .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1008`) })
@@ -28,6 +32,7 @@ export const fetchVideoInformationFromReviewLink = async (req: Request, res: Res
         })
         else {
             videoDetails.fileId = video.fileId
+            videoDetails.workspaceId = video.workspaceId
             res.json({
                 message: "Video Details From Link",
                 data: { error: false, videoDetails }
@@ -39,4 +44,17 @@ export const fetchVideoInformationFromReviewLink = async (req: Request, res: Res
         }
         else throw new JOUError(400, "Link is not valid")
     }
+}
+
+export const generateVideoReviewLink = (req: Request<{}, {}, VideoMetaDataMail & WorkspaceMail>, res: Response<APIResponse>) => {
+    const { title, fileId, willUploadAt, id, avatar, userHandle, name } = req.body
+    res.json({
+        message: "Video Review Link",
+        data: {
+            link: generateReviewUrl(
+                { id, name, avatar, userHandle },
+                { title, fileId, willUploadAt }
+            )
+        }
+    })
 }

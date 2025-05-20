@@ -1,4 +1,3 @@
-import { Request, Response } from 'express'
 import { google } from 'googleapis'
 import { oauth2Client } from '../../lib/secrets'
 import { db } from '../../db'
@@ -8,11 +7,17 @@ import { validate } from 'uuid'
 import { JOUError } from '../../lib/error'
 import { deleteOnDrive, getFileFromDrive } from '../drive'
 
+const printCommands = (msg: string) => {
+    console.log(`${msg} - ${new Date()}`);
+}
 
-export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string, videoId: string }>, res: Response<APIResponse>) => {
-    const { workspaceId, videoId } = req.body
+const uploadOnYoutube = async (workspaceId: string, fileId: string):
+    Promise<{
+        editor: string,
+        uploadedVideoId: string
+    }> => {
     if (!workspaceId) throw new JOUError(404, "WorkspaceId is not exist")
-    if (!videoId || !validate(videoId)) throw new JOUError(400, "Video Id is not valid")
+    if (!fileId) throw new JOUError(400, "Video Id is not valid")
 
     const [video] = await db
         .select({
@@ -23,7 +28,7 @@ export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string
         .leftJoin(WorkspaceTable, eq(WorkspaceTable.id, VideoTable.workspace))
         .where(and(
             eq(VideoTable.workspace, workspaceId),
-            eq(VideoTable.id, videoId)
+            eq(VideoTable.fileId, fileId)
         ))
         .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1018`) })
 
@@ -39,9 +44,9 @@ export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string
 
     const videoStream = await getFileFromDrive(video.fileId)
 
-    console.log('1. Video Uploading Start ...');
+    printCommands('1. Video Uploading Start ...');
 
-    yt.videos.insert({
+    const resUpload = await yt.videos.insert({
         part: ['snippet', 'status'],
         requestBody: {
             snippet: {
@@ -57,53 +62,51 @@ export const uploadOnYoutube = async (req: Request<{}, {}, { workspaceId: string
             body: videoStream
         }
     })
-        .then(async (resUpload) => {
-            console.log('2. Video Uploading Finish ...');
-            console.log('3. Video Uploaded, Id : ', resUpload.data.id);
-            // Video successfull uploaded
+        .catch(err => { throw new JOUError(err.status, err.message) })
 
-            // 1. Thumbnail set if not null
-            const uploadedVideoId = resUpload.data.id
-            if (video.thumbnail) {
-                console.log('4. Thumbnail Uploading Start ...');
-                yt.thumbnails.set({
-                    videoId: uploadedVideoId!,
-                    media: {
-                        body: await getFileFromDrive(video.thumbnail)
-                    }
-                })
-                    .then(async (resThumbUpload) => {
-                        console.log('5. Thumbnail Uploaded');
-                        // 2. Delete entry in VideoTable & in Drive
 
-                        // Drive deletion
-                        await deleteOnDrive(video.fileId)
+    printCommands('2. Video Uploading Finish ...');
+    printCommands(`3. Video Uploaded, Id : ${resUpload.data.id}`);
 
-                        db
-                            .delete(VideoTable)
-                            .where(eq(VideoTable.id, videoId))
-                            .then(deltedRes => {
-                                if (deltedRes.rowCount! > 0) {
-                                    console.log('6. Video Deleting in VideoTable ...');
-                                    // 3. Add entry in VideoWorkSpaceTable
-                                    db.insert(VideoWorkspaceJoinTable).values({
-                                        videoId: uploadedVideoId,
-                                        workspace: workspaceId,
-                                        editor: video.editor
-                                    })
-                                        .then(_ => {
-                                            console.log('7. Video Insert in VideoWorkSpaceJoinTable ...');
-                                            res.json({
-                                                message: "Video Uploaded",
-                                                data: { videoId: uploadedVideoId }
-                                            })
-                                        })
-                                }
-                            })
-                            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1019`) })
-                    })
-                    .catch(err => { throw new JOUError(err.status, err.message) })
+    // 1. Thumbnail set if not null
+    const uploadedVideoId = resUpload.data.id
+    if (video.thumbnail) {
+        printCommands('4. Thumbnail Uploading Start ...');
+        await yt.thumbnails.set({
+            videoId: uploadedVideoId!,
+            media: {
+                body: await getFileFromDrive(video.thumbnail)
             }
         })
-        .catch(err => { throw new JOUError(err.status, err.message) })
+            .catch(err => { throw new JOUError(err.status, err.message) })
+        printCommands('5. Thumbnail Uploaded');
+    }
+
+
+    // 2. Video Delete on Drive
+    await deleteOnDrive(fileId)
+    printCommands('6. Video Deleted From Drive ...');
+
+
+    // 3. Video Details Delete On VideoTable
+    await db
+        .delete(VideoTable)
+        .where(eq(VideoTable.fileId, fileId))
+        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1019`) })
+    printCommands('7. Video Deleting in VideoTable ...');
+
+
+    // 4. Add entry in VideoWorkSpaceTable
+    await db.insert(VideoWorkspaceJoinTable).values({
+        videoId: uploadedVideoId,
+        workspace: workspaceId,
+        editor: video.editor
+    })
+        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1023`) })
+    printCommands('8. Video Insert in VideoWorkSpaceJoinTable ...');
+
+
+    return { editor: video.editor, uploadedVideoId: uploadedVideoId! };
 }
+
+export default uploadOnYoutube

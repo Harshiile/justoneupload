@@ -1,6 +1,5 @@
 import { JwtGenerate } from "../../../lib/jwt"
 import { SendMail } from "../sendmail"
-import { UserMail } from "./types"
 
 export interface AuthorizeInterface {
     editorId: string

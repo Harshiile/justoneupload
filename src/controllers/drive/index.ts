@@ -149,7 +149,6 @@ export const deleteOnDrive = async (fileId: string) => {
     await drive.files.delete({ fileId }).catch(err => { throw new JOUError(err.status, "Deletion Failed") })
 }
 
-
 // Fetch File From Drive
 export const getFileFromDrive = async (fileId: string, RangeObject?: { start: number, end: number }) => {
     const responseOptions: StreamMethodOptions = RangeObject ? {

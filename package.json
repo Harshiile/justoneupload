@@ -20,7 +20,8 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "bullmq": "^5.52.2",
+    "bull": "^4.16.5",
+    "bullmq": "^5.52.3",
     "busboy": "^1.6.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
