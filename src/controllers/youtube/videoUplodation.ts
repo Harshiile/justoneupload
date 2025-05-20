@@ -26,15 +26,15 @@ export const pushVideoOnScheduler = async (req: Request<{}, {}, VideoScheduler>,
             console.log('Now Time : ', new Date().toLocaleTimeString());
             console.log('Delay in Minutes : ', (new Date(schedule).getTime() - Date.now()) / (1000 * 60));
 
-            await uploadQueue.add('uploadVideoToYoutube', {
-                workspaceId,
-                fileId
-            }, {
-                delay: new Date(schedule).getTime() - Date.now(),
-                attempts: 3,
-                backoff: 60 * 1000, // 1 min
-                removeOnComplete: true
-            })
+            // await uploadQueue.add('uploadVideoToYoutube', {
+            //     workspaceId,
+            //     fileId
+            // }, {
+            //     delay: new Date(schedule).getTime() - Date.now(),
+            //     attempts: 3,
+            //     backoff: 60 * 1000, // 1 min
+            //     removeOnComplete: true
+            // })
             // }
             // else throw new JOUError(400, "Uploading Time Should be 1 hour ahead, You should change the uploading time")
         }

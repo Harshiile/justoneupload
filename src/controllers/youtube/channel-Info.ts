@@ -36,30 +36,32 @@ export const connectYoutubeChannel = async (req: Request, res: Response<APIRespo
     const { id: channelId } = channels.data.items![0]
     const { customUrl } = channels.data.items![0].snippet!
 
+    console.log(refToken);
+
     // Checks if ws already exists
-    const existingChannel = await db
-        .select()
-        .from(WorkspaceTable)
-        .where(eq(WorkspaceTable.id, channelId!))
-        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1016`) })
+    // const existingChannel = await db
+    //     .select()
+    //     .from(WorkspaceTable)
+    //     .where(eq(WorkspaceTable.id, channelId!))
+    //     .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1016`) })
 
     // DB Insert
-    if (existingChannel.length > 0) throw new JOUError(409, "Workspace already exist")
-    else
-        db
-            .insert(WorkspaceTable).values({
-                id: channelId?.toString()!,
-                owner: userId?.toString(),
-                userHandle: customUrl?.toString(),
-                refreshToken: refToken
-            })
-            .then(data => {
-                data.rowCount! > 0 &&
-                    res.json({
-                        message: "Workspace Created",
-                    })
-            })
-            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1017`) })
+    // if (existingChannel.length > 0) throw new JOUError(409, "Workspace already exist")
+    // else
+    //     db
+    //         .insert(WorkspaceTable).values({
+    //             id: channelId?.toString()!,
+    //             owner: userId?.toString(),
+    //             userHandle: customUrl?.toString(),
+    //             refreshToken: refToken
+    //         })
+    //         .then(data => {
+    //             data.rowCount! > 0 &&
+    //         })
+    //         .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1017`) })
+    res.json({
+        message: "Workspace Created",
+    })
 }
 
 

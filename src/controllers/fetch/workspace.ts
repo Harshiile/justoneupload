@@ -123,6 +123,7 @@ export const getWorkspacesOfUser = async (req: Request<{}, {}>, res: Response<AP
                 mine: true
             }))
         })
+
         Promise.all(wsFetcherPromises)
             .then(ws => {
                 const workspaces = ws.map(w => {
@@ -135,12 +136,13 @@ export const getWorkspacesOfUser = async (req: Request<{}, {}>, res: Response<AP
                         subscribers: wsData.statistics?.subscriberCount
                     }
                 })
-                res.json({
+
+                return res.json({
                     message: "Workspaces of Editor",
                     data: { workspaces }
                 })
             })
-            .catch(err => { throw new JOUError(err.status, "Failed to Fetch Workspaces") })
+            .catch(err => { throw new JOUError(400, "Failed to Fetch Workspaces") })
     }
     else throw new JOUError(404, "UserId is not valid");
 }

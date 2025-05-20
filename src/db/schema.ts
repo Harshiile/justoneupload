@@ -47,7 +47,7 @@ export const VideoTable = pgTable("video", {
     duration: varchar('duration').notNull(),
     isMadeForKids: boolean('isMadeForKids').notNull(),
     status: statusEnum('status').notNull(),
-    willUploadAt: timestamp('willUploadAt', { withTimezone: true }),
+    willUploadAt: timestamp('willUploadAt'),
     editor: uuid("editor").references(() => UserTable.id).notNull(), // This field going to VideoWorkspaceJoinTable
     workspace: varchar("workspace").references(() => WorkspaceTable.id).notNull() // This field going to VideoWorkspaceJoinTable
 })
