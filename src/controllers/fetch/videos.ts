@@ -56,59 +56,63 @@ export const getVideosOfWorkSpace = async (req: Request, res: Response<APIRespon
             .where(eq(VideoWorkspaceJoinTable.workspace, workspace.toString()!))
             .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1010`) })
 
-
-
-        const [ws] = await db
-            .select({
-                refreshToken: WorkspaceTable.refreshToken
+        if (nonUploadedVideos.length <= 0 && uploadedVideos.length <= 0)
+            res.json({
+                message: "Videos from workspace",
+                data: { metadata: [] }
             })
-            .from(WorkspaceTable)
-            .where(eq(WorkspaceTable.id, workspace.toString()))
-            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1011`) })
 
-        if (!ws) throw new JOUError(404, "Workspace not Exist")
+        else {
+            const [ws] = await db
+                .select({
+                    refreshToken: WorkspaceTable.refreshToken
+                })
+                .from(WorkspaceTable)
+                .where(eq(WorkspaceTable.id, workspace.toString()))
+                .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1011`) })
 
+            if (!ws) throw new JOUError(404, "Workspace not Exist")
 
-        const { refreshToken } = ws
-        oauth2Client.setCredentials({
-            refresh_token: refreshToken
-        })
-        const yt = google.youtube({ version: 'v3', auth: oauth2Client })
-        const videos = uploadedVideos.map(v => v.videoId!)
-        const videoDetails = await yt.videos.list({
-            part: ['snippet', 'contentDetails', 'status', 'statistics'],
-            id: videos
-        });
-
-        // Fetching Details About Videos Using IDs
-        const metadata: VideoMetaData[] = nonUploadedVideos || [];
-        const videosMetaDatas = videoDetails?.data?.items;
-        videosMetaDatas?.forEach(video => {
-            const { editor } = uploadedVideos.filter(fv => fv.videoId == video.id)[0]
-            metadata.push({
-                id: video.id!,
-                title: video.snippet!.title!,
-                publishedAt: video.snippet!.publishedAt!,
-                duration: video.contentDetails!.duration!,
-                thumbnail: video.snippet?.thumbnails!.high?.url!,
-                videoType: video.status!.privacyStatus!,
-                views: video.statistics!.viewCount!,
-                status: 'uploaded',
-                editor
+            const { refreshToken } = ws
+            oauth2Client.setCredentials({
+                refresh_token: refreshToken
             })
-        })
-        res.json({
-            message: "Videos from workspace",
-            data: {
-                metadata,
-            }
-        })
+            const yt = google.youtube({ version: 'v3', auth: oauth2Client })
+            const videos = uploadedVideos.map(v => v.videoId!)
+            const videoDetails = await yt.videos.list({
+                part: ['snippet', 'contentDetails', 'status', 'statistics'],
+                id: videos
+            });
+
+            // Fetching Details About Videos Using IDs
+            const metadata: VideoMetaData[] = nonUploadedVideos || [];
+            const videosMetaDatas = videoDetails?.data?.items;
+            videosMetaDatas?.forEach(video => {
+                const { editor } = uploadedVideos.filter(fv => fv.videoId == video.id)[0]
+                metadata.push({
+                    id: video.id!,
+                    title: video.snippet!.title!,
+                    publishedAt: video.snippet!.publishedAt!,
+                    duration: video.contentDetails!.duration!,
+                    thumbnail: video.snippet?.thumbnails!.high?.url!,
+                    videoType: video.status!.privacyStatus!,
+                    views: video.statistics!.viewCount!,
+                    status: 'uploaded',
+                    editor
+                })
+            })
+            res.json({
+                message: "Videos from workspace",
+                data: {
+                    metadata,
+                }
+            })
+        }
     }
-
 }
 
 export const getPendingUploadingVideos = async (req: Request, res: Response<APIResponse>) => {
-    const userId = req.query['id']
+    const userId = req.user.id
     if (!req.query['type']) throw new JOUError(404, "Video type not found")
 
     const type = req.query['type'].toString()!
@@ -120,7 +124,7 @@ export const getPendingUploadingVideos = async (req: Request, res: Response<APIR
             .from(WorkspaceTable)
             .where(eq(WorkspaceTable.owner, userId?.toString()!))
 
-        const pendingVideos = await db
+        const videos = await db
             .select({
                 id: VideoTable.id,
                 title: VideoTable.title,
@@ -143,7 +147,7 @@ export const getPendingUploadingVideos = async (req: Request, res: Response<APIR
 
         res.json({
             message: type == 'reviewPending' ? "Pending Videos" : "Uploading Videos",
-            data: { pendingVideos }
+            data: { videos }
         })
     }
     else throw new JOUError(400, "Invalid Type")

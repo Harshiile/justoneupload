@@ -1,6 +1,6 @@
 {
-  "id": "98c4e44b-98f5-4513-89c9-f8050b4a6500",
-  "prevId": "9ba1b839-5dc0-4c86-a9c7-52ab3668f039",
+  "id": "f605762f-0d1a-43c6-9a86-69e1686688d6",
+  "prevId": "22fa57af-53bb-4a86-80a7-9440729abdd7",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -17,6 +17,12 @@
         "editor": {
           "name": "editor",
           "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "authorize": {
+          "name": "authorize",
+          "type": "boolean",
           "primaryKey": false,
           "notNull": false
         }
@@ -79,19 +85,19 @@
           "name": "name",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "email": {
           "name": "email",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "password": {
           "name": "password",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "userType": {
           "name": "userType",
@@ -172,7 +178,7 @@
         },
         "willUploadAt": {
           "name": "willUploadAt",
-          "type": "timestamp with time zone",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         },
@@ -301,15 +307,33 @@
           "primaryKey": true,
           "notNull": true
         },
+        "userHandle": {
+          "name": "userHandle",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "owner": {
           "name": "owner",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
+        "email": {
+          "name": "email",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
         "refreshToken": {
           "name": "refreshToken",
           "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "disconnected": {
+          "name": "disconnected",
+          "type": "boolean",
           "primaryKey": false,
           "notNull": false
         }

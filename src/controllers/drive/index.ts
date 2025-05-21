@@ -70,7 +70,6 @@ export const uploadOnDrive = async (req: Request, res: Response<APIResponse>) =>
         videoType: null,
         willUploadAt: null,
         isMadeForKids: null,
-        editor: null,
         workspace: null,
     };
 
@@ -113,7 +112,7 @@ export const uploadOnDrive = async (req: Request, res: Response<APIResponse>) =>
                         duration: fields.duration?.toString()!,
                         isMadeForKids: fields.isMadeForKids == null ? false : true,
                         willUploadAt: fields.willUploadAt?.toString() ? new Date(fields.willUploadAt?.toString()) : null,
-                        editor: fields.editor?.toString()!,
+                        editor: req.user.id,
                         workspace: fields.workspace?.toString()!,
                         thumbnail: fileIds.thumbnailId,
                         fileId: fileIds.fileId!,

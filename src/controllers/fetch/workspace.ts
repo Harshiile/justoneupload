@@ -142,7 +142,7 @@ export const getWorkspacesOfUser = async (req: Request<{}, {}>, res: Response<AP
                     data: { workspaces }
                 })
             })
-            .catch(err => { throw new JOUError(400, "Failed to Fetch Workspaces") })
+            .catch(err => { console.log('error in fetching workspace : ', err); throw new JOUError(400, "Failed to Fetch Workspaces") })
     }
     else throw new JOUError(404, "UserId is not valid");
 }

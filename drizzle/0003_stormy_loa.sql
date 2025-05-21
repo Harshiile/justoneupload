@@ -1,1 +1,0 @@
-ALTER TABLE "ws-editor-join" ADD COLUMN "authorize" boolean;

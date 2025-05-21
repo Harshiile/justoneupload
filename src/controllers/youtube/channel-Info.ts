@@ -11,7 +11,7 @@ import { fetchWorkspaceMetadata } from '../fetch/workspace'
 // Authenticate & Store YT Channel in DB
 export const connectYoutubeChannel = async (req: Request, res: Response<APIResponse>) => {
     const yt = google.youtube({ version: 'v3', auth: oauth2Client })
-    const { code, userId } = req.query
+    const { code } = req.query
 
     if (!code) throw new JOUError(400, "Code not generated after youtube signup")
 
@@ -21,9 +21,12 @@ export const connectYoutubeChannel = async (req: Request, res: Response<APIRespo
     if (!youtubeChannel) throw new JOUError(404, "Youtube Channel Fetching Failed")
 
     const refToken = youtubeChannel.tokens.refresh_token
+
     oauth2Client.setCredentials({
         refresh_token: refToken
     })
+
+    const email = (await google.oauth2({ version: 'v2', auth: oauth2Client }).userinfo.get()).data.email
 
     const channels = await yt.channels.list({
         part: ['id', 'snippet'],
@@ -36,29 +39,24 @@ export const connectYoutubeChannel = async (req: Request, res: Response<APIRespo
     const { id: channelId } = channels.data.items![0]
     const { customUrl } = channels.data.items![0].snippet!
 
-    console.log(refToken);
-
-    // Checks if ws already exists
-    // const existingChannel = await db
-    //     .select()
-    //     .from(WorkspaceTable)
-    //     .where(eq(WorkspaceTable.id, channelId!))
-    //     .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1016`) })
-
-    // DB Insert
-    // if (existingChannel.length > 0) throw new JOUError(409, "Workspace already exist")
-    // else
-    //     db
-    //         .insert(WorkspaceTable).values({
-    //             id: channelId?.toString()!,
-    //             owner: userId?.toString(),
-    //             userHandle: customUrl?.toString(),
-    //             refreshToken: refToken
-    //         })
-    //         .then(data => {
-    //             data.rowCount! > 0 &&
-    //         })
-    //         .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1017`) })
+    await db
+        .insert(WorkspaceTable).values({
+            id: channelId?.toString()!,
+            owner: req.user.id,
+            userHandle: customUrl?.toString(),
+            refreshToken: refToken,
+            email: email!,
+            disconnected: false
+        })
+        .catch(async err => {
+            if (err.code == '23505') {
+                // Just renew the refresh Token
+                await db
+                    .update(WorkspaceTable)
+                    .set({ refreshToken: refToken })
+                    .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1017`) })
+            }
+        })
     res.json({
         message: "Workspace Created",
     })
@@ -69,12 +67,42 @@ export const connectYoutubeChannel = async (req: Request, res: Response<APIRespo
 export const youtubeConnecterLink = (req: Request, res: Response<APIResponse>) => {
     const scopes = [
         'https://www.googleapis.com/auth/youtube.upload',
-        'https://www.googleapis.com/auth/youtube.readonly'
+        'https://www.googleapis.com/auth/youtube.readonly',
+        'https://www.googleapis.com/auth/userinfo.email',
     ]
     const url = oauth2Client.generateAuthUrl({
         access_type: 'offline',
         prompt: 'consent',
         scope: scopes
+    })
+    res.json({
+        message: "Youtube Connector URL",
+        data: {
+            url
+        }
+    })
+}
+
+// Reconnecting URL
+export const youtubeReConnecterLink = async (req: Request, res: Response<APIResponse>) => {
+    const { id } = req.query
+    if (!id) throw new JOUError(404, 'Params not found')
+
+    const [ws] = await db
+        .select({ email: WorkspaceTable.email })
+        .from(WorkspaceTable)
+        .where(eq(WorkspaceTable.id, id?.toString()!))
+
+    const scopes = [
+        'https://www.googleapis.com/auth/youtube.upload',
+        'https://www.googleapis.com/auth/youtube.readonly',
+        'https://www.googleapis.com/auth/userinfo.email',
+    ]
+    const url = oauth2Client.generateAuthUrl({
+        access_type: 'offline',
+        prompt: 'consent',
+        scope: scopes,
+        login_hint: ws.email
     })
     res.json({
         message: "Youtube Connector URL",

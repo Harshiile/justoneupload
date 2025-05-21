@@ -4,16 +4,16 @@ CREATE TYPE "public"."videoType" AS ENUM('public', 'private', 'unlisted');--> st
 CREATE TABLE "ws-editor-join" (
 	"workspace" varchar,
 	"editor" uuid,
+	"authorize" boolean,
 	CONSTRAINT "pk-ws-editor-join" PRIMARY KEY("editor","workspace")
 );
 --> statement-breakpoint
 CREATE TABLE "user" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar,
-	"email" varchar,
-	"password" varchar,
-	"userType" "userType" NOT NULL,
-	"refreshToken" varchar
+	"name" varchar NOT NULL,
+	"email" varchar NOT NULL,
+	"password" varchar NOT NULL,
+	"userType" "userType" NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "video" (
@@ -26,7 +26,7 @@ CREATE TABLE "video" (
 	"duration" varchar NOT NULL,
 	"isMadeForKids" boolean NOT NULL,
 	"status" "status" NOT NULL,
-	"willUploadAt" timestamp with time zone,
+	"willUploadAt" timestamp,
 	"editor" uuid NOT NULL,
 	"workspace" varchar NOT NULL
 );
@@ -40,8 +40,10 @@ CREATE TABLE "ws-video-editor-join" (
 --> statement-breakpoint
 CREATE TABLE "workspace" (
 	"id" varchar PRIMARY KEY NOT NULL,
+	"userHandle" varchar,
 	"owner" uuid,
-	"refreshToken" varchar
+	"refreshToken" varchar,
+	"disconnected" boolean
 );
 --> statement-breakpoint
 ALTER TABLE "ws-editor-join" ADD CONSTRAINT "ws-editor-join_workspace_workspace_id_fk" FOREIGN KEY ("workspace") REFERENCES "public"."workspace"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

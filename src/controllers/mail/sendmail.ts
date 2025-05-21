@@ -11,21 +11,24 @@ const transporter = nodemailer.createTransport({
 });
 
 
-export const SendMail = async (email: string, htmlText: string) => {
+export const SendMail = async (email: Array<string>, htmlText: string) => {
     if (email) {
-        const mailOptions = {
-            from: "theharshiile@gmail.com",
-            to: "",
-            subject: "Hello Frsssssom Habibi",
-            html: htmlText
-        }
-        mailOptions.to = email
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) throw new JOUError(400, "Email sending failed")
-            else {
-                console.log("Email sent to " + email);
+        email?.forEach(e => {
+            const mailOptions = {
+                from: "theharshiile@gmail.com",
+                to: "",
+                subject: "Hello Frsssssom Habibi",
+                html: htmlText
             }
-        });
+            mailOptions.to = e
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) throw new JOUError(400, "Email sending failed")
+                else {
+                    console.log("Email sent to " + e);
+                }
+            });
+        })
+
     }
     else throw new JOUError(404, "Email not found")
 }

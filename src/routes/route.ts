@@ -8,7 +8,7 @@ import { loginUser, signUpUser, logoutUser, renewAccessToken } from '../controll
 import { getVideoFromDrive, uploadOnDrive } from '../controllers/drive'
 import { getWorkspaceDetails, getPendingUploadingVideos, getVideosOfWorkSpace, getWorkspacesOfUser, fetchUserOnRefresh } from '../controllers/fetch'
 import { decryptLink, initialWorkspaceJoin, fetchVideoInformationFromReviewLink, generateVideoReviewLink, finalWorkspaceJoin, generateWorkspaceJoinLink, updateScheduleTime } from '../controllers/extra'
-import { connectYoutubeChannel, youtubeConnecterLink, pushVideoOnScheduler } from '../controllers/youtube'
+import { connectYoutubeChannel, youtubeConnecterLink, pushVideoOnScheduler, youtubeReConnecterLink } from '../controllers/youtube'
 
 const router = express.Router()
 
@@ -33,6 +33,7 @@ router.get('/video/update/schedule', authorize, updateScheduleTime)
 // Youtube-Service
 router.get('/youtube/connecter-link', youtubeConnecterLink)
 router.get('/youtube/connect/channel', authorize, connectYoutubeChannel)
+router.get('/youtube/re-connect', authorize, youtubeReConnecterLink)
 router.post('/youtube/video/approval', authorize, pushVideoOnScheduler)
 
 // Drive-Service

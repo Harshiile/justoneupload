@@ -17,7 +17,9 @@ export const WorkspaceTable = pgTable("workspace", {
     id: varchar("id").primaryKey(),
     userHandle: varchar('userHandle'),
     owner: uuid("owner").references(() => UserTable.id, { onDelete: 'cascade' }),
-    refreshToken: varchar("refreshToken")
+    email: varchar('email').notNull(),
+    refreshToken: varchar("refreshToken"),
+    disconnected: boolean('disconnected')
 })
 
 

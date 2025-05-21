@@ -5,43 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1747122002121,
-      "tag": "0000_sloppy_zemo",
+      "when": 1747816115211,
+      "tag": "0000_old_black_queen",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1747219037408,
-      "tag": "0001_thin_swarm",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1747400593635,
-      "tag": "0002_noisy_magik",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1747403512105,
-      "tag": "0003_stormy_loa",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1747632099705,
-      "tag": "0004_right_donald_blake",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1747748088429,
-      "tag": "0005_deep_saracen",
+      "when": 1747818410766,
+      "tag": "0001_slimy_greymalkin",
       "breakpoints": true
     }
   ]

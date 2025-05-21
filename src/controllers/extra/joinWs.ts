@@ -9,7 +9,8 @@ import { AuthorizeInterface, SendAuthorizeMail } from '../mail/templates/authori
 import { fetchWorkspaceMetadata } from '../fetch/workspace'
 
 
-export const initialWorkspaceJoin = async (req: Request<{ link: string }, {}, { userId: string }>, res: Response<APIResponse>) => {
+export const initialWorkspaceJoin = async (req: Request<{ link: string }>, res: Response<APIResponse>) => {
+    const { id } = req.user
     const link = req.params.link
     if (!link) throw new JOUError(400, "Link is not valid")
     let linkData;
@@ -25,9 +26,7 @@ export const initialWorkspaceJoin = async (req: Request<{ link: string }, {}, { 
 
     if (linkData && typeof (linkData) != 'string') {
         // User can signup
-        // const { id } = req.user
-        // const id = 'bff10982-59b9-48fc-addb-e2aec515ca5f' //Youtuber
-        const id = 'b8162480-15e2-4480-b087-aa1016c4bd8c' //Editor
+        const id = req.user.id
         if (!validate(id)) { throw new JOUError(400, "User Id not valid") }
 
         const [user] = await db

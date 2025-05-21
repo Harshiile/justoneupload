@@ -49,13 +49,11 @@ export const SendApprovalMail = async (VideoData: ApprovalInterface) => {
     .where(eq(UserTable.id, VideoData.editor))
     .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1020`) })
 
-  const [youtuber] = await db
+  const youtuber = await db
     .select({
-      name: UserTable.name,
-      email: UserTable.email
+      email: WorkspaceTable.email
     })
     .from(WorkspaceTable)
-    .leftJoin(UserTable, eq(UserTable.id, WorkspaceTable.owner))
     .where(eq(WorkspaceTable.id, VideoData.workspace))
     .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1021`) })
 
@@ -64,7 +62,7 @@ export const SendApprovalMail = async (VideoData: ApprovalInterface) => {
 
   const htmlText = ApprovalMailTemplate(VideoData, editor, ws)
 
-  await SendMail('theharshiile@gmail.com', htmlText)
+  await SendMail(youtuber.map(yt => yt.email), htmlText)
 }
 
 export const generateReviewUrl = (workspace: WorkspaceMail, video: VideoMetaDataMail) => {

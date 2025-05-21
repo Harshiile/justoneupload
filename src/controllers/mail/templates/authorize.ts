@@ -1,3 +1,7 @@
+import { eq } from "drizzle-orm"
+import { db } from "../../../db"
+import { WorkspaceTable } from "../../../db/schema"
+import { JOUError } from "../../../lib/error"
 import { JwtGenerate } from "../../../lib/jwt"
 import { SendMail } from "../sendmail"
 
@@ -21,7 +25,15 @@ const generateAuthorizeURL = (data: AuthorizeInterface, approve: boolean) => {
 export const SendAuthorizeMail = async (data: AuthorizeInterface) => {
     const htmlText = AuthorizeMailTemplate(data);
 
-    await SendMail('theharshiile@gmail.com', htmlText)
+    const youtuber = await db
+        .select({
+            email: WorkspaceTable.email
+        })
+        .from(WorkspaceTable)
+        .where(eq(WorkspaceTable.id, data.wsId))
+        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1025`) })
+
+    await SendMail(youtuber.map(yt => yt.email), htmlText)
 }
 
 export const AuthorizeMailTemplate = (data: AuthorizeInterface): string => {
