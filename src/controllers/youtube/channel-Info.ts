@@ -10,53 +10,53 @@ import { fetchWorkspaceMetadata } from '../fetch/workspace'
 
 // Authenticate & Store YT Channel in DB
 export const connectYoutubeChannel = async (req: Request, res: Response<APIResponse>) => {
-    const yt = google.youtube({ version: 'v3', auth: oauth2Client })
-    const { code } = req.query
+    // const yt = google.youtube({ version: 'v3', auth: oauth2Client })
+    // const { code } = req.query
 
-    if (!code) throw new JOUError(400, "Code not generated after youtube signup")
+    // if (!code) throw new JOUError(400, "Code not generated after youtube signup")
 
-    const youtubeChannel = await oauth2Client.getToken(code!.toString());
+    // const youtubeChannel = await oauth2Client.getToken(code!.toString());
 
-    // store refreshToken on db - Workspace Table
-    if (!youtubeChannel) throw new JOUError(404, "Youtube Channel Fetching Failed")
+    // // store refreshToken on db - Workspace Table
+    // if (!youtubeChannel) throw new JOUError(404, "Youtube Channel Fetching Failed")
 
-    const refToken = youtubeChannel.tokens.refresh_token
+    // const refToken = youtubeChannel.tokens.refresh_token
 
-    oauth2Client.setCredentials({
-        refresh_token: refToken
-    })
+    // oauth2Client.setCredentials({
+    //     refresh_token: refToken
+    // })
 
-    const email = (await google.oauth2({ version: 'v2', auth: oauth2Client }).userinfo.get()).data.email
+    // const email = (await google.oauth2({ version: 'v2', auth: oauth2Client }).userinfo.get()).data.email
 
-    const channels = await yt.channels.list({
-        part: ['id', 'snippet'],
-        mine: true
-    })
-    if (!channels) throw new JOUError(400, "Error while fetching youtube channel info")
+    // const channels = await yt.channels.list({
+    //     part: ['id', 'snippet'],
+    //     mine: true
+    // })
+    // if (!channels) throw new JOUError(400, "Error while fetching youtube channel info")
 
-    if (channels.data.items!.length <= 0) throw new JOUError(404, "No channel associated with given youtube account")
+    // if (channels.data.items!.length <= 0) throw new JOUError(404, "No channel associated with given youtube account")
 
-    const { id: channelId } = channels.data.items![0]
-    const { customUrl } = channels.data.items![0].snippet!
+    // const { id: channelId } = channels.data.items![0]
+    // const { customUrl } = channels.data.items![0].snippet!
 
-    await db
-        .insert(WorkspaceTable).values({
-            id: channelId?.toString()!,
-            owner: req.user.id,
-            userHandle: customUrl?.toString(),
-            refreshToken: refToken,
-            email: email!,
-            disconnected: false
-        })
-        .catch(async err => {
-            if (err.code == '23505') {
-                // Just renew the refresh Token
-                await db
-                    .update(WorkspaceTable)
-                    .set({ refreshToken: refToken })
-                    .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1017`) })
-            }
-        })
+    // await db
+    //     .insert(WorkspaceTable).values({
+    //         id: channelId!,
+    //         owner: req.user.id,
+    //         userHandle: customUrl?.toString(),
+    //         refreshToken: refToken,
+    //         email: email!,
+    //         disconnected: false
+    //     })
+    //     .catch(async err => {
+    //         if (err.code == '23505') {
+    //             // Just renew the refresh Token
+    //             await db
+    //                 .update(WorkspaceTable)
+    //                 .set({ refreshToken: refToken! })
+    //                 .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1017`) })
+    //         }
+    //     })
     res.json({
         message: "Workspace Created",
     })

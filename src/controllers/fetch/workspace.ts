@@ -9,6 +9,15 @@ import { GaxiosPromise } from 'googleapis/build/src/apis/abusiveexperiencereport
 import { JOUError } from '../../lib/error';
 import { JwtValidate } from '../../lib/jwt';
 
+interface WorkSpaces {
+    id?: string,
+    disconnected?: boolean,
+    userHandle?: string,
+    avatar?: string,
+    subscribers?: string,
+    name?: string
+}
+
 
 export const fetchWorkspaceMetadata = async (workspaceId: string) => {
     const [ws] = await db
@@ -72,23 +81,83 @@ export const getWorkspaceDetails = async (req: Request, res: Response<APIRespons
     }
 }
 
+
+
+
+const fetchYoutubeChannels = async (wsFromDB: Array<{
+    id: string,
+    refToken: string,
+    disconnected: boolean,
+    userHandle: string
+}>, workspaces: Map<string, WorkSpaces>) => {
+    const wsFetcherPromises: GaxiosPromise<youtube_v3.Schema$ChannelListResponse>[] = []
+    const youtube = google.youtube({ version: 'v3', auth: oauth2Client })
+
+    // Fetch Details About YT Channels using Ref Tokens
+    wsFromDB?.map(async (ws) => {
+        workspaces.set(ws.id, {
+            id: ws.id,
+            userHandle: ws.userHandle,
+            disconnected: ws.disconnected,
+        })
+        oauth2Client.setCredentials({
+            refresh_token: ws.refToken
+        })
+        wsFetcherPromises.push(youtube.channels.list({
+            part: ['snippet', 'statistics'],
+            mine: true
+        }))
+    })
+
+    const ws = await Promise.all(wsFetcherPromises)
+        .catch(err => { console.log('error in fetching workspace : ', err); throw new JOUError(400, "Failed to Fetch Workspaces") })
+
+    ws.map(w => {
+        const wsData = w.data.items![0]
+        workspaces.set(wsData.id!, {
+            id: workspaces.get(wsData.id!)?.id!,
+            userHandle: workspaces.get(wsData.id!)?.userHandle!,
+            disconnected: workspaces.get(wsData.id!)?.disconnected!,
+            name: wsData.snippet!.title!,
+            avatar: wsData.snippet!.thumbnails?.high?.url!,
+            subscribers: wsData.statistics?.subscriberCount!
+        })
+    })
+    return workspaces
+}
+
+
+
+
+
 // All Workspaces of User
 export const getWorkspacesOfUser = async (req: Request<{}, {}>, res: Response<APIResponse>) => {
     const { id: userId, userType } = req.user;
 
     if (!validate(userId)) throw new JOUError(404, "UserId is not valid");
 
-    let wsRefTokens = null;
+    let workspaces = new Map<string, WorkSpaces>();
 
     if (typeof (userId) == 'string') {
 
         // Workspaces for Youtuber
         if (userType == 'youtuber') {
-            wsRefTokens = await db
-                .select({ refToken: WorkspaceTable.refreshToken })
+            const wsFromDB = await db
+                .select({
+                    id: WorkspaceTable.id,
+                    refToken: WorkspaceTable.refreshToken,
+                    disconnected: WorkspaceTable.disconnected,
+                    userHandle: WorkspaceTable.userHandle
+                })
                 .from(WorkspaceTable)
                 .where(eq(WorkspaceTable.owner, userId))
                 .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1014`) })
+
+            res.json({
+                message: "Workspaces",
+                data: { workspaces: Object.fromEntries(await fetchYoutubeChannels(wsFromDB, workspaces)) }
+            })
+
         }
 
         // Workspaces for Editor
@@ -101,48 +170,27 @@ export const getWorkspacesOfUser = async (req: Request<{}, {}>, res: Response<AP
                     eq(EditorWorkspaceJoinTable.authorize, true)
                 ))
 
-            wsRefTokens = await db
-                .select({ refToken: WorkspaceTable.refreshToken })
+            const wsFromDB = await db
+                .select({
+                    id: WorkspaceTable.id,
+                    refToken: WorkspaceTable.refreshToken,
+                    disconnected: WorkspaceTable.disconnected,
+                    userHandle: WorkspaceTable.userHandle
+                })
                 .from(WorkspaceTable)
                 .where(inArray(WorkspaceTable.id, subQuery))
                 .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1015`) })
+
+            res.json({
+                message: "Workspaces",
+                data: {
+                    workspaces: Object.fromEntries(await fetchYoutubeChannels(wsFromDB, workspaces))
+                }
+            })
         }
 
         else throw new JOUError(404, "userType is not valid");
 
-        const wsFetcherPromises: GaxiosPromise<youtube_v3.Schema$ChannelListResponse>[] = []
-        const youtube = google.youtube({ version: 'v3', auth: oauth2Client })
-
-        // Fetch Details About YT Channels using Ref Tokens
-        wsRefTokens?.map(async (ws) => {
-            oauth2Client.setCredentials({
-                refresh_token: ws.refToken
-            })
-            wsFetcherPromises.push(youtube.channels.list({
-                part: ['snippet', 'statistics'],
-                mine: true
-            }))
-        })
-
-        Promise.all(wsFetcherPromises)
-            .then(ws => {
-                const workspaces = ws.map(w => {
-                    const wsData = w.data.items![0]
-                    return {
-                        id: wsData.id,
-                        name: wsData.snippet!.title,
-                        userHandle: wsData.snippet?.customUrl,
-                        avatar: wsData.snippet!.thumbnails?.high?.url,
-                        subscribers: wsData.statistics?.subscriberCount
-                    }
-                })
-
-                return res.json({
-                    message: "Workspaces of Editor",
-                    data: { workspaces }
-                })
-            })
-            .catch(err => { console.log('error in fetching workspace : ', err); throw new JOUError(400, "Failed to Fetch Workspaces") })
     }
     else throw new JOUError(404, "UserId is not valid");
 }

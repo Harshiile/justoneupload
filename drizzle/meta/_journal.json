@@ -15,6 +15,20 @@
       "when": 1747818410766,
       "tag": "0001_slimy_greymalkin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1747883602347,
+      "tag": "0002_futuristic_skaar",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1747899544369,
+      "tag": "0003_simple_rafael_vega",
+      "breakpoints": true
     }
   ]
 }

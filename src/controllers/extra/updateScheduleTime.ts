@@ -10,7 +10,7 @@ export const updateScheduleTime = async (req: Request, res: Response<APIResponse
 
     await db
         .update(VideoTable)
-        .set({ willUploadAt: new Date(`${schedule.toString()}`) })
+        .set({ willUploadAt: schedule.toString() })
         .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1024`) })
 
     res.json({

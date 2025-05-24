@@ -12,7 +12,7 @@ interface ApprovalInterface {
   videoType: 'public' | 'private' | 'unlisted'
   duration: string
   isMadeForKids: boolean
-  willUploadAt: Date | null
+  willUploadAt: string | null
   editor: string
   fileId: string,
   workspace: string
@@ -32,7 +32,7 @@ export interface WorkspaceMail {
 }
 export interface VideoMetaDataMail {
   title: string
-  willUploadAt: Date | null
+  willUploadAt: string | null
   fileId: string
 }
 

@@ -9,12 +9,13 @@ import { JOUError } from '../../lib/error';
 interface VideoMetaData {
     id: string;
     title: string;
-    uploadAt?: Date | null;
+    uploadAt?: string | null;
     duration: string;
     publishedAt?: string | null;
     thumbnail: string | null;
     videoType: string;
     views?: string | null;
+    channelHandle?: string;
     status: string;
     editor: string | null
 }
@@ -22,92 +23,90 @@ interface VideoMetaData {
 
 export const getVideosOfWorkSpace = async (req: Request, res: Response<APIResponse>) => {
     const { workspace } = req.query;
-    if (workspace) {
+    if (!workspace) throw new JOUError(404, "Request Params Invalid")
+    // Non-Uploaded Videos
+    const nonUploadedVideos = await db
+        .select({
+            id: VideoTable.id,
+            title: VideoTable.title,
+            duration: VideoTable.duration,
+            willUploadAt: VideoTable.willUploadAt,
+            thumbnail: VideoTable.thumbnail,
+            videoType: VideoTable.videoType,
+            status: VideoTable.status,
+            editor: UserTable.name,
+            fileId: VideoTable.fileId
+        })
+        .from(VideoTable)
+        .leftJoin(UserTable, eq(UserTable.id, VideoTable.editor))
+        .where(eq(VideoTable.workspace, workspace.toString()))
+        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1009`) })
 
 
-        // Non-Uploaded Videos
-        const nonUploadedVideos = await db
+
+    // Uploaded Videos
+    const uploadedVideos = await db
+        .select({
+            editor: UserTable.name,
+            videoId: VideoWorkspaceJoinTable.videoId,
+        })
+        .from(VideoWorkspaceJoinTable)
+        .leftJoin(UserTable, eq(UserTable.id, VideoWorkspaceJoinTable.editor))
+        .where(eq(VideoWorkspaceJoinTable.workspace, workspace.toString()!))
+        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1010`) })
+
+    if (nonUploadedVideos.length <= 0 && uploadedVideos.length <= 0)
+        res.json({
+            message: "Videos from workspace",
+            data: { metadata: [] }
+        })
+
+    else {
+        const [ws] = await db
             .select({
-                id: VideoTable.id,
-                title: VideoTable.title,
-                duration: VideoTable.duration,
-                uploadAt: VideoTable.willUploadAt,
-                thumbnail: VideoTable.thumbnail,
-                videoType: VideoTable.videoType,
-                status: VideoTable.status,
-                editor: UserTable.name,
-                fileId: VideoTable.fileId
+                refreshToken: WorkspaceTable.refreshToken
             })
-            .from(VideoTable)
-            .leftJoin(UserTable, eq(UserTable.id, VideoTable.editor))
-            .where(eq(VideoTable.workspace, workspace.toString()))
-            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1009`) })
+            .from(WorkspaceTable)
+            .where(eq(WorkspaceTable.id, workspace.toString()))
+            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1011`) })
 
+        if (!ws) throw new JOUError(404, "Workspace not Exist")
 
+        const { refreshToken } = ws
+        oauth2Client.setCredentials({
+            refresh_token: refreshToken
+        })
+        const yt = google.youtube({ version: 'v3', auth: oauth2Client })
+        const videos = uploadedVideos.map(v => v.videoId!)
+        const videoDetails = await yt.videos.list({
+            part: ['snippet', 'contentDetails', 'status', 'statistics'],
+            id: videos
+        });
 
-        // Uploaded Videos
-        const uploadedVideos = await db
-            .select({
-                editor: UserTable.name,
-                videoId: VideoWorkspaceJoinTable.videoId,
+        // Fetching Details About Videos Using IDs
+        const metadata: VideoMetaData[] = nonUploadedVideos || [];
+        const videosMetaDatas = videoDetails?.data?.items;
+        videosMetaDatas?.forEach(video => {
+            const { editor } = uploadedVideos.filter(fv => fv.videoId == video.id)[0]
+            metadata.push({
+                id: video.id!,
+                title: video.snippet!.title!,
+                publishedAt: video.snippet!.publishedAt!,
+                duration: video.contentDetails!.duration!,
+                channelHandle: video.snippet?.channelTitle!,
+                thumbnail: video.snippet?.thumbnails!.high?.url!,
+                videoType: video.status!.privacyStatus!,
+                views: video.statistics!.viewCount!,
+                status: 'uploaded',
+                editor
             })
-            .from(VideoWorkspaceJoinTable)
-            .leftJoin(UserTable, eq(UserTable.id, VideoWorkspaceJoinTable.editor))
-            .where(eq(VideoWorkspaceJoinTable.workspace, workspace.toString()!))
-            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1010`) })
-
-        if (nonUploadedVideos.length <= 0 && uploadedVideos.length <= 0)
-            res.json({
-                message: "Videos from workspace",
-                data: { metadata: [] }
-            })
-
-        else {
-            const [ws] = await db
-                .select({
-                    refreshToken: WorkspaceTable.refreshToken
-                })
-                .from(WorkspaceTable)
-                .where(eq(WorkspaceTable.id, workspace.toString()))
-                .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1011`) })
-
-            if (!ws) throw new JOUError(404, "Workspace not Exist")
-
-            const { refreshToken } = ws
-            oauth2Client.setCredentials({
-                refresh_token: refreshToken
-            })
-            const yt = google.youtube({ version: 'v3', auth: oauth2Client })
-            const videos = uploadedVideos.map(v => v.videoId!)
-            const videoDetails = await yt.videos.list({
-                part: ['snippet', 'contentDetails', 'status', 'statistics'],
-                id: videos
-            });
-
-            // Fetching Details About Videos Using IDs
-            const metadata: VideoMetaData[] = nonUploadedVideos || [];
-            const videosMetaDatas = videoDetails?.data?.items;
-            videosMetaDatas?.forEach(video => {
-                const { editor } = uploadedVideos.filter(fv => fv.videoId == video.id)[0]
-                metadata.push({
-                    id: video.id!,
-                    title: video.snippet!.title!,
-                    publishedAt: video.snippet!.publishedAt!,
-                    duration: video.contentDetails!.duration!,
-                    thumbnail: video.snippet?.thumbnails!.high?.url!,
-                    videoType: video.status!.privacyStatus!,
-                    views: video.statistics!.viewCount!,
-                    status: 'uploaded',
-                    editor
-                })
-            })
-            res.json({
-                message: "Videos from workspace",
-                data: {
-                    metadata,
-                }
-            })
-        }
+        })
+        res.json({
+            message: "Videos from workspace",
+            data: {
+                metadata,
+            }
+        })
     }
 }
 
@@ -131,6 +130,7 @@ export const getPendingUploadingVideos = async (req: Request, res: Response<APIR
                 videoType: VideoTable.videoType,
                 thumbnail: VideoTable.thumbnail,
                 duration: VideoTable.duration,
+                fileId: VideoTable.fileId,
                 status: VideoTable.status,
                 willUploadAt: VideoTable.willUploadAt,
                 editor: UserTable.name,

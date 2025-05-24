@@ -9,6 +9,18 @@ import { JOUError } from '../lib/error'
 dotenv.config()
 const app = express()
 
+declare global {
+    namespace Express {
+        interface Request {
+            user: {
+                id: string,
+                name: string,
+                userType: string,
+            };
+        }
+    }
+}
+
 // Apply Middlewares
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))

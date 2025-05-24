@@ -9,7 +9,7 @@ export const authorize = (req: Request, res: Response<APIResponse>, next: NextFu
 
     if (!accessToken) {
         console.log('Access Token Undefined');
-        throw new JOUError(401, errMsg)
+        throw new JOUError(999, "Seesion Expired")
     }
     else {
         try {

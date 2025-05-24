@@ -15,11 +15,11 @@ export const UserTable = pgTable("user", {
 // Channel Details
 export const WorkspaceTable = pgTable("workspace", {
     id: varchar("id").primaryKey(),
-    userHandle: varchar('userHandle'),
+    userHandle: varchar('userHandle').notNull(),
     owner: uuid("owner").references(() => UserTable.id, { onDelete: 'cascade' }),
-    email: varchar('email').notNull(),
-    refreshToken: varchar("refreshToken"),
-    disconnected: boolean('disconnected')
+    email: varchar('email').notNull().notNull(),
+    refreshToken: varchar("refreshToken").notNull(),
+    disconnected: boolean('disconnected').notNull()
 })
 
 
@@ -49,7 +49,7 @@ export const VideoTable = pgTable("video", {
     duration: varchar('duration').notNull(),
     isMadeForKids: boolean('isMadeForKids').notNull(),
     status: statusEnum('status').notNull(),
-    willUploadAt: timestamp('willUploadAt'),
+    willUploadAt: varchar('willUploadAt'),
     editor: uuid("editor").references(() => UserTable.id).notNull(), // This field going to VideoWorkspaceJoinTable
     workspace: varchar("workspace").references(() => WorkspaceTable.id).notNull() // This field going to VideoWorkspaceJoinTable
 })

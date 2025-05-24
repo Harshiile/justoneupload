@@ -31,13 +31,14 @@ router.get('/video/update/schedule', authorize, updateScheduleTime)
 
 
 // Youtube-Service
-router.get('/youtube/connecter-link', youtubeConnecterLink)
+router.get('/youtube/connecter-link', authorize, youtubeConnecterLink)
 router.get('/youtube/connect/channel', authorize, connectYoutubeChannel)
 router.get('/youtube/re-connect', authorize, youtubeReConnecterLink)
 router.post('/youtube/video/approval', authorize, pushVideoOnScheduler)
 
 // Drive-Service
 router.post('/drive/upload', authorize, uploadOnDrive)
+
 
 // Fetcher
 router.get('/get/user/workspace/videos', authorize, getVideosOfWorkSpace)
