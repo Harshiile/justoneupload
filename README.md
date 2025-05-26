@@ -1,5 +1,5 @@
 <div style="display: grid; place-items: center; text-align: center;">
-  <img src="./public/logo.png" alt="JOU" width="100" />
+  <img src="https://res.cloudinary.com/doeuywzyb/image/upload/v1748236493/nvqe46sfwmfat0ios7ds.png" alt="JOU" width="100" />
   <p style="font-size: 1.6rem; font-weight: bold;">JustOneUpload</p>
 </div>
 
