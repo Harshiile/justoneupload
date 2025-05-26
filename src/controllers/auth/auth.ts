@@ -38,7 +38,8 @@ export const generateTokens = (userData: UserData) => {
 export const cookieOptions = {
     httpOnly: true,
     secure: true,
-    sameSite: true
+    sameSite: true,
+    maxAge: 3 * 24 * 60 * 60 * 1000
 }
 
 export const signUpUser = async (req: Request<{}, {}, User>, res: Response<APIResponse>) => {

@@ -33,15 +33,15 @@ export const pushVideoOnScheduler = async (req: Request<{}, {}, VideoScheduler>,
             console.log('Delay in Minutes : ', (Number(schedule) - Date.now()) / (1000 * 60));
 
 
-            await uploadQueue.add('uploadVideoToYoutube', {
-                workspaceId,
-                fileId
-            }, {
-                delay: Number(schedule) - Date.now(),
-                attempts: 3,
-                backoff: 60 * 1000, // 1 min
-                removeOnComplete: true
-            })
+            // await uploadQueue.add('uploadVideoToYoutube', {
+            //     workspaceId,
+            //     fileId
+            // }, {
+            //     delay: Number(schedule) - Date.now(),
+            //     attempts: 3,
+            //     backoff: 60 * 1000, // 1 min
+            //     removeOnComplete: true
+            // })
 
             // Set video state as uploadPending------------------
             await db
@@ -59,10 +59,10 @@ export const pushVideoOnScheduler = async (req: Request<{}, {}, VideoScheduler>,
         }
         else {
             // Immediate Upload
-            await uploadQueue.add('uploadVideoToYoutube', {
-                workspaceId,
-                fileId
-            })
+            // await uploadQueue.add('uploadVideoToYoutube', {
+            //     workspaceId,
+            //     fileId
+            // })
         }
         res.json({
             message: !schedule ? 'Video Uploading Started' : `Video is Scheduled to upload on ${schedule.toDateString()} - ${schedule.toLocaleTimeString()}`

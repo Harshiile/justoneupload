@@ -197,7 +197,8 @@ const NotifyMailTemplate = (workspace: WorkspaceMail, video: VideoNofityMail, na
         }
 
         .logo img {
-            height: 40px;
+        width:60px;
+            height: 60px;
             opacity: 0.6;
         }
   </style>
@@ -250,7 +251,7 @@ const NotifyMailTemplate = (workspace: WorkspaceMail, video: VideoNofityMail, na
       This message confirms a successful upload through your JustOneUpload workspace.<br />
       If you were not expecting this activity, please review your workspace permissions.
       <div class='logo'>
-        <img src='https://your-cdn.com/logo-dark.svg' alt='JustOneUpload Logo' />
+        <img src=${process.env.CLOUDINARY_LOGO} alt='JustOneUpload' />
       </div>
     </div>
   </div>

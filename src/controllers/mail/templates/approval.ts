@@ -259,12 +259,17 @@ const ApprovalMailTemplate = (video: ApprovalInterface, editor: User, youtuber: 
       position: relative;
     }
 
-    .logo-footer {
+    .logo {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
       bottom: 8px;
     }
+      .logo img{
+      width:60px;
+      height:60px;
+      opacity: 0.6;
+      }
 
     @media (max-width: 600px) {
       .video-card {
@@ -342,8 +347,8 @@ const ApprovalMailTemplate = (video: ApprovalInterface, editor: User, youtuber: 
     <!-- Footer -->
     <div class="footer">
       You're receiving this email because you subscribed to updates from Awesome Channel.
-      <div class="logo-footer">
-        <img src='${process.env.BACKEND_URL}/logo.png' alt="JOU" style="height: 30px;" />
+      <div class="logo">
+       <img src=${process.env.CLOUDINARY_LOGO} alt='JustOneUpload' />
       </div>
     </div>
   </div>

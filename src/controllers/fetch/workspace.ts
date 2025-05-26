@@ -15,7 +15,9 @@ interface WorkSpaces {
     userHandle?: string,
     avatar?: string,
     subscribers?: string,
-    name?: string
+    name?: string,
+    desc?: string,
+    totalVideos?: string
 }
 
 
@@ -120,7 +122,9 @@ const fetchYoutubeChannels = async (wsFromDB: Array<{
             disconnected: workspaces.get(wsData.id!)?.disconnected!,
             name: wsData.snippet!.title!,
             avatar: wsData.snippet!.thumbnails?.high?.url!,
-            subscribers: wsData.statistics?.subscriberCount!
+            subscribers: wsData.statistics?.subscriberCount!,
+            desc: wsData.snippet?.description!,
+            totalVideos: wsData.statistics?.videoCount!,
         })
     })
     return workspaces

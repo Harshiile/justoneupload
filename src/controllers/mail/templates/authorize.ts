@@ -134,7 +134,8 @@ const AuthorizeMailTemplate = (data: AuthorizeInterface): string => {
         }
 
         .logo img {
-            height: 40px;
+        width:60px;
+            height: 60px;
             opacity: 0.6;
         }
 
@@ -186,7 +187,7 @@ const AuthorizeMailTemplate = (data: AuthorizeInterface): string => {
             If you did not expect this request, please disregard this message.<br />
             This authorization link will expire in 24 hours for your security
             <div class='logo'>
-                <img src='${process.env.BACKEND_URL}/logo.png' alt='JustOneUpload' />
+                <img src=${process.env.CLOUDINARY_LOGO} alt='JustOneUpload' />
             </div>
         </div>
     </div>
