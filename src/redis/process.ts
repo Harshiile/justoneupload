@@ -6,6 +6,7 @@ import { and, eq, getTableColumns } from 'drizzle-orm';
 import { VideoTable, VideoWorkspaceJoinTable, WorkspaceTable } from '../db/schema';
 import { drive, oauth2Client } from '../lib/secrets';
 import { google } from 'googleapis';
+import { SendNotifyMail, VideoNofityMail } from '../controllers/mail/templates/notify';
 
 
 const deleteOnDrive = async (fileId: string) => {
@@ -90,6 +91,7 @@ const worker = new Worker('video-scheudler-queue', async job => {
     printCommands('2. Video Uploading Finish ...');
     printCommands(`3. Video Uploaded, Id : ${resUpload.data.id}`);
 
+
     // 1. Thumbnail set if not null
     const uploadedVideoId = resUpload.data.id
     if (video.thumbnail) {
@@ -107,6 +109,21 @@ const worker = new Worker('video-scheudler-queue', async job => {
         printCommands('6. Thumbnail Deleted From Drive ...');
     }
 
+
+
+    // Sending Mail
+    const videoData = resUpload.data.snippet
+    const videoMailObject: VideoNofityMail = {
+        thumbnail: videoData?.thumbnails?.high?.url!,
+        title: videoData?.title!,
+        publishedAt: videoData?.publishedAt!,
+        videoType: resUpload.data.status?.privacyStatus!,
+        duration: resUpload.data.contentDetails?.duration!,
+        id: resUpload.data.id!,
+        uploadingStatus: resUpload.data.status?.uploadStatus!,
+        editorId: video.editor
+    }
+    await SendNotifyMail(videoMailObject, workspaceId)
 
     // 2. Video Delete on Drive
     await deleteOnDrive(fileId)

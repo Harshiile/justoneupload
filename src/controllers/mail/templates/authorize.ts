@@ -15,17 +15,16 @@ export interface AuthorizeInterface {
     wsUserHandle: string
 }
 
-const generateAuthorizeURL = (data: AuthorizeInterface, approve: boolean) => {
+const generateAuthorizeURL = (data: AuthorizeInterface) => {
     return `${process.env.FRONTEND_URL}/authorize-editor/${JwtGenerate({
         data,
-        approve
     })}`
 }
 
 export const SendAuthorizeMail = async (data: AuthorizeInterface) => {
     const htmlText = AuthorizeMailTemplate(data);
 
-    const youtuber = await db
+    const [youtuber] = await db
         .select({
             email: WorkspaceTable.email
         })
@@ -33,126 +32,167 @@ export const SendAuthorizeMail = async (data: AuthorizeInterface) => {
         .where(eq(WorkspaceTable.id, data.wsId))
         .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1025`) })
 
-    await SendMail(youtuber.map(yt => yt.email), htmlText)
+    await SendMail(youtuber.email, `🚀 ${data.editorName} Is Ready to Collaborate — Grant Access Now`, htmlText)
 }
 
-export const AuthorizeMailTemplate = (data: AuthorizeInterface): string => {
-
-    const approveUrl = generateAuthorizeURL(data, true)
-    const rejectUrl = generateAuthorizeURL(data, false)
+const AuthorizeMailTemplate = (data: AuthorizeInterface): string => {
 
     return `
-    <!DOCTYPE html>
-<html>
+ <!DOCTYPE html>
+<html lang='en'>
 
 <head>
-    <meta charset='UTF-8'>
-    <title>Editor Authorization Request - JustOneUpload</title>
+    <meta charset='UTF-8' />
+    <title>Authorize Editor Access - JustOneUpload</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #f7f7f7;
-            padding: 20px;
-            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .card {
-            background: #ffffff;
-            border-radius: 10px;
-            padding: 20px;
-            max-width: 500px;
+        .container {
+            max-width: 640px;
             margin: auto;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            background-color: #111;
+            border: 1px solid #222;
+            border-radius: 12px;
+            overflow: hidden;
         }
 
-        h2 {
-            color: #222;
-            margin-bottom: 10px;
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #222;
         }
 
-        .info {
-            margin: 15px 0;
-            background: #f1f1f1;
-            padding: 10px;
-            border-radius: 6px;
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            margin-right: 12px;
         }
 
-        p {
-            line-height: 1.4;
+        .channel-info h2 {
+            margin: 0;
+            color: #aaa;
+            font-size: 1.25rem;
+        }
+
+        .channel-info p {
+            margin: 2px 0 0 0;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .content {
+            padding: 24px 20px;
+        }
+
+        .intro {
+            color: #ccc;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .button-wrapper {
+            text-align: center;
+            padding: 10px 0 30px;
         }
 
         .btn {
-            display: inline-block;
+            background-color: #fff;
+            color: #000;
             padding: 12px 24px;
-            border-radius: 50px;
+            border-radius: 8px;
+            font-weight: bold;
             text-decoration: none;
+            display: inline-block;
+            margin: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #eaeaea;
+        }
+
+        .footer {
+            padding: 16px 20px;
+            font-size: 0.8rem;
+            color: #666;
+            border-top: 1px solid #222;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            margin-top: 20px;
+        }
+
+        .logo img {
+            height: 40px;
+            opacity: 0.6;
+        }
+
+        .tagline {
+            text-align: center;
+            font-size: 1rem;
             font-weight: 600;
-            font-size: 15px;
-            transition: background 0.3s ease;
-            text-align: center;
-        }
-
-        .approve {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .approve:hover {
-            background-color: #218838;
-        }
-
-        .reject {
-            background-color: #dc3545;
-            color: white;
-        }
-
-        .reject:hover {
-            background-color: #c82333;
-        }
-
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-
-        .footer-note {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #777;
-            text-align: center;
+            color: #4ac1ff;
+            margin-bottom: 10px;
+            font-style: italic;
         }
     </style>
 </head>
 
 <body>
-
-    <div class='card'>
-        <h2>Editor Authorization Request</h2>
-
-        <p><strong>Workspace:</strong> ${data.wsName}</p>
-        <p><strong>Requested by:</strong> ${data.editorName} (${data.editorMail})</p>
-
-        <div class='info'>
-            <p>This editor is requesting permission to upload videos to your YouTube channel via <strong>JustOneUpload</strong>.</p>
-            <p>Please confirm if you trust this person and want to authorize their uploads.</p>
+    <div class='container'>
+        <!-- Header -->
+        <div class='header'>
+            <img src='${data.wsAvatar}' alt='Avatar' class='avatar' />
+            <div class='channel-info'>
+                <h2>${data.wsName}</h2>
+                <p>${data.wsUserHandle}</p>
+            </div>
         </div>
 
-        <div class='button-group'>
-            <a href=${approveUrl} class='btn approve'>✅ Approve Editor</a>
-            <a href=${rejectUrl} class='btn reject'>❌ Reject Editor</a>
+        <!-- Content -->
+        <div class='content'>
+            <div class='intro'>
+                <strong>${data.editorName}</strong> (<a style='color: #4ac1ff;'
+                    href='mailto:${data.editorName}'>${data.editorMail}</a>)
+                has requested permission to join your workspace <strong>${data.wsName}</strong> on
+                <strong>JustOneUpload</strong>
+                <br /><br />
+                By authorizing, you grant the editor the ability to upload and schedule videos on your channel through
+                our platform, while maintaining full control over your content
+                <br /><br />
+                If you trust this request, please click the <strong>Authorize</strong> button below to proceed.
+                Otherwise, you may safely ignore this email
+            </div>
+
+            <!-- CTA Button -->
+            <div class='button-wrapper'>
+                <a href=${generateAuthorizeURL(data)} class='btn'>🔓 Authorize</a>
+            </div>
         </div>
 
-        <p class='footer-note'>
-            If you do not recognize this request, you can safely ignore this email.<br>
-            This request will expire in 24 hours.
-        </p>
+        <!-- Footer -->
+        <div class='footer'>
+            If you did not expect this request, please disregard this message.<br />
+            This authorization link will expire in 24 hours for your security
+            <div class='logo'>
+                <img src='${process.env.BACKEND_URL}/logo.png' alt='JustOneUpload' />
+            </div>
+        </div>
     </div>
-
 </body>
 
 </html>
+
     `
 }

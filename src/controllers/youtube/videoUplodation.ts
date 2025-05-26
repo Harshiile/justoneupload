@@ -44,6 +44,13 @@ export const pushVideoOnScheduler = async (req: Request<{}, {}, VideoScheduler>,
             })
 
             // Set video state as uploadPending------------------
+            await db
+                .update(VideoTable)
+                .set({
+                    status: "uploadPending"
+                })
+                .where(eq(VideoTable.fileId, fileId))
+                .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1026`) })
 
 
 
@@ -58,7 +65,7 @@ export const pushVideoOnScheduler = async (req: Request<{}, {}, VideoScheduler>,
             })
         }
         res.json({
-            message: !schedule ? 'Video Uploading Started' : `Video is Scheduled to upload on ${new Date(schedule?.toString()!)}`
+            message: !schedule ? 'Video Uploading Started' : `Video is Scheduled to upload on ${schedule.toDateString()} - ${schedule.toLocaleTimeString()}`
         })
     }
     else {

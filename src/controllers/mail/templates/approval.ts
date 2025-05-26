@@ -5,8 +5,9 @@ import { fetchWorkspaceMetadata } from "../../fetch/workspace"
 import { JOUError } from "../../../lib/error"
 import { JwtGenerate } from "../../../lib/jwt"
 import { SendMail } from "../sendmail"
+import { Duration } from 'luxon'
 
-interface ApprovalInterface {
+export interface ApprovalInterface {
   title: string
   desc: string | null
   videoType: 'public' | 'private' | 'unlisted'
@@ -25,10 +26,10 @@ interface User {
 }
 
 export interface WorkspaceMail {
-  id: string | null | undefined;
-  name: string;
-  avatar: string;
-  userHandle: string | null;
+  id: string | null | undefined
+  name: string | null | undefined
+  avatar: string | null | undefined
+  userHandle: string | null | undefined
 }
 export interface VideoMetaDataMail {
   title: string
@@ -36,33 +37,60 @@ export interface VideoMetaDataMail {
   fileId: string
 }
 
-export const SendApprovalMail = async (VideoData: ApprovalInterface) => {
-  // I have wsId & editorId, need owner mail(youtuber mail), editor(name,gmail), workspace(name,avatar,userHandle)
+export const convertDate = (date: string) => {
+  const formattedDate = new Date(Number(date))
+  return `${formattedDate.toDateString()} - ${formattedDate.toLocaleTimeString()}`
+}
 
-  // Get Owner Mail
+export const convertDuration = (duration: string) => {
+  let formattedDuration = ' ';
+  const dur = Duration.fromISO(duration);
+  if (dur.hours > 0) formattedDuration += `${dur.hours < 10 ? '0' + dur.hours.toString() : dur.hours.toString()}:`
+  if (dur.minutes > 0) formattedDuration += `${dur.minutes < 10 ? '0' + dur.minutes.toString() : dur.minutes.toString()}:`
+  if (dur.seconds > 0) formattedDuration += `${dur.seconds < 10 ? '0' + dur.seconds.toString() : dur.seconds.toString()}`
+  return formattedDuration
+}
+
+export const fetchEditor = async (editorId: string) => {
   const [editor] = await db
     .select({
       name: UserTable.name,
       email: UserTable.email
     })
     .from(UserTable)
-    .where(eq(UserTable.id, VideoData.editor))
-    .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1020`) })
-
-  const youtuber = await db
+    .where(eq(UserTable.id, editorId))
+    .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1020`) });
+  return editor
+}
+export const fetchYoutuber = async (workspaceId: string) => {
+  const [youtuber] = await db
     .select({
-      email: WorkspaceTable.email
+      email: WorkspaceTable.email,
+      name: UserTable.name
     })
     .from(WorkspaceTable)
-    .where(eq(WorkspaceTable.id, VideoData.workspace))
-    .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1021`) })
+    .leftJoin(UserTable, eq(UserTable.id, WorkspaceTable.owner))
+    .where(eq(WorkspaceTable.id, workspaceId))
+    .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1021`) });
+  return youtuber
+}
+
+
+export const SendApprovalMail = async (VideoData: ApprovalInterface) => {
+  // I have wsId & editorId, need owner mail(youtuber mail), editor(name,gmail), workspace(name,avatar,userHandle)
+
+  // Get Owner Mail
+
+  const editor = await fetchEditor(VideoData.editor);
+  const youtuber = await fetchYoutuber(VideoData.workspace);
+
 
 
   const ws = await fetchWorkspaceMetadata(VideoData.workspace)
 
-  const htmlText = ApprovalMailTemplate(VideoData, editor, ws)
+  const htmlText = ApprovalMailTemplate(VideoData, editor, youtuber, ws)
 
-  await SendMail(youtuber.map(yt => yt.email), htmlText)
+  await SendMail(youtuber.email, "🎬 A New Video Awaits Your Review — Ready When You Are", htmlText)
 }
 
 export const generateReviewUrl = (workspace: WorkspaceMail, video: VideoMetaDataMail) => {
@@ -78,118 +106,250 @@ export const generateReviewUrl = (workspace: WorkspaceMail, video: VideoMetaData
   return `${process.env.FRONTEND_URL}/review/${JwtGenerate(videoDetails)}`
 }
 
-const ApprovalMailTemplate = (VideoData: ApprovalInterface, editor: User, workspace: WorkspaceMail): string => {
+const ApprovalMailTemplate = (video: ApprovalInterface, editor: User, youtuber: User, workspace: WorkspaceMail): string => {
   return `
-    <!DOCTYPE html>
-<html>
+ <!DOCTYPE html>
+<html lang="en">
+
 <head>
+  <meta charset="UTF-8" />
+  <title>New Video Uploaded for Review</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f6f9fc;
       margin: 0;
       padding: 0;
-      color: #333;
-    }
-    .container {
-      background-color: #ffffff;
-      width: 100%;
-      max-width: 600px;
-      margin: 30px auto;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
-    }
-    .header {
-      background-color: #ff0000;
+      background-color: #0b0b0b;
       color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 40px auto;
+      background-color: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
       padding: 20px;
-      text-align: center;
+      border-bottom: 1px solid #222;
     }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin-right: 12px;
+    }
+
+    .channel-info h2 {
+      margin: 0;
+      color: #eee;
+      font-size: 1.25rem;
+    }
+
+    .channel-info p {
+      margin: 2px 0 0 0;
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
     .content {
-      padding: 30px;
+      padding: 24px 20px;
     }
-    .section {
+
+    .greeting {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      color: #ccc;
+    }
+
+    .intro {
+      color: #bbb;
+      font-size: 0.95rem;
+      line-height: 1.6;
       margin-bottom: 20px;
     }
-    .channel-avatar {
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
+
+    .video-card {
+      display: flex;
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
     }
-    .btn {
-      display: inline-block;
-      background-color: #28a745;
-      color: #fff !important;
-      padding: 12px 20px;
-      text-align: center;
-      border-radius: 5px;
-      text-decoration: none;
+
+    .thumbnail {
+      width: 160px;
+      height: 90px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .video-info {
+      padding: 12px;
+      flex: 1;
+    }
+
+    .video-title {
+      font-size: 1rem;
       font-weight: bold;
+      margin-bottom: 6px;
+      color: #fff;
     }
-    .footer {
-      text-align: center;
-      padding: 20px;
-      font-size: 12px;
+
+    .video-meta {
+      font-size: 0.85rem;
+      color: #bbb;
+      margin-bottom: 6px;
+      display:flex;
+      align-items:center;
+    }
+
+    .badge {
+      display: inline-block;
+      background-color: #444;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      color: #fff;
+      margin-right: 8px;
+      text-transform: capitalize;
+    }
+
+    .editor-info {
+      margin-top: 12px;
+      font-size: 0.9rem;
       color: #aaa;
+    }
+
+    .button-wrapper {
+      text-align: center;
+      padding: 28px 0 16px;
+    }
+
+    .btn {
+      background-color: #fff;
+      color: #000;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #eaeaea;
+    }
+
+    .footer {
+      padding: 16px 20px 36px;
+      font-size: 0.8rem;
+      color: #666;
+      border-top: 1px solid #222;
+      text-align: center;
+      position: relative;
+    }
+
+    .logo-footer {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .video-card {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .thumbnail {
+        width: 100%;
+        height: auto;
+      }
+
+      .video-info {
+        text-align: center;
+      }
     }
   </style>
 </head>
+
 <body>
-  <div class='container'>
-    <div class='header'>
-      <h2>New Video Uploaded for Review</h2>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <img src=${workspace.avatar} alt="Avatar" class="avatar" />
+      <div class="channel-info">
+        <h2>${workspace.name}</h2>
+        <p>${workspace.userHandle}</p>
+      </div>
     </div>
-    <div class='content'>
 
-      <div class='section'>
-        <h3>👨‍💻 Workspace Details</h3>
-        <p><strong>Channel Name : </strong> ${workspace.name}</p>
-        <p><strong>Handle : </strong> ${workspace.userHandle}</p>
-        <img src=${workspace.avatar} alt='Channel Avatar' class='channel-avatar'>
+    <!-- Content -->
+    <div class="content">
+      <div class="greeting">Hey ${youtuber.name},</div>
+
+      <div class='intro'>
+                Just a heads-up — your editor <strong>${editor.name}</strong> has uploaded a brand new video titled
+                <strong>"${video.title}"</strong> to your workspace <strong>${workspace.name}</strong>
+                <br /><br />
+                It's neatly packaged, beautifully edited, and awaiting your final word.
+                Whether you’re sipping your coffee or in between takes, now’s the perfect time to give it a watch and
+                hit <strong>approve</strong> when ready
+                <br /><br />
+                As always, you're in control. You can review, reschedule or reject
+            </div>
+
+      <!-- Video Card -->
+      <div class="video-card">
+        <img src="http://localhost:3000/api/get/stream/file?type=image&id=${video.thumbnail}" alt="${video.title}" class="thumbnail" />
+        <div class="video-info">
+          <div class="video-title">${video.title}</div>
+          <div class="video-meta">
+            <span class="badge">${video.videoType}</span>
+            Duration : ${convertDuration(video.duration)}
+          </div>
+          <div class="video-meta">
+            ${video.willUploadAt ? `Publishing : ${convertDate(video.willUploadAt)}` : `Publishing once you approve`}
+          </div>
+        </div>
       </div>
 
-      <div class='section'>
-        <h3>🧑 Editor Details</h3>
-        <p><strong>Name : </strong>${editor.name}</p>
-        <p><strong>Email : </strong> ${editor.email}</p>
+      <!-- Editor Info -->
+      <div style="margin: 20px 0; text-align: center;">
+        <p style="font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 6px;">Edited by</p>
+        <p style="font-style: italic; font-size: 0.95rem; color: #bbb; margin: 0;">
+          ${editor.name} &mdash; ${editor.email}
+        </p>
       </div>
 
-      <div class='section'>
-        <h3>🧑 Video Details</h3>
-        <p><strong>Name : </strong>${VideoData.title}</p>
-        <p><strong>Duration : </strong>${VideoData.duration}</p>
-        <p><strong>Duration : </strong>${VideoData.videoType}</p>
-        <p><strong>Will Upload At : </strong>${VideoData.willUploadAt ? VideoData.willUploadAt : 'Immediate After Approval'}</p>
+      <!-- CTA Button -->
+      <div class="button-wrapper">
+        <a href="${generateReviewUrl(workspace, { title: video.title, fileId: video.fileId, willUploadAt: video.willUploadAt })}" class="btn">👀 Review Now</a>
       </div>
-
-      <div class='section' style='text-align: center;'>
-        <a href=${generateReviewUrl(workspace, { title: VideoData.title, fileId: VideoData.fileId, willUploadAt: VideoData.willUploadAt })} class='btn'>Review Video</a>
-      </div>
-
     </div>
-    <div class='footer'>
-      You are receiving this email because you're part of the workspace <strong>Harshil</strong>.
+
+    <!-- Footer -->
+    <div class="footer">
+      You're receiving this email because you subscribed to updates from Awesome Channel.
+      <div class="logo-footer">
+        <img src='${process.env.BACKEND_URL}/logo.png' alt="JOU" style="height: 30px;" />
+      </div>
     </div>
   </div>
 </body>
+
 </html>
-`
+
+  `
 }
-
-
-
-
-
-// editor : { name: 'Joe Carter', email: 'carterinesess@gmail.com' }
-// youtuber : { name: 'Harshil', email: 'carterinesess@gmail.com' }
-// channel : {
-//   id: 'UCHZ0UZ7PTrabekn_r-owSZg',
-//   name: 'Harshil',
-//   description: '20 !',
-//   avatar: 'https://yt3.ggpht.com/ddp99cPb_6PzTlZ9zrcUgBlB3hkvdRJxPyZwDeMV_MbYnMIFjVVFmih4P2N4omaXA3JaQwQ1=s800-c-k-c0x00ffffff-no-rj',
-//   userHandle: '@harshile',
-//   totalSubscribers: 0,
-//   totalVideos: 1,
-//   dateCreated: '2023-07-09T14:16:21.010993Z'
-// }

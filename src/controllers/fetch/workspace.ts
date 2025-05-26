@@ -40,14 +40,14 @@ export const fetchWorkspaceMetadata = async (workspaceId: string) => {
         const snippet = channelData?.snippet || {};
         const statistics = channelData?.statistics || {};
         return {
-            id: channelData?.id,
-            name: snippet.title || '',
-            description: snippet.description || '',
-            avatar: snippet.thumbnails?.high?.url || '',
-            userHandle: snippet.customUrl || null,
-            totalSubscribers: parseInt(statistics.subscriberCount || '0'),
-            totalVideos: parseInt(statistics.videoCount || '0'),
-            dateCreated: snippet.publishedAt || '',
+            id: channelData?.id!,
+            name: snippet.title!,
+            description: snippet.description!,
+            avatar: snippet.thumbnails?.high?.url!,
+            userHandle: snippet.customUrl!,
+            totalSubscribers: parseInt(statistics.subscriberCount!),
+            totalVideos: parseInt(statistics.videoCount!),
+            dateCreated: snippet.publishedAt!,
         }
     }
     else throw new JOUError(400, "Invalid Link")

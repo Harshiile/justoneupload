@@ -9,6 +9,7 @@ import { getVideoFromDrive, uploadOnDrive } from '../controllers/drive'
 import { getWorkspaceDetails, getPendingUploadingVideos, getVideosOfWorkSpace, getWorkspacesOfUser, fetchUserOnRefresh } from '../controllers/fetch'
 import { decryptLink, initialWorkspaceJoin, fetchVideoInformationFromReviewLink, generateVideoReviewLink, finalWorkspaceJoin, generateWorkspaceJoinLink, updateScheduleTime } from '../controllers/extra'
 import { connectYoutubeChannel, youtubeConnecterLink, pushVideoOnScheduler, youtubeReConnecterLink } from '../controllers/youtube'
+import { sendMailTmp } from '../controllers/mail/tmpSendMail'
 
 const router = express.Router()
 
@@ -52,5 +53,7 @@ router.get('/get/workspace/metadata/:link', authorize, getWorkspaceDetails)
 router.get('/get/video/metadata/:link', authorize, fetchVideoInformationFromReviewLink)
 
 
+
+router.get('/send/mail', sendMailTmp)
 
 export default router

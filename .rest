@@ -51,3 +51,5 @@ GET http://localhost:3000/api/get/ws-metadata/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVC
 ### Pending Videos
 GET http://localhost:3000/api/get/pending-videos?type=reviewPending&id=bff10982-59b9-48fc-addb-e2aec515ca5f
 
+###
+GET http://localhost:3000/send/mail
