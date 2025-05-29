@@ -44,13 +44,13 @@ export const pushVideoOnScheduler = async (req: Request<{}, {}, VideoScheduler>,
             // })
 
             // Set video state as uploadPending------------------
-            await db
-                .update(VideoTable)
-                .set({
-                    status: "uploadPending"
-                })
-                .where(eq(VideoTable.fileId, fileId))
-                .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1026`) })
+            // await db
+            //     .update(VideoTable)
+            //     .set({
+            //         status: "uploadPending"
+            //     })
+            //     .where(eq(VideoTable.fileId, fileId))
+            //     .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1026`) })
 
 
 

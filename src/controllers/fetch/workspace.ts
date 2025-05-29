@@ -17,6 +17,7 @@ interface WorkSpaces {
     subscribers?: string,
     name?: string,
     desc?: string,
+    email?: string,
     totalVideos?: string
 }
 
@@ -89,44 +90,57 @@ export const getWorkspaceDetails = async (req: Request, res: Response<APIRespons
 const fetchYoutubeChannels = async (wsFromDB: Array<{
     id: string,
     refToken: string,
-    disconnected: boolean,
-    userHandle: string
+    userHandle: string,
+    email: string
 }>, workspaces: Map<string, WorkSpaces>) => {
+
     const wsFetcherPromises: GaxiosPromise<youtube_v3.Schema$ChannelListResponse>[] = []
     const youtube = google.youtube({ version: 'v3', auth: oauth2Client })
 
     // Fetch Details About YT Channels using Ref Tokens
-    wsFromDB?.map(async (ws) => {
+    await Promise.all(wsFromDB.map(async (ws) => {
         workspaces.set(ws.id, {
             id: ws.id,
             userHandle: ws.userHandle,
-            disconnected: ws.disconnected,
-        })
+            email: ws.email
+        });
+
         oauth2Client.setCredentials({
             refresh_token: ws.refToken
-        })
-        wsFetcherPromises.push(youtube.channels.list({
-            part: ['snippet', 'statistics'],
-            mine: true
-        }))
-    })
+        });
 
-    const ws = await Promise.all(wsFetcherPromises)
-        .catch(err => { console.log('error in fetching workspace : ', err); throw new JOUError(400, "Failed to Fetch Workspaces") })
+        try {
+            const wsData = await youtube.channels.list({
+                part: ['snippet', 'statistics'],
+                mine: true
+            });
 
-    ws.map(w => {
-        const wsData = w.data.items![0]
-        workspaces.set(wsData.id!, {
-            id: workspaces.get(wsData.id!)?.id!,
-            userHandle: workspaces.get(wsData.id!)?.userHandle!,
-            disconnected: workspaces.get(wsData.id!)?.disconnected!,
-            name: wsData.snippet!.title!,
-            avatar: wsData.snippet!.thumbnails?.high?.url!,
-            subscribers: wsData.statistics?.subscriberCount!,
-            desc: wsData.snippet?.description!,
-            totalVideos: wsData.statistics?.videoCount!,
-        })
-    })
+            const channelData = wsData.data.items?.[0];
+
+            if (channelData) {
+                workspaces.set(ws.id, {
+                    id: workspaces.get(ws.id)?.id!,
+                    userHandle: workspaces.get(ws.id)?.userHandle!,
+                    email: workspaces.get(ws.id)?.email,
+                    name: channelData.snippet?.title!,
+                    avatar: channelData.snippet?.thumbnails?.high?.url!,
+                    subscribers: channelData.statistics?.subscriberCount!,
+                    desc: channelData.snippet?.description!,
+                    totalVideos: channelData.statistics?.videoCount!,
+                    disconnected: false
+                });
+            }
+        } catch (err) {
+            // If token is invalid or revoked, mark as disconnected
+            workspaces.set(ws.id, {
+                id: ws.id,
+                userHandle: ws.userHandle,
+                email: ws.email,
+                disconnected: true
+            });
+        }
+    }));
+
     return workspaces
 }
 
@@ -142,59 +156,55 @@ export const getWorkspacesOfUser = async (req: Request<{}, {}>, res: Response<AP
 
     let workspaces = new Map<string, WorkSpaces>();
 
-    if (typeof (userId) == 'string') {
 
-        // Workspaces for Youtuber
-        if (userType == 'youtuber') {
-            const wsFromDB = await db
-                .select({
-                    id: WorkspaceTable.id,
-                    refToken: WorkspaceTable.refreshToken,
-                    disconnected: WorkspaceTable.disconnected,
-                    userHandle: WorkspaceTable.userHandle
-                })
-                .from(WorkspaceTable)
-                .where(eq(WorkspaceTable.owner, userId))
-                .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1014`) })
-
-            res.json({
-                message: "Workspaces",
-                data: { workspaces: Object.fromEntries(await fetchYoutubeChannels(wsFromDB, workspaces)) }
+    // Workspaces for Youtuber
+    if (userType == 'youtuber') {
+        const wsFromDB = await db
+            .select({
+                id: WorkspaceTable.id,
+                refToken: WorkspaceTable.refreshToken,
+                userHandle: WorkspaceTable.userHandle,
+                email: WorkspaceTable.email
             })
+            .from(WorkspaceTable)
+            .where(eq(WorkspaceTable.owner, userId))
+            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1014`) })
 
-        }
-
-        // Workspaces for Editor
-        else if (userType == 'editor') {
-            const subQuery = db
-                .select({ workspace: EditorWorkspaceJoinTable.workspace })
-                .from(EditorWorkspaceJoinTable)
-                .where(and(
-                    eq(EditorWorkspaceJoinTable.editor, userId),
-                    eq(EditorWorkspaceJoinTable.authorize, true)
-                ))
-
-            const wsFromDB = await db
-                .select({
-                    id: WorkspaceTable.id,
-                    refToken: WorkspaceTable.refreshToken,
-                    disconnected: WorkspaceTable.disconnected,
-                    userHandle: WorkspaceTable.userHandle
-                })
-                .from(WorkspaceTable)
-                .where(inArray(WorkspaceTable.id, subQuery))
-                .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1015`) })
-
-            res.json({
-                message: "Workspaces",
-                data: {
-                    workspaces: Object.fromEntries(await fetchYoutubeChannels(wsFromDB, workspaces))
-                }
-            })
-        }
-
-        else throw new JOUError(404, "userType is not valid");
+        res.json({
+            message: "Workspaces",
+            data: { workspaces: Object.fromEntries(await fetchYoutubeChannels(wsFromDB, workspaces)) }
+        })
 
     }
-    else throw new JOUError(404, "UserId is not valid");
+
+    // Workspaces for Editor
+    else if (userType == 'editor') {
+        const subQuery = db
+            .select({ workspace: EditorWorkspaceJoinTable.workspace })
+            .from(EditorWorkspaceJoinTable)
+            .where(and(
+                eq(EditorWorkspaceJoinTable.editor, userId),
+                eq(EditorWorkspaceJoinTable.authorize, true)
+            ))
+
+        const wsFromDB = await db
+            .select({
+                id: WorkspaceTable.id,
+                refToken: WorkspaceTable.refreshToken,
+                userHandle: WorkspaceTable.userHandle,
+                email: WorkspaceTable.email
+            })
+            .from(WorkspaceTable)
+            .where(inArray(WorkspaceTable.id, subQuery))
+            .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1015`) })
+
+        res.json({
+            message: "Workspaces",
+            data: {
+                workspaces: Object.fromEntries(await fetchYoutubeChannels(wsFromDB, workspaces))
+            }
+        })
+    }
+
+    else throw new JOUError(404, "Invalid UserType");
 }

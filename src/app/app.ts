@@ -15,7 +15,7 @@ declare global {
             user: {
                 id: string,
                 name: string,
-                userType: string,
+                userType: 'youtuber' | 'editor',
             };
         }
     }

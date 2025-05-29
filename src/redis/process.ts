@@ -10,7 +10,7 @@ import { SendNotifyMail, VideoNofityMail } from '../controllers/mail/templates/n
 
 
 const deleteOnDrive = async (fileId: string) => {
-    await drive.files.delete({ fileId }).catch(err => { throw new JOUError(err.status, "Deletion Failed") })
+    await drive.files.delete({ fileId }).catch(err => console.log(err.message))
 }
 
 const getFileFromDrive = async (fileId: string) => {
@@ -25,7 +25,7 @@ const getFileFromDrive = async (fileId: string) => {
         }
     )
         .then(fileRes => fileRes.data)
-        .catch(_ => { throw new JOUError(404, "File not Found") })
+        .catch(_ => console.log(_.message))
 }
 
 
@@ -53,7 +53,10 @@ const worker = new Worker('video-scheudler-queue', async job => {
             eq(VideoTable.workspace, workspaceId),
             eq(VideoTable.fileId, fileId)
         ))
-        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1018`) })
+        .catch(_ => {
+            console.log(_.message);
+            throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1027 `)
+        })
 
     if (!video) throw new JOUError(404, "No Video Found")
 
@@ -85,7 +88,10 @@ const worker = new Worker('video-scheudler-queue', async job => {
             body: videoStream
         }
     })
-        .catch(err => { throw new JOUError(err.status, err.message) })
+        .catch(err => {
+            console.log(err.message)
+            throw new JOUError(400, err.message)
+        })
 
 
     printCommands('2. Video Uploading Finish ...');
@@ -102,7 +108,7 @@ const worker = new Worker('video-scheudler-queue', async job => {
                 body: await getFileFromDrive(video.thumbnail)
             }
         })
-            .catch(err => { throw new JOUError(err.status, err.message) })
+            .catch(err => console.log(err.message))
 
         await deleteOnDrive(video.thumbnail)
         printCommands('5. Thumbnail Uploaded');
@@ -134,7 +140,7 @@ const worker = new Worker('video-scheudler-queue', async job => {
     await db
         .delete(VideoTable)
         .where(eq(VideoTable.fileId, fileId))
-        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1019`) })
+        .catch(_ => console.log(_.message))
     printCommands('8. Video Deleting in VideoTable ...');
 
 
@@ -144,7 +150,7 @@ const worker = new Worker('video-scheudler-queue', async job => {
         workspace: workspaceId,
         editor: video.editor
     })
-        .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1023`) })
+        .catch(_ => console.log(_.message))
     printCommands('9. Video Insert in VideoWorkSpaceJoinTable ...');
 
 }, { connection });

@@ -14,12 +14,11 @@ export const UserTable = pgTable("user", {
 
 // Channel Details
 export const WorkspaceTable = pgTable("workspace", {
-    id: varchar("id").primaryKey(),
+    id: varchar("id").notNull().primaryKey(),
     userHandle: varchar('userHandle').notNull(),
     owner: uuid("owner").references(() => UserTable.id, { onDelete: 'cascade' }),
-    email: varchar('email').notNull().notNull(),
-    refreshToken: varchar("refreshToken").notNull(),
-    disconnected: boolean('disconnected').notNull()
+    email: varchar('email').notNull(),
+    refreshToken: varchar("refreshToken").notNull()
 })
 
 
