@@ -1,1 +1,0 @@
-ALTER TABLE "workspace" ADD COLUMN "email" varchar NOT NULL;

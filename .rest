@@ -1,52 +1,17 @@
-###
-POST http://localhost:3000/api/login
+### 
+POST http://localhost:3000/api/fetch/videos/review/generate
 Content-Type: application/json
 
 {
-    "email":"theharshiile@gmail.com",
-    "password":"Mcintyre@04"
+    "title":"First From POSTMAN",
+    "fileId":"1g8wdbV-UxboKA6nhqLSrzcYyvYHIOaxT",
+    "willUploadAt":null,
+    "id":"e16dc2e2-1b98-47b8-ba18-dd354f9a61ba",
+    "avatar":"dasdasdasd",
+    "userHandle":"dasdasd",
+    "name":"asdsd"
 }
 
 
-### -- Videos from Workspace
-GET http://localhost:3000/api/get/videos?workspace=UCHZ0UZ7PTrabekn_r-owSZg
-
-
-### -- Workspaces from userId
-GET http://localhost:3000/api/get/workspaces?userId=298446e0-745d-4ff5-b34c-d44f45b9e7b5&role=youtuber
-
-
-### -- Workspaces from userId & role
-GET http://localhost:3000/api/get/workspaces?userId=298446e0-745d-4ff5-b34c-d44f45b9e7b5&role=editor
-
-
-
-### -- Delete drive file using fileId
-DELETE http://localhost:3000/api/drive?fileId=1RPPsDba8YrgHFt1aMEFVUZrupZ6csXLe
-
-
-
-### -- Get Youtuber Connecter URL
-GET http://localhost:3000/api/youtube/get/oauth-url
-
-
-### -- User Joining WS via Link
-POST http://localhost:3000/api/service/join/workspace/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3b3Jrc3BhY2VJZCI6IlVDSFowVVo3UFRyYWJla25fci1vd1NaZyIsImlhdCI6MTc0NzQ1MjU1MiwiZXhwIjoxNzQ3NTM4OTUyfQ.36RpJV07ANvj4_gnna37SSdN1zhCAT5cyXfjRo33k9g
-
-
-### -- Generate Link
-GET http://localhost:3000/api/service/generate-link?ws=UCHZ0UZ7PTrabekn_r-owSZg
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsIm5hbWUiOiJIYXJzaGlsIiwidXNlclR5cGUiOiJ5b3V0dWJlciIsImlhdCI6MTc0NzIwODg2NCwiZXhwIjoxNzQ3MjA4ODk0fQ.vVFTXvFyWd-kbzQAVWbI-1Uarepxe906o3U2fyhQteE
-Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJmZjEwOTgyLTU5YjktNDhmYy1hZGRiLWUyYWVjNTE1Y2E1ZiIsImlhdCI6MTc0NzIwOTAwNCwiZXhwIjoxNzQ3ODEzODA0fQ.TkEGaE26AFOSFFHoJsT5-6xy8L5w8qxtoB18DhaGtCY
-
-
-### -- Editor Contribution
-GET http://localhost:3000/api/get/editor-contribution?ws=2f868511-5242-45a9-b305-d0ca1b28b106
-
-
-### -- Upload on Youtube
-GET http://localhost:3000/api/get/ws-metadata/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ3b3Jrc3BhY2VJZCI6IlVDSFowVVo3UFRyYWJla25fci1vd1NaZyIsImlhdCI6MTc0NzMwMjQ5NiwiZXhwIjoxNzQ3Mzg4ODk2fQ.xzZr96jPz2XZ_cGNGfki5RpnkpusYY-doOzwMMYg68U
-
-
-### Pending Videos
-GET http://localhost:3000/get/user/videos
+###
+GET http://localhost:3000/api/fetch/videos/review/validate?link=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjaGFubmVsIjp7ImlkIjoiZTE2ZGMyZTItMWI5OC00N2I4LWJhMTgtZGQzNTRmOWE2MWJhIiwibmFtZSI6ImFzZHNkIiwiYXZhdGFyIjoiZGFzZGFzZGFzZCIsInVzZXJIYW5kbGUiOiJkYXNkYXNkIn0sInZpZGVvIjp7InRpdGxlIjoiRmlyc3QgRnJvbSBQT1NUTUFOIiwiZmlsZUlkIjoiMWc4d2RiVi1VeGJvS0E2bmhxTFNyemNZeXZZSElPYXhUIiwid2lsbFVwbG9hZEF0IjpudWxsfSwiaWF0IjoxNzQ4OTQxMTc2fQ.hRMrDKDS9ePa5veZ84zoX7eHHXqhka9CWXpcVqHDBkw

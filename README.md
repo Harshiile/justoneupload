@@ -1,52 +1,36 @@
-<div style="display: grid; place-items: center; text-align: center;">
-  <img src="https://res.cloudinary.com/doeuywzyb/image/upload/v1748236493/nvqe46sfwmfat0ios7ds.png" alt="JOU" width="100" />
-  <p style="font-size: 1.6rem; font-weight: bold;">JustOneUpload</p>
-</div>
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## The Problem It Solves
+## Getting Started
 
-### Traditional Workflow (Without JOU)
+First, run the development server:
 
-- YouTuber records a raw (uncut) video, usually large in size
-- The raw footage is shared with the editor (X GB)
-- Editor edits the footage and sends it back to the YouTuber (X GB)
-- YouTuber reviews the video, once finalized the YouTuber uploads the edited video to YouTube (X GB)
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
----
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-### Total Redundant Data Transfer : 3X GB per video
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
----
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-### Optimized Workflow With JustOneUpload
+## Learn More
 
-- The editor **uploads** the final edited video directly to the YouTuber's workspace
-- The YouTuber **reviews** and **approves or rejects** the video directly on the platform
-- Once approved, the video is **automatically uploaded to YouTube** by JOU's system
-- No back-and-forth file transfers
-- No need for the YouTuber to download & upload at all
+To learn more about Next.js, take a look at the following resources:
 
----
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-### Bandwidth Optimization
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-Using JOU :
-- **Only X GB is uploaded once** (by the editor)
-- Total transfer : **X GB instead of 3X GB**.
-- **Saves up to 2X GB** per video
+## Deploy on Vercel
 
----
-## Tech Stacks
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-| Category        | Technology                                                                                            | Description                             |
-| --------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| Frontend        | ![Vite](https://img.shields.io/badge/Vite-000000.svg?style=for-the-badge&logo=vite)                   | UI, Client-side Interactivity           |
-| Backend         | ![Express.js](https://img.shields.io/badge/Express.js-000000.svg?style=for-the-badge&logo=express)    | API Server                              |
-| Database        | ![Postgresql](https://img.shields.io/badge/Postgresql-000000.svg?style=for-the-badge&logo=postgresql) | Information Storage                     |
-| Styling         | ![Tailwind](https://img.shields.io/badge/tailwind-000000.svg?style=for-the-badge&logo=tailwindcss)    | Utility-first CSS framework             |
-| Realtime Commu. | ![WebSocket](https://img.shields.io/badge/WebSockets-000000.svg?style=for-the-badge&logo=socket.io)   | Live communication (e.g. Upload Status) |
-| Scheduling      | ![Redis](https://img.shields.io/badge/Redis-000000.svg?style=for-the-badge&logo=redis)                | Job queues for video upload scheduling  |
-| Mails           | ![NodeMailer](https://img.shields.io/badge/NodeMailer-000000?style=for-the-badge&logo=gmail)          | Notify the Users                        |
-| OAuth           | ![Google Oauth](https://img.shields.io/badge/OAuth-000000.svg?style=for-the-badge&logo=google)        | Secure YouTuber authentication          |
-| Cloud Storage   | ![Drive](https://img.shields.io/badge/Drive-000000.svg?style=for-the-badge&logo=googledrive)          | Storage of Videos                       |
-
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1747816115211,
-      "tag": "0000_old_black_queen",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1747818410766,
-      "tag": "0001_slimy_greymalkin",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1747883602347,
-      "tag": "0002_futuristic_skaar",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1747899544369,
-      "tag": "0003_simple_rafael_vega",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1748496661534,
-      "tag": "0004_slow_slayback",
+      "when": 1748676684604,
+      "tag": "0000_wild_james_howlett",
       "breakpoints": true
     }
   ]

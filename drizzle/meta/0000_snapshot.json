@@ -1,5 +1,5 @@
 {
-  "id": "22fa57af-53bb-4a86-80a7-9440729abdd7",
+  "id": "89aef1f6-c92e-4ff2-88d7-689d5849a9e7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -178,7 +178,7 @@
         },
         "willUploadAt": {
           "name": "willUploadAt",
-          "type": "timestamp",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
@@ -311,7 +311,7 @@
           "name": "userHandle",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "owner": {
           "name": "owner",
@@ -319,17 +319,17 @@
           "primaryKey": false,
           "notNull": false
         },
+        "email": {
+          "name": "email",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
         "refreshToken": {
           "name": "refreshToken",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false
-        },
-        "disconnected": {
-          "name": "disconnected",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},

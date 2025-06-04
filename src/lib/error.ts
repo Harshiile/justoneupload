@@ -1,8 +1,8 @@
-export class JOUError extends Error {
-    public statusCode: number;
-    constructor(code: number, message: string) {
-        super(message)
-        this.statusCode = code
-        Error.captureStackTrace(this, this.constructor)
-    }
+import { NextResponse } from "next/server";
+
+export const JOUError = (statusCode: number, message: string): NextResponse => {
+    return NextResponse.json(
+        { error: message },
+        { status: statusCode }
+    )
 }

@@ -1,1 +1,0 @@
-ALTER TABLE "video" ALTER COLUMN "willUploadAt" SET DATA TYPE varchar;
