@@ -1,7 +1,6 @@
 "use client"
 import { useState } from 'react'
-// import { toast } from 'sonner';
-// import Loader from '../../../components/loader'
+import { toast } from 'sonner';
 
 const ChooseWS = ({ setChosenWs, workspacesForChooseWS }) => {
     const [isSelected, setIsSelected] = useState(null)
@@ -12,7 +11,6 @@ const ChooseWS = ({ setChosenWs, workspacesForChooseWS }) => {
             <div className={`${!workspacesForChooseWS && 'py-3'} ${workspacesForChooseWS ? `grid ${workspacesForChooseWS.length > 2 ? 'grid-cols-3' : 'grid-cols-1'} ` : 'mb-18'} gap-6 mt-8 mb-20`}>
                 {
                     !workspacesForChooseWS ?
-                        // <Loader />
                         <p>Loading...</p>
                         :
                         workspacesForChooseWS.length <= 0 ?

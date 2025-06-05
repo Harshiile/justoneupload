@@ -63,7 +63,7 @@ export default function Review({ params }) {
         <>
             {
                 isVideoProcessDone ?
-                    <p>Link Is Expires ...</p>
+                    <p>Video Process Already Done ...</p>
                     :
                     <>
                         {!video ?

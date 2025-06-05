@@ -156,8 +156,9 @@ const VideoCard = ({ video, userType, isForDialog, isForDrawer, channel, classNa
                             <Image
                                 src={thumbnailUrl}
                                 alt={video.title}
-                                width={100}
-                                height={100}
+                                width={1280}
+                                height={720}
+                                placeholder="empty"
                                 className="h-full w-full object-cover rounded-md group-hover:scale-105 transition-transform duration-300"
                             />
                             {video.duration && (

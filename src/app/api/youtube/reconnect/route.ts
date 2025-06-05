@@ -2,7 +2,7 @@ import { db } from "@/db"
 import { WorkspaceTable } from "@/db/schema"
 import { JOUError } from "@/lib/error"
 import { eq } from "drizzle-orm"
-import { oauth2Client } from "../../lib/screats"
+import { oauth2Client } from "../../utils/screats"
 import { NextResponse } from "next/server"
 
 export async function GET(req: Request) {

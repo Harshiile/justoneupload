@@ -1,4 +1,4 @@
-import { JwtValidate } from "@/app/api/lib/jwt";
+import { JwtValidate } from "@/app/api/utils/jwt";
 import { db } from "@/db";
 import { VideoTable } from "@/db/schema";
 import { JOUError } from "@/lib/error";

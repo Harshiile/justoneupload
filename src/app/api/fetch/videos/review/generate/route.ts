@@ -1,4 +1,4 @@
-import { JwtGenerate } from "@/app/api/lib/jwt"
+import { JwtGenerate } from "@/app/api/utils/jwt"
 import { NextRequest, NextResponse } from "next/server"
 
 export interface Channel {

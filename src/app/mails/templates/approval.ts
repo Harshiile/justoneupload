@@ -1,11 +1,10 @@
-import { fetchWorkspaceMetadata } from "@/app/api/fetch/workspaces/route"
-import { db } from "@/db"
-import { UserTable, WorkspaceTable } from "@/db/schema"
-import { JOUError } from "@/lib/error"
+import { db } from "../../../db/index.ts"
+import { UserTable, WorkspaceTable } from "../../../db/schema.ts"
 import { eq } from "drizzle-orm"
-import { SendMail } from ".."
-import { JwtGenerate } from "@/app/api/lib/jwt"
-import { convertDuration, convertDate } from "@/app/(pages)/(layoutContainers)/dashboard/components/VideoCard"
+import { SendMail } from "../index.ts"
+import { JwtGenerate } from "../../api/utils/jwt.ts"
+import { fetchWorkspaceMetadata } from "../../api/fetch/workspaces/utils/index.ts"
+import { convertDuration, convertDate } from "./notify.ts"
 
 export interface ApprovalInterface {
   title: string
@@ -70,7 +69,7 @@ export const SendApprovalMail = async (VideoData: ApprovalInterface) => {
   const youtuber = await fetchYoutuber(VideoData.workspace);
 
   const ws = await fetchWorkspaceMetadata(VideoData.workspace, null)
-  if (!ws) return JOUError(400, "Workspace not found");
+  if (!ws) throw new Error("Workspace not found");
 
   const htmlText = ApprovalMailTemplate(VideoData, editor, youtuber, ws)
 

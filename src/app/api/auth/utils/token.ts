@@ -1,4 +1,4 @@
-import { JwtGenerate } from "@/app/api/lib/jwt"
+import { JwtGenerate } from "@/app/api/utils/jwt"
 import { User } from "../login/route"
 
 export const generateTokens = (userData: User) => {

@@ -1,7 +1,7 @@
 import { JOUError } from '@/lib/error';
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { JwtValidate } from './app/api/lib/jwt';
+import { JwtValidate } from './app/api/utils/jwt';
 
 export async function middleware(req: NextRequest) {
     const accessToken = req.cookies.get('acsTkn')?.value

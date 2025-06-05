@@ -4,7 +4,7 @@ import { google } from "googleapis";
 export const drive = google.drive({
     version: 'v3', auth: new google.auth.GoogleAuth({
         keyFile: process.env.DRIVE_SERVICE_ACCOUNT_CREDENTIALS,
-        scopes: ['https://www.googleapis.com/auth/drive.file']
+        scopes: ['https://www.googleapis.com/auth/drive']
     })
 });
 

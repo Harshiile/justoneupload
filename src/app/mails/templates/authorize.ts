@@ -1,4 +1,4 @@
-import { JwtGenerate } from "@/app/api/lib/jwt"
+import { JwtGenerate } from "@/app/api/utils/jwt"
 import { db } from "@/db"
 import { WorkspaceTable } from "@/db/schema"
 import { JOUError } from "@/lib/error"

@@ -1,10 +1,20 @@
-// workspace - avatar,name,handle
-// video - thumbnail,title,publishedAt,videoType,duration,id
+import { fetchEditor, fetchYoutuber } from "./approval.ts"
+import { SendMail } from "../index.ts"
+import { Duration } from 'luxon'
+import { fetchWorkspaceMetadata } from "../../api/fetch/workspaces/utils/index.ts";
 
-import { fetchWorkspaceMetadata } from "@/app/api/fetch/workspaces/route"
-import { fetchEditor, fetchYoutuber } from "./approval"
-import { SendMail } from ".."
-import { convertDuration } from "@/app/(pages)/(layoutContainers)/dashboard/components/VideoCard"
+export const convertDuration = (duration: string) => {
+    let formattedDuration = ' ';
+    const dur = Duration.fromISO(duration);
+    if (dur.hours > 0) formattedDuration += `${dur.hours < 10 ? '0' + dur.hours.toString() : dur.hours.toString()}:`
+    if (dur.minutes > 0) formattedDuration += `${dur.minutes < 10 ? '0' + dur.minutes.toString() : dur.minutes.toString()}:`
+    if (dur.seconds > 0) formattedDuration += `${dur.seconds < 10 ? '0' + dur.seconds.toString() : dur.seconds.toString()}`
+    return formattedDuration
+}
+export const convertDate = (date: string) => {
+    const dateD = new Date(Number(date))
+    return `${dateD.toDateString()} - ${dateD.toLocaleTimeString()}`
+}
 
 // to - editor & youtuber name
 export interface VideoNofityMail {

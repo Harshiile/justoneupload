@@ -1,4 +1,4 @@
-import { sign, SignOptions, verify } from 'jsonwebtoken'
+import JWT from 'jsonwebtoken'
 import { jwtVerify } from 'jose'
 
 export const JwtValidate = async (token: string) => {
@@ -14,5 +14,5 @@ export const JwtValidate = async (token: string) => {
 }
 
 export const JwtGenerate = (payload: object, expiry?: string) => {
-    return expiry ? sign(payload, process.env.JWT_SECRET!, { expiresIn: expiry } as SignOptions) : sign(payload, process.env.JWT_SECRET!)
+    return expiry ? JWT.sign(payload, process.env.JWT_SECRET!, { expiresIn: expiry } as JWT.SignOptions) : JWT.sign(payload, process.env.JWT_SECRET!)
 }

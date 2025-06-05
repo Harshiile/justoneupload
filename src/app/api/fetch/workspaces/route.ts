@@ -4,11 +4,11 @@ import { JOUError } from "@/lib/error";
 import { and, eq, inArray } from "drizzle-orm";
 import { google, youtube_v3 } from "googleapis";
 import { GaxiosPromise } from "googleapis/build/src/apis/abusiveexperiencereport";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { validate } from "uuid";
-import { oauth2Client } from "../../lib/screats";
-import { CustomNextRequest } from "@/lib/customRequest";
-import { getUser } from "../../lib/getUser";
+import { oauth2Client } from "../../utils/screats";
+import { getUser } from "../../utils/getUser";
+import { fetchWorkspaceMetadata } from "./utils";
 
 
 interface WorkSpaces {
@@ -25,7 +25,7 @@ interface WorkSpaces {
 
 
 
-export async function GET(req: CustomNextRequest) {
+export async function GET(req: NextRequest) {
     // const { id: userId, userType } = req.user;
     const { id: userId, userType } = getUser(req)
     if (!validate(userId)) JOUError(404, "UserId is not valid");
@@ -118,45 +118,4 @@ const fetchYoutubeChannels = async (wsFromDB: Array<{
         }
     }));
     return workspaces
-}
-
-
-export const fetchWorkspaceMetadata = async (wsId: string, refToken: string | null): Promise<WorkSpaces | null> => {
-    const youtube = google.youtube({ version: 'v3', auth: oauth2Client })
-    let refTkn = refToken;
-    if (!refTkn) {
-        try {
-            const [ws] = await db
-                .select({ refTkn: WorkspaceTable.refreshToken })
-                .from(WorkspaceTable)
-                .where(eq(WorkspaceTable.id, wsId));
-
-            refTkn = ws.refTkn
-        } catch (error) { throw new Error() }
-    }
-    try {
-        oauth2Client.setCredentials({
-            refresh_token: refTkn
-        });
-
-        const wsData = await youtube.channels.list({
-            part: ['snippet', 'statistics'],
-            mine: true
-        }).catch(_ => { throw new Error() });
-
-        if (!wsData) return null;
-        else {
-            const channelData = wsData.data.items?.[0]!;
-            return {
-                id: channelData.id!,
-                userHandle: channelData.snippet?.customUrl!,
-                name: channelData.snippet?.title!,
-                avatar: channelData.snippet?.thumbnails?.high?.url!,
-                subscribers: channelData.statistics?.subscriberCount!,
-                desc: channelData.snippet?.description!,
-                totalVideos: channelData.statistics?.videoCount!,
-                disconnected: false
-            };
-        }
-    } catch (error) { throw new Error() }
 }

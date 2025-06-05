@@ -1,17 +1,23 @@
 ### 
-POST http://localhost:3000/api/fetch/videos/review/generate
+POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-    "title":"First From POSTMAN",
-    "fileId":"1g8wdbV-UxboKA6nhqLSrzcYyvYHIOaxT",
-    "willUploadAt":null,
-    "id":"e16dc2e2-1b98-47b8-ba18-dd354f9a61ba",
-    "avatar":"dasdasdasd",
-    "userHandle":"dasdasd",
-    "name":"asdsd"
+    "email":"theharshiile@gmail.com",
+    "password":"12"
 }
 
 
+
 ###
-GET http://localhost:3000/api/fetch/videos/review/validate?link=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjaGFubmVsIjp7ImlkIjoiZTE2ZGMyZTItMWI5OC00N2I4LWJhMTgtZGQzNTRmOWE2MWJhIiwibmFtZSI6ImFzZHNkIiwiYXZhdGFyIjoiZGFzZGFzZGFzZCIsInVzZXJIYW5kbGUiOiJkYXNkYXNkIn0sInZpZGVvIjp7InRpdGxlIjoiRmlyc3QgRnJvbSBQT1NUTUFOIiwiZmlsZUlkIjoiMWc4d2RiVi1VeGJvS0E2bmhxTFNyemNZeXZZSElPYXhUIiwid2lsbFVwbG9hZEF0IjpudWxsfSwiaWF0IjoxNzQ4OTQxMTc2fQ.hRMrDKDS9ePa5veZ84zoX7eHHXqhka9CWXpcVqHDBkw
+POST http://localhost:3000/api/youtube/video-approval
+Content-Type: application/json
+Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQyOTU0Nzg5LWU0MGItNGFjMS1iYzg0LWRlNmI1YzIyN2NlMCIsImlhdCI6MTc0OTA5OTQxMiwiZXhwIjoxNzQ5MzU4NjEyfQ.dM30YNRNDPuDsJOhjULbCtddiHr9LrAgOCVdUNQFgNI; Path=/; Expires=Mon, 22 Aug 2033 04:56:52 GMT; Max-Age=259200000; Secure; HttpOnly; SameSite=true,acsTkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQyOTU0Nzg5LWU0MGItNGFjMS1iYzg0LWRlNmI1YzIyN2NlMCIsIm5hbWUiOiJIYXJzaGlsIFAiLCJ1c2VyVHlwZSI6InlvdXR1YmVyIiwiaWF0IjoxNzQ5MDk5NDEyLCJleHAiOjE3NDkxMDAzMTJ9.oBGSURREEZ5rrFLEYR9WHlD4QQbD-xVJmN6fP-kTvmA; Path=/; Expires=Mon, 22 Aug 2033 04:56:52 GMT; Max-Age=259200000; Secure; HttpOnly; SameSite=true
+
+{
+    "isApprove":true,
+    "schedule":null,
+    "fileId":"1res0rZDVQYcLx1cs03vC1KN4UmLYMBo1",
+    "workspaceId":"UCHZ0UZ7PTrabekn_r-owSZg"
+}
+

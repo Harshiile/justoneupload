@@ -1,5 +1,5 @@
 import { v4 } from "uuid"
-import { drive } from "../../lib/screats"
+import { drive } from "../../utils/screats"
 import Busboy from "busboy";
 import { NextRequest, NextResponse } from "next/server";
 import { JOUError } from "@/lib/error";
@@ -8,9 +8,10 @@ import { db } from "@/db";
 import { IncomingHttpHeaders } from "http";
 import { Readable } from "stream";
 import { ReadableStream } from "stream/web";
-import { getSocket } from "../../lib/socket";
+import { getSocket } from "../../utils/socket";
 import { Server as IOServer } from "socket.io";
-import { getUser } from "../../lib/getUser";
+import { getUser } from "../../utils/getUser";
+import { SendApprovalMail } from "@/app/mails/templates/approval";
 
 interface FileName {
     filename: string,
@@ -43,6 +44,7 @@ const DriveUpload = (file: object, filename: FileName, headers: IncomingHttpHead
                 const uploaded = progress.bytesRead || progress.loaded
                 const percent = Math.round((Number(uploaded) / Number((headers['content-length']) || 1)) * 100);
                 // io.to(headers['socket']!).emit('uploading-progress', { percentage: percent })
+                console.log(`Uploading -- ${percent}%`);
             }
         }
     })
@@ -58,7 +60,7 @@ export async function POST(req: NextRequest) {
         headers[key.toLowerCase()] = value;
     });
 
-    // if (!headers['socket']) return JOUError(404, "Socket is not connected")
+    if (!headers['socket']) return JOUError(404, "Socket is not connected")
 
     // Fetching other fields
     const fields: Record<string, string | boolean | null> = {
@@ -152,7 +154,7 @@ export async function POST(req: NextRequest) {
                 console.log('Video Inserted in DB');
 
                 // Send mail to youtuber - workspaceId
-                // await SendApprovalMail(mailInput)
+                await SendApprovalMail(mailInput)
 
 
                 resolve({});

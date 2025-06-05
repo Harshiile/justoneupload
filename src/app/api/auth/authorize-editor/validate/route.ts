@@ -1,4 +1,4 @@
-import { JwtValidate } from "@/app/api/lib/jwt";
+import { JwtValidate } from "@/app/api/utils/jwt";
 import { JOUError } from "@/lib/error";
 import { NextRequest, NextResponse } from "next/server";
 

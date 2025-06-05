@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm'
 import { cookieOptions } from "../utils/cookieOptions";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { JwtGenerate, JwtValidate } from "../../lib/jwt";
+import { JwtGenerate, JwtValidate } from "../../utils/jwt";
 
 export async function GET(req: NextRequest) {
     const refreshToken = req.cookies.get('auth')?.value?.toString()

@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchWorkspaceMetadata } from '../../route';
 import { SendAuthorizeMail } from '@/app/mails/templates/authorize';
-import { getUser } from '@/app/api/lib/getUser';
+import { getUser } from '@/app/api/utils/getUser';
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)

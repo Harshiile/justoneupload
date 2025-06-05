@@ -106,7 +106,7 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                     <div className="flex items-center gap-x-4">
                                         {user?.userType === 'editor' && (
                                             <motion.div whilehover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                                                <Link to="/upload">
+                                                <Link href="/upload">
                                                     <Button className="bg-white text-black font-bold">New Upload</Button>
                                                 </Link>
                                             </motion.div>

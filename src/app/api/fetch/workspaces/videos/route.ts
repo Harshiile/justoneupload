@@ -1,4 +1,4 @@
-import { oauth2Client } from "@/app/api/lib/screats";
+import { oauth2Client } from "@/app/api/utils/screats";
 import { db } from "@/db";
 import { UserTable, VideoTable, VideoWorkspaceJoinTable, WorkspaceTable } from "@/db/schema";
 import { CustomNextRequest } from "@/lib/customRequest";

@@ -1,3 +1,4 @@
+import { uploadQueue } from "@/app/api/redis/queue";
 import { db } from "@/db";
 import { VideoTable } from "@/db/schema";
 import { JOUError } from "@/lib/error";
@@ -20,24 +21,24 @@ export async function POST(req: Request) {
             console.log('Delay in Minutes : ', (Number(schedule) - Date.now()) / (1000 * 60));
 
 
-            // await uploadQueue.add('uploadVideoToYoutube', {
-            //     workspaceId,
-            //     fileId
-            // }, {
-            //     delay: Number(schedule) - Date.now(),
-            //     attempts: 3,
-            //     backoff: 60 * 1000, // 1 min
-            //     removeOnComplete: true
-            // })
+            await uploadQueue.add('uploadVideoToYoutube', {
+                workspaceId,
+                fileId
+            }, {
+                delay: Number(schedule) - Date.now(),
+                attempts: 3,
+                backoff: 60 * 1000, // 1 min
+                removeOnComplete: true
+            })
 
             // Set video state as uploadPending------------------
-            // await db
-            //     .update(VideoTable)
-            //     .set({
-            //         status: "uploadPending"
-            //     })
-            //     .where(eq(VideoTable.fileId, fileId))
-            //     .catch(_ => { throw new JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1026`) })
+            await db
+                .update(VideoTable)
+                .set({
+                    status: "uploadPending"
+                })
+                .where(eq(VideoTable.fileId, fileId))
+                .catch(_ => { return JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1026`) })
 
 
 
@@ -46,10 +47,10 @@ export async function POST(req: Request) {
         }
         else {
             // Immediate Upload
-            // await uploadQueue.add('uploadVideoToYoutube', {
-            //     workspaceId,
-            //     fileId
-            // })
+            await uploadQueue.add('uploadVideoToYoutube', {
+                workspaceId,
+                fileId
+            })
         }
         return NextResponse.json({
             message: !schedule ? 'Video Uploading Started' : `Video is Scheduled to upload on ${schedule.toDateString()} - ${schedule.toLocaleTimeString()}`

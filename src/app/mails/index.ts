@@ -1,4 +1,3 @@
-import { JOUError } from '@/lib/error';
 import nodemailer from 'nodemailer'
 
 const transporter = nodemailer.createTransport({
@@ -20,11 +19,11 @@ export const SendMail = async (email: string, subjectText: string, htmlText: str
         }
         mailOptions.to = email
         transporter.sendMail(mailOptions, (error, info) => {
-            if (error) return JOUError(400, "Email sending failed")
+            if (error) console.error("Email sending failed")
             else {
                 console.log("Email sent to " + email);
             }
         });
     }
-    else return JOUError(404, "Email not found")
+    else console.error("Email not found")
 }

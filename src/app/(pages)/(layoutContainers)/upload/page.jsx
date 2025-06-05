@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import { useEffect, useRef, useState } from 'react';
-// import { toast } from "sonner";
+import { toast } from "sonner";
 // import { useUser } from '@/context/user';
 import { UploadCloud } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -60,8 +60,10 @@ const Upload = () => {
             }
         })
         socket.connect();
-        socket.on('uploading-progress', ({ percentage }) => { console.log(percentage); setProgress(percentage) });
-        return () => socket.off('uploading-progress');
+        // socket.on('uploading-progress', ({ percentage }) => { console.log(percentage); setProgress(percentage) });
+
+        socket.on('test', (test) => { console.log('Socket Test : ', test) });
+        return () => socket.off('test');
     }, []);
 
     useEffect(() => {
@@ -97,9 +99,8 @@ const Upload = () => {
     };
 
     const handleUpload = async (e) => {
-        console.log('id : ', socket.id);
-
         e.preventDefault();
+
         if (!videoType) return toast.error("Type of Video is required");
         if (date && date.getTime() < Date.now()) return toast.warning("Uploading Time must be 1 hour ahead of current time");
         if (isMadeForKids == null) return toast.error("Audience Type is required");
@@ -139,8 +140,8 @@ const Upload = () => {
                 const resJson = await res.json()
                 console.log(resJson)
                 // setIsUploading(false);
-                // toast.success(resJson.message);
-                navigate.push('/dashboard')
+                toast.success(resJson.message);
+                // navigate.push('/dashboard')
             }
         } else {
             console.log('Wait for socket initialized');

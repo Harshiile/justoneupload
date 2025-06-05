@@ -1,36 +1,12 @@
-import { JOUError } from "@/lib/error"
-import { drive } from "../lib/screats"
-import { StreamMethodOptions } from "googleapis/build/src/apis/abusiveexperiencereport"
+import { JOUError } from "../../../lib/error.ts"
+import { drive } from "../utils/screats.ts"
 import { NextResponse } from "next/server"
 import { Readable } from "stream"
+import { getFileFromDrive } from "./utils/index.ts"
 
 // Video Delete
 export const deleteOnDrive = async (fileId: string) => {
     await drive.files.delete({ fileId }).catch(err => { JOUError(err.status, "Deletion Failed") })
-}
-
-// Fetch File From Drive
-export const getFileFromDrive = async (fileId: string, RangeObject?: { start: number, end: number }) => {
-    const responseOptions: StreamMethodOptions = RangeObject ? {
-        responseType: 'stream',
-        headers: {
-            Range: `bytes=${RangeObject.start}-${RangeObject.end}`
-        }
-    } : {
-        responseType: 'stream',
-    }
-    try {
-        const x = await drive.files.get(
-            {
-                fileId,
-                fields: 'size',
-                alt: 'media',
-            }, responseOptions).catch(_ => {
-                return { data: "" }
-            });
-
-        return x.data
-    } catch (error) { JOUError(404, "File not Found") }
 }
 
 

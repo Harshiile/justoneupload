@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { oauth2Client } from "../../lib/screats"
+import { oauth2Client } from "../../utils/screats"
 import { google } from "googleapis"
 import { JOUError } from "@/lib/error"
 import { db } from "@/db"
@@ -7,7 +7,7 @@ import { WorkspaceTable } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { CustomNextRequest } from "@/lib/customRequest"
 import { getURL } from "next/dist/shared/lib/utils"
-import { getUser } from "../../lib/getUser"
+import { getUser } from "../../utils/getUser"
 
 export async function GET(req: Request) {
     const scopes = [
