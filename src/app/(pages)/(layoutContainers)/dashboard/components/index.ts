@@ -1,9 +1,9 @@
 import { ChannelDrawer } from "./ChannelDrawer"
 import VideoCard from "./VideoCard"
-import WorkspaceSlider from "./WorkspaceSlider"
+import Contribution from "./Contribution"
 
 export {
     ChannelDrawer,
     VideoCard,
-    WorkspaceSlider
+    Contribution
 }

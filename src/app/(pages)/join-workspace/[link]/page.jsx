@@ -6,6 +6,7 @@ import { AsyncFetcher } from '@/lib/fetcher'
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { convertViews } from '../../(layoutContainers)/dashboard/components/VideoCard';
+import { CustomButton } from '@/components/CustomButton';
 
 const JoinWs = ({ params }) => {
     const searchParams = useSearchParams();
@@ -178,19 +179,21 @@ const JoinWs = ({ params }) => {
                                 className="flex justify-center gap-4 mt-6"
                             >
                                 <motion.button
-                                    onClick={_ => {
-                                        AsyncFetcher({
-                                            url: `/api/fetch/workspaces/join/initial?ws=${workspace.id}`,
-                                            cb: ({ message }) => {
-                                                toast.success(message);
-                                            }
-                                        })
-                                    }}
-                                    className="bg-primary text-white px-8 py-3 rounded-lg font-medium"
-                                    whileHover={{ scale: 1.05, backgroundColor: 'white', color: 'black', cursor: 'pointer' }}
+                                    className="bg-white text-black text-dull px-8 py-3 rounded-lg font-medium"
+                                    whileHover={{ scale: 1.05, backgroundColor: 'white', color: 'white', cursor: 'pointer' }}
                                     whileTap={{ scale: 0.95 }}
                                 >
-                                    Join Workspace
+                                    <CustomButton
+                                        title={'Join Workspace'}
+                                        cb={_ => {
+                                            AsyncFetcher({
+                                                url: `/api/fetch/workspaces/join/initial?ws=${workspace.id}`,
+                                                cb: ({ message }) => {
+                                                    toast.success(message);
+                                                }
+                                            })
+                                        }}
+                                    />
                                 </motion.button>
                                 <motion.button
                                     onClick={handleReject}
@@ -202,9 +205,9 @@ const JoinWs = ({ params }) => {
                                 </motion.button>
                             </motion.div>
                         </div>
-                    </motion.div>
+                    </motion.div >
             }
-        </motion.div>
+        </motion.div >
     )
 }
 

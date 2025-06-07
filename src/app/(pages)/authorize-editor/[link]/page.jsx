@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { AsyncFetcher } from '@/lib/fetcher';
 import { useRouter } from 'next/navigation';
+import { CustomButton } from '@/components/CustomButton';
 
 const Authorize = ({ params }) => {
     const [data, setData] = useState(null);
@@ -140,22 +141,20 @@ const Authorize = ({ params }) => {
                         variants={itemVariants}
                         className="flex justify-center gap-4 mt-4"
                     >
-                        <motion.button
-                            onClick={() => handleAuthorize(true)}
-                            className="bg-primary text-white px-8 py-3 rounded-lg font-medium"
-                            whileHover={{ scale: 1.05, backgroundColor: 'white', color: 'black', cursor: 'pointer' }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            Authorize
-                        </motion.button>
-                        <motion.button
-                            onClick={() => handleAuthorize(false)}
-                            className="bg-white text-black text-dull px-8 py-3 rounded-lg font-medium"
-                            whileHover={{ scale: 1.05, backgroundColor: 'red', color: 'white', cursor: 'pointer' }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            Decline
-                        </motion.button>
+
+                        <CustomButton
+                            className={'bg-green-500 text-white hover:text-white text-md h-12 px-7'}
+                            title={'Authorize'}
+                            cb={() => handleAuthorize(true)}
+                        />
+
+
+                        <CustomButton
+                            className={'bg-red-500 text-white hover:text-white text-md h-12 px-7'}
+                            title={'Decline'}
+                            cb={() => handleAuthorize(false)}
+                        />
+
                     </motion.div>
 
                 </div>

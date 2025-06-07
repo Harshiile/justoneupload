@@ -1,7 +1,7 @@
 import { JwtValidate } from "@/app/api/utils/jwt";
 import { JOUError } from "@/lib/error";
 import { NextRequest, NextResponse } from "next/server";
-import { fetchWorkspaceMetadata } from "../../../route";
+import { fetchWorkspaceMetadata } from "../../../utils";
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)

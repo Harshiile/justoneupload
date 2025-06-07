@@ -1,6 +1,7 @@
 "use client"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { CustomButton } from '@/components/CustomButton'
 
 import { useState, useEffect, use } from 'react'
 import { ThumbsUp, ThumbsDown } from 'lucide-react'
@@ -204,12 +205,16 @@ export default function Review({ params }) {
                                                         <Button variant="outline" onClick={() => setConfirmDialog(false)} className='text-black'>
                                                             Cancel
                                                         </Button>
-                                                        <Button
-                                                            className={`hover:cursor-pointer font-bold ${dialogData.cta == 'Approve' ? "bg-green-400 text-black hover:bg-green-500 hover:text-black" : "bg-red-500 hover:bg-red-600"}`}
-                                                            onClick={() => handleApprove(dialogData.cta == 'Approve' ? true : false)}
-                                                        >
-                                                            {dialogData.cta}
-                                                        </Button>
+                                                        <CustomButton
+                                                            className={`
+                                                                ${dialogData.cta == 'Approve' ?
+                                                                    'bg-green-500 hover:bg-green-500'
+                                                                    :
+                                                                    'bg-red-500 hover:bg-red-500'
+                                                                }`}
+                                                            title={dialogData.cta}
+                                                            cb={() => handleApprove(dialogData.cta == 'Approve' ? true : false)}
+                                                        />
                                                     </DialogFooter>
                                                 </DialogContent>
                                             </Dialog>

@@ -1,6 +1,6 @@
 "use client"
-import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { CustomButton } from '@/components/CustomButton';
 
 import { Clock, Eye } from 'lucide-react'
 import { Duration } from 'luxon'
@@ -10,7 +10,6 @@ import { useState } from 'react'
 import Schedule from '../../upload/components/Schedule'
 import { toast } from 'sonner'
 import Image from 'next/image'
-
 
 export const getTypeBadgeStyle = (type) => {
     switch (type.toLowerCase()) {
@@ -122,15 +121,15 @@ const VideoCard = ({ video, userType, isForDialog, isForDrawer, channel, classNa
                             className={'w-[45vw]'}
                         />
 
-                        <Button
-                            className="border border-secondary bg-white text-black hover:bg-white hover:text-black px-20 font-semibold text-md"
-                            onClick={_ => AsyncFetcher({
-                                url: `/video/update/schedule?id=${video.id}&schedule=${date.getTime()}`,
-                                cb: ({ message }) => { toast.success(message); setIsDialogOpen(false) }
-                            })}
-                        >
-                            Change
-                        </Button>
+                        <CustomButton
+                            title={'Change'}
+                            cb={() =>
+                                AsyncFetcher({
+                                    url: `/video/update/schedule?id=${video.id}&schedule=${date.getTime()}`,
+                                    cb: ({ message }) => { toast.success(message); setIsDialogOpen(false) }
+                                })
+                            }
+                        />
                     </div>
 
                 </DialogContent>
@@ -255,8 +254,10 @@ const VideoCard = ({ video, userType, isForDialog, isForDrawer, channel, classNa
                                     whileTap={{ scale: 0.95 }}
                                     transition={{ type: "spring", stiffness: 250 }}
                                 >
-                                    <Button
-                                        onClick={() => {
+
+                                    <CustomButton
+                                        title={'Review'}
+                                        cb={() =>
                                             AsyncFetcher({
                                                 url: '/api/fetch/videos/review/generate',
                                                 methodType: 'POST',
@@ -273,12 +274,9 @@ const VideoCard = ({ video, userType, isForDialog, isForDrawer, channel, classNa
                                                     window.open(link, '_blank')
                                                 }
                                             })
+
                                         }
-                                        }
-                                        className="bg-white text-black hover:bg-white/80 hover:text-black hover:cursor-pointer shadow-sm"
-                                    >
-                                        Review
-                                    </Button>
+                                    />
                                 </motion.div>
                             )}
                     </div>

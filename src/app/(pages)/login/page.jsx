@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CustomButton } from '@/components/CustomButton'
 import { toast } from "sonner";
 
 import { useState } from 'react';
@@ -131,14 +132,14 @@ const Login = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                 >
-                    <Button
-                        variant="default"
-                        className='w-full bg-white text-primary hover:bg-[#ffffffc7] font-medium text-md mt-2 transition'
-                        onClick={() => {
-                            if (!email) return toast.error('Email is required');
-                            if (!password) return toast.error('Password is required');
-                            if (!isLogin && !name) return toast.error('Name is required');
-                            if (!isLogin && !role) return toast.error('Role is required');
+                    <CustomButton
+                        className={'w-full'}
+                        title={isLogin ? 'Log In' : 'Sign Up'}
+                        cb={() => {
+                            if (!email) throw new Error('Email is required');
+                            if (!password) throw new Error('Password is required');
+                            if (!isLogin && !name) throw new Error('Name is required');
+                            if (!isLogin && !role) throw new Error('Role is required');
 
 
                             AsyncFetcher({
@@ -157,9 +158,7 @@ const Login = () => {
                                 }
                             })
                         }}
-                    >
-                        {isLogin ? 'Log In' : 'Sign Up'}
-                    </Button>
+                    />
                 </motion.div>
 
                 {/* Toggle link */}

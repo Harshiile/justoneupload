@@ -4,7 +4,7 @@ import {
 } from '@/components/ui/sidebar'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-
+import { CustomButton } from '@/components/CustomButton';
 
 import { useRef, useState, useEffect } from 'react'
 import { LayoutDashboard, LogOut, Video } from 'lucide-react'
@@ -146,14 +146,14 @@ export default function Layout({ children }) {
                         <Button variant="outline" onClick={() => setConfirmLogout(false)} className='text-black'>
                             Cancel
                         </Button>
-                        <Button variant="destructive"
-                            onClick={_ => AsyncFetcher({
+                        <CustomButton
+                            className={'bg-red-600 text-white hover:bg-red-600 hover:text-white'}
+                            title={'Logout'}
+                            cb={_ => AsyncFetcher({
                                 url: '/api/auth/logout',
                                 cb: _ => { setConfirmLogout(false); router.push('/login') }
                             })}
-                        >
-                            Logout
-                        </Button>
+                        />
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

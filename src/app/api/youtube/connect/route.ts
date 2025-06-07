@@ -1,15 +1,24 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { oauth2Client } from "../../utils/screats"
 import { google } from "googleapis"
 import { JOUError } from "@/lib/error"
 import { db } from "@/db"
 import { WorkspaceTable } from "@/db/schema"
-import { eq } from "drizzle-orm"
-import { CustomNextRequest } from "@/lib/customRequest"
-import { getURL } from "next/dist/shared/lib/utils"
+import { eq, sql } from "drizzle-orm"
 import { getUser } from "../../utils/getUser"
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
+    // WORKSPACE_CAPICITY
+    const { id: UserId } = getUser(req)
+    let [{ count }] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(WorkspaceTable)
+        .where(eq(WorkspaceTable.owner, 'd2954789-e40b-4ac1-bc84-de6b5c227ce0'));
+
+
+    if (count >= Number(process.env.WORKSPACE_CAPICITY)) return JOUError(401, "Workspace Limits Reached");
+
+
     const scopes = [
         'https://www.googleapis.com/auth/youtube.upload',
         'https://www.googleapis.com/auth/youtube.readonly',
@@ -24,7 +33,7 @@ export async function GET(req: Request) {
 }
 
 
-export async function POST(req: CustomNextRequest) {
+export async function POST(req: NextRequest) {
     const yt = google.youtube({ version: 'v3', auth: oauth2Client })
     const { id: userId } = getUser(req)
     const { searchParams } = new URL(req.url)

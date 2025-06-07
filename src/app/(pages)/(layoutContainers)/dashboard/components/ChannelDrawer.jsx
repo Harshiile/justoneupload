@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { CustomButton } from '@/components/CustomButton';
 
 import { Loader } from '@/components/Loader';
 import { ArrowUpDown } from 'lucide-react';
@@ -14,6 +15,7 @@ import { AsyncFetcher } from '@/lib/fetcher';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import Link from "next/link";
+
 
 import { useUser } from '@/hooks/store/user'
 
@@ -81,9 +83,9 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                     </div>
                                     {user?.userType === 'youtuber' && (
                                         <motion.div whilehover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                                            <Button
-                                                className="bg-white text-black font-bold hover:bg-white hover:text-black"
-                                                onClick={() =>
+                                            <CustomButton
+                                                title={'Generate Link'}
+                                                cb={() =>
                                                     AsyncFetcher({
                                                         url: `/api/fetch/workspaces/join/link/generate?ws=${channel.id}`,
                                                         cb: ({ link }) => {
@@ -92,9 +94,7 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                                         }
                                                     })
                                                 }
-                                            >
-                                                Generate Link
-                                            </Button>
+                                            />
                                         </motion.div>
                                     )}
                                 </div>
