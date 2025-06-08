@@ -13,14 +13,12 @@ export const CustomButton = ({ title, cb, className }) => {
             onClick={async () => {
                 setIsLoading(true)
                 try {
-                    // await cb()
+                    await cb()
                 } catch (error) {
                     setIsLoading(false)
                     toast.error(error.message)
                 } finally {
-                    setTimeout(() => {
-                        setIsLoading(false)
-                    }, 6000);
+                    setIsLoading(false)
                 }
             }}
         >

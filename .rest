@@ -1,4 +1,12 @@
+### 
+GET http://localhost:3000/api/fetch/chart/editor
+Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQyOTU0Nzg5LWU0MGItNGFjMS1iYzg0LWRlNmI1YzIyN2NlMCIsImlhdCI6MTc0OTM1NDE1MSwiZXhwIjoxNzQ5NjEzMzUxfQ.rM4GtOjS_2wTcYh546ZGJNAgF5frqUK-G7cSCxSzYaA; acsTkn=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQyOTU0Nzg5LWU0MGItNGFjMS1iYzg0LWRlNmI1YzIyN2NlMCIsIm5hbWUiOiJIYXJzaGlsIFAiLCJ1c2VyVHlwZSI6InlvdXR1YmVyIiwiaWF0IjoxNzQ5MzU0MTUxLCJleHAiOjE3NDk0NDA1NTF9.JXmHrYYURURDt4uYE_eQ0vsr7gnBGZJwGM-hJLJbfNU; 
 
 ###
-### 
-GET http://localhost:3000/api/fetch/chart/youtuber
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "email":"theharshiile@gmail.com",
+    "password":"12"
+}

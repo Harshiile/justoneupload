@@ -61,6 +61,7 @@ const Dashboard = () => {
     const setWorkspaces = useWorkspaces(state => state.setWorkspaces);
     // const navigate = useNavigate()
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [chartData, setChartData] = useState(null)
     const [filterVideos, setFilterVideos] = useState();
     const [pendingVideos, setPendingVideos] = useState({
         review: null,
@@ -71,32 +72,37 @@ const Dashboard = () => {
     const [isReviewVideos, setisReviewVideos] = useState(null)
 
     useEffect(() => {
-        AsyncFetcher({
-            url: '/api/fetch/workspaces',
-            cb: ({ workspaces }) => {
-                const tmpVideos = []
-                new Map(Object.entries(workspaces)).forEach(v => tmpVideos.push(v))
-                console.log(tmpVideos);
-                setWorkspaces(tmpVideos);
-            }
-        });
-        // AsyncFetcher({
-        //     url: '/api/fetch/videos',
-        //     cb: ({ videos }) => {
-        //         const reviewPendingVideos = []
-        //         const uploadPendingVideos = []
-        //         videos.filter(v => {
-        //             if (v.status == 'reviewPending') reviewPendingVideos.push(v);
-        //             else if (v.status == 'uploadPending') uploadPendingVideos.push(v);
-        //         })
-        //         setPendingVideos({
-        //             review: reviewPendingVideos,
-        //             upload: uploadPendingVideos
-        //         });
-        //         setisReviewVideos(true);
-        //     },
-        // });
-    }, [])
+        if (user) {
+            // AsyncFetcher({
+            //     url: '/api/fetch/workspaces',
+            //     cb: ({ workspaces }) => {
+            //         const tmpVideos = []
+            //         new Map(Object.entries(workspaces)).forEach(v => tmpVideos.push(v))
+            //         setWorkspaces(tmpVideos);
+            //     }
+            // });
+            AsyncFetcher({
+                url: `/api/fetch/chart?chart=1`,
+                cb: (totalEditors) => setChartData(totalEditors)
+            });
+            // AsyncFetcher({
+            //     url: '/api/fetch/videos',
+            //     cb: ({ videos }) => {
+            //         const reviewPendingVideos = []
+            //         const uploadPendingVideos = []
+            //         videos.filter(v => {
+            //             if (v.status == 'reviewPending') reviewPendingVideos.push(v);
+            //             else if (v.status == 'uploadPending') uploadPendingVideos.push(v);
+            //         })
+            //         setPendingVideos({
+            //             review: reviewPendingVideos,
+            //             upload: uploadPendingVideos
+            //         });
+            //         setisReviewVideos(true);
+            //     },
+            // });
+        }
+    }, [user])
 
     return (
         <>
@@ -110,7 +116,6 @@ const Dashboard = () => {
                         cb={() => AsyncFetcher({
                             url: '/api/youtube/connect',
                             cb: ({ url }) => {
-                                console.log(url)
                             }
                         })}
                         className='bg-red-600 hover:bg-red-600 text-white text-md hover:text-white'
@@ -245,7 +250,7 @@ const Dashboard = () => {
                         transition={{ delay: 0.2 }}
                     >
                         <p className="text-lg font-semibold mb-2">Contribution</p>
-                        <Contribution contributions={contributionData} />
+                        <Contribution chartData={chartData} />
                     </motion.div>
                 </div >
 
@@ -300,39 +305,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-
-const contributionData = [
-    {
-        id: '1',
-        userHandle: "@harshiile",
-        editors: [
-            { editor: 'Editor 1', count: 2 },
-            { editor: 'Editor 2', count: 3 },
-            { editor: 'Editor 3', count: 7 },
-            { editor: 'Editor 4', count: 4 },
-        ],
-    },
-    {
-        id: '2',
-        userHandle: "@codewithhp",
-        editors: [
-            { editor: 'Editor 1', count: 1 },
-            { editor: 'Editor 3', count: 5 },
-        ],
-    },
-    {
-        id: '3',
-        userHandle: "@designxmaya",
-        editors: [], // 0 editors
-    },
-    {
-        id: '4',
-        userHandle: "@theeditgenius",
-        editors: [
-            { editor: 'Editor 2', count: 4 },
-            { editor: 'Editor 4', count: 2 },
-            { editor: 'Editor 5', count: 3 },
-        ],
-    },
-];
