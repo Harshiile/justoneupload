@@ -95,12 +95,12 @@ export const convertDuration = (duration) => {
     return formattedDuration
 }
 
-const VideoCard = ({ video, userType, isForDialog, isForDrawer, channel, className }) => {
+const VideoCard = ({ video, userType, showChangeScheduleButton, isForDrawer, channel, className }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [date, setDate] = useState(null)
     const thumbnailUrl = video.thumbnail
         ? video.status !== 'uploaded'
-            ? `http://localhost:3000/api/drive?type=image&id=${video.thumbnail}`
+            ? `/api/drive?type=image&id=${video.thumbnail}`
             : video.thumbnail
         : '/invalid.jpg';
 
@@ -112,23 +112,26 @@ const VideoCard = ({ video, userType, isForDialog, isForDrawer, channel, classNa
                         <DialogTitle className="text-2xl">Change Schedule Time</DialogTitle>
                     </DialogHeader>
 
-                    <div className="flex flex-col items-center justify-center gap-y-2 mt-20 absolute left-1/2 -translate-x-1/2 w-full px-10">
+                    <div className="flex flex-col items-center justify-center gap-y-2 mt-20 absolute left-1/2 -translate-x-1/2 w-full px-60">
                         <Schedule id="schedule" date={date} setDate={setDate} />
 
                         <VideoCard
                             video={video}
-                            isForDialog={true}
+                            showChangeScheduleButton={false}
                             className={'w-[45vw]'}
                         />
 
                         <CustomButton
                             title={'Change'}
-                            cb={() =>
+                            cb={() => {
+                                if (date.getTime() == Number(video.willUploadAt)) toast.warning('Time is as same as Previous');
+                                if (date.getTime() < Date.now()) toast.error('New Schedule Time must be ahead of current time');
+
                                 AsyncFetcher({
-                                    url: `/video/update/schedule?id=${video.id}&schedule=${date.getTime()}`,
+                                    url: `/api/videos/update-schedule?id=${video.id}&schedule=${date.getTime()}`,
                                     cb: ({ message }) => { toast.success(message); setIsDialogOpen(false) }
                                 })
-                            }
+                            }}
                         />
                     </div>
 
@@ -157,6 +160,7 @@ const VideoCard = ({ video, userType, isForDialog, isForDrawer, channel, classNa
                                 alt={video.title}
                                 width={1280}
                                 height={720}
+                                quality={100}
                                 placeholder="empty"
                                 className="h-full w-full object-cover rounded-md group-hover:scale-105 transition-transform duration-300"
                             />
@@ -177,17 +181,11 @@ const VideoCard = ({ video, userType, isForDialog, isForDrawer, channel, classNa
                                 )}
                             </div>
                             {(!isForDrawer || (userType === 'editor' && video.status == 'uploaded')) && (
-                                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                    {isForDrawer
-                                        &&
-                                        <img
-                                            src={video.channel?.avatar || "/placeholder.svg"}
-                                            alt={video.channelHandle}
-                                            className="w-5 h-5 rounded-full"
-                                        />
-                                    }
-                                    <span>{!isForDrawer ? video.userHandle : video.channelHandle}</span>
-                                </div>
+                                !isForDrawer
+                                &&
+                                <span className='text-sm text-muted-foreground'>
+                                    {!isForDrawer ? video.userHandle : video.channelHandle}
+                                </span>
                             )}
                             {video.status === 'uploaded' ? (
                                 <div className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -199,31 +197,33 @@ const VideoCard = ({ video, userType, isForDialog, isForDrawer, channel, classNa
                                         <Clock className="h-3.5 w-3.5" />
                                         <span>{convertPublishTime(video.publishedAt)}</span>
                                     </div>
-
+                                    {console.log(Date.now())}
                                 </div>
                             ) : (
                                 video.willUploadAt ?
                                     <div className="flex items-center gap-x-2 text-sm text-muted-foreground">
                                         <Clock className="h-3.5 w-3.5" />
                                         {
-                                            isForDialog ?
-                                                <span>
-                                                    Previous Scheudle Time : {convertDate(video.willUploadAt)}
-                                                </span>
-                                                :
+                                            showChangeScheduleButton ?
                                                 <span>
                                                     Scheduled to upload on {convertDate(video.willUploadAt)}
                                                 </span>
+                                                :
+                                                <span>
+                                                    Previous Scheudle Time : {convertDate(video.willUploadAt)}
+                                                </span>
                                         }
                                         {
-                                            !isForDialog &&
+                                            showChangeScheduleButton &&
                                             <button
                                                 className='border border-secondary px-2 py-1 rounded-md ml-4 text-white hover:border-white'
                                                 onClick={_ => {
                                                     setDate(new Date())
                                                     setIsDialogOpen(true)
                                                 }}
-                                            >Change Schedule Time</button>
+                                            >
+                                                Change Schedule Time
+                                            </button>
                                         }
                                     </div>
                                     :

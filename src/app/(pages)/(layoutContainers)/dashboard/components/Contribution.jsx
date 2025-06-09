@@ -73,8 +73,6 @@ const Contribution = ({ user, chartData }) => {
                                                     labelLine={false}
                                                 >
                                                     {filteredData?.map((entry, index) => {
-                                                        console.log(entry);
-
                                                         return <Cell key={entry.id} fill={COLORS[index % COLORS.length]} />
                                                     })}
                                                 </Pie>

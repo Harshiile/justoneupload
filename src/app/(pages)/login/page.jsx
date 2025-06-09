@@ -93,7 +93,7 @@ const Login = () => {
                     className='flex flex-col items-start gap-y-2'
                 >
                     <Label htmlFor='password' className='text-md' > Password </Label>
-                    < Input
+                    <Input
                         id='password'
                         type="password"
                         className='border border-[#27272a] bg-transparent text-md focus-visible:ring-1 focus-visible:ring-blue-500 transition'
@@ -128,38 +128,33 @@ const Login = () => {
                 </AnimatePresence>
 
                 {/* Submit Button */}
-                <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                >
-                    <CustomButton
-                        className={'w-full'}
-                        title={isLogin ? 'Log In' : 'Sign Up'}
-                        cb={() => {
-                            if (!email) throw new Error('Email is required');
-                            if (!password) throw new Error('Password is required');
-                            if (!isLogin && !name) throw new Error('Name is required');
-                            if (!isLogin && !role) throw new Error('Role is required');
 
+                <CustomButton
+                    className={'w-full'}
+                    title={isLogin ? 'Log In' : 'Sign Up'}
+                    cb={() => {
+                        if (!email) throw new Error('Email is required');
+                        if (!password) throw new Error('Password is required');
+                        if (!isLogin && !name) throw new Error('Name is required');
+                        if (!isLogin && !role) throw new Error('Role is required');
 
-                            AsyncFetcher({
-                                url: '/api/auth/login',
-                                methodType: 'POST',
-                                body: {
-                                    email,
-                                    password
-                                },
-                                cb: ({ message, user }) => {
-                                    console.log(message);
-                                    console.log(user);
-                                    setUser(user)
-                                    toast.success(message);
-                                    navigate.push('/dashboard');
-                                }
-                            })
-                        }}
-                    />
-                </motion.div>
+                        AsyncFetcher({
+                            url: '/api/auth/login',
+                            methodType: 'POST',
+                            body: {
+                                email,
+                                password
+                            },
+                            cb: ({ message, user }) => {
+                                console.log(message);
+                                console.log(user);
+                                setUser(user)
+                                toast.success(message);
+                                navigate.push('/dashboard');
+                            }
+                        })
+                    }}
+                />
 
                 {/* Toggle link */}
                 <motion.div

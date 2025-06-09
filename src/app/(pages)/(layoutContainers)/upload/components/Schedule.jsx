@@ -20,10 +20,6 @@ const Schedule = ({ date, setDate, className }) => {
     const [isOpen, setIsOpen] = useState(false);
     const hours = Array.from({ length: 12 }, (_, i) => i + 1);
 
-    const handleDateSelect = (selectedDate) => {
-        if (selectedDate) setDate(selectedDate);
-    };
-
     const handleTimeChange = (type, value) => {
         if (date) {
             const newDate = new Date(date);

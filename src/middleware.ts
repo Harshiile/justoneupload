@@ -43,7 +43,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/api/drive/:path*', '/api/youtube/:path*', '/api/fetch/:path*', '/api/update/:path*'],
+    matcher: ['/api/drive/:path*', '/api/youtube/:path*', '/api/videos/:path*', '/api/fetch/:path*', '/api/update/:path*'],
 }
 
 

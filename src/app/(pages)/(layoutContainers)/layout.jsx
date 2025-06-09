@@ -16,16 +16,16 @@ import Image from 'next/image'
 import { AsyncFetcher } from '@/lib/fetcher'
 import Link from 'next/link'
 import { fetchMe } from '@/lib/fetchMe'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 
 export default function Layout({ children }) {
     const user = useUser(state => state.user)
     const setUser = useUser(state => state.setUser)
-    const currentPath = '/dashboard'
     const [open, setOpen] = useState(false);
     const [confirmLogout, setConfirmLogout] = useState(false);
     const buttonRef = useRef()
     const router = useRouter()
+    const pathname = usePathname()
 
     useEffect(() => {
         !user && fetchMe(setUser)
@@ -55,7 +55,7 @@ export default function Layout({ children }) {
                                             user?.userType == 'editor' &&
                                             <Link href='/upload'>
                                                 <SidebarMenuItem>
-                                                    <SidebarMenuButton isActive={currentPath.pathname == '/upload'}>
+                                                    <SidebarMenuButton isActive={pathname == '/upload'}>
                                                         <Video className="h-4 w-4" />
                                                         <span>Upload</span>
                                                     </SidebarMenuButton>
@@ -65,7 +65,7 @@ export default function Layout({ children }) {
 
                                         <Link href='/dashboard'>
                                             <SidebarMenuItem>
-                                                <SidebarMenuButton isActive={currentPath.pathname == '/dashboard'}>
+                                                <SidebarMenuButton isActive={pathname == '/dashboard'}>
                                                     <LayoutDashboard className="h-4 w-4" />
                                                     <span>Dashboard</span>
                                                 </SidebarMenuButton>
@@ -144,7 +144,7 @@ export default function Layout({ children }) {
                                 Cancel
                             </Button>
                             <CustomButton
-                                className={'bg-red-600 text-white hover:bg-red-600 hover:text-white'}
+                                className={' bg-red-600 text-white hover:bg-red-600 hover:text-white'}
                                 title={'Logout'}
                                 cb={_ => AsyncFetcher({
                                     url: '/api/auth/logout',

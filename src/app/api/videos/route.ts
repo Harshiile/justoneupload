@@ -3,7 +3,7 @@ import { EditorWorkspaceJoinTable, UserTable, VideoTable, WorkspaceTable } from 
 import { JOUError } from "@/lib/error";
 import { and, eq, inArray } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
-import { getUser } from "../../utils/getUser";
+import { getUser } from "../utils/getUser";
 
 export async function GET(req: NextRequest) {
     const { id: userId, userType } = getUser(req)

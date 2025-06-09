@@ -34,7 +34,7 @@ const PendingVideos = ({ videos, isReviewVideos, user, channel }) => {
                     <VideoCard
                         video={video}
                         userType={user?.userType}
-                        isForDialog={false}
+                        showChangeScheduleButton={true}
                         isForDrawer={false}
                         channel={channel}
                     />
@@ -43,7 +43,7 @@ const PendingVideos = ({ videos, isReviewVideos, user, channel }) => {
             ))
             :
             <motion.div
-                className="text-muted-foreground text-center col-span-full"
+                className="text-muted-foreground text-center h-full grid place-items-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
             >
@@ -62,7 +62,7 @@ const Dashboard = () => {
     // const navigate = useNavigate()
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [chartData, setChartData] = useState(null)
-    const [filterVideos, setFilterVideos] = useState();
+    const [filterVideos, setFilterVideos] = useState(null);
     const [pendingVideos, setPendingVideos] = useState({
         review: null,
         upload: null
@@ -73,20 +73,20 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (user) {
+            // AsyncFetcher({
+            //     url: '/api/fetch/workspaces',
+            //     cb: ({ workspaces }) => {
+            //         const tmpVideos = []
+            //         new Map(Object.entries(workspaces)).forEach(v => tmpVideos.push(v))
+            //         setWorkspaces(tmpVideos);
+            //     }
+            // });
+            // AsyncFetcher({
+            //     url: `/api/fetch/chart?chart=1`,
+            //     cb: (totalEditors) => setChartData(totalEditors)
+            // });
             AsyncFetcher({
-                url: '/api/fetch/workspaces',
-                cb: ({ workspaces }) => {
-                    const tmpVideos = []
-                    new Map(Object.entries(workspaces)).forEach(v => tmpVideos.push(v))
-                    setWorkspaces(tmpVideos);
-                }
-            });
-            AsyncFetcher({
-                url: `/api/fetch/chart?chart=1`,
-                cb: (totalEditors) => setChartData(totalEditors)
-            });
-            AsyncFetcher({
-                url: '/api/fetch/videos',
+                url: '/api/videos',
                 cb: ({ videos }) => {
                     const reviewPendingVideos = []
                     const uploadPendingVideos = []
@@ -268,6 +268,7 @@ const Dashboard = () => {
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
+                                        disabled={!pendingVideos.review}
                                         className='bg-white text-black font-bold hover:bg-white hover:text-black hover:ont-bold hover:cursor-pointer'
                                         onClick={_ => setisReviewVideos(!isReviewVideos)}
                                     >{isReviewVideos ? 'Review Pending' : 'Upload Pending'}

@@ -15,11 +15,7 @@ import { SendApprovalMail } from "@/app/mails/templates/approval";
 import { Transform } from "stream";
 import mime from "mime";
 
-interface FileName {
-    filename: string,
-    encoding: string,
-    mimeType: string
-}
+
 type VideoType = 'public' | 'private' | 'unlisted'
 
 const parseFieldData = (data: string) => {

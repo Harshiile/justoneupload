@@ -199,10 +199,12 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                                 ))}
                                             </AnimatePresence>
                                         ) : (
-                                            <p>Workspace does not contain any videos</p>
+                                            <p className="text-muted-foreground text-center mt-[25vh]">
+                                                Workspace does not contain any videos
+                                            </p>
                                         )
                                     ) : (
-                                        <Loader className="absolute top-1/2 left-1/2" />
+                                        <Loader className="absolute top-1/2 left-1/2  text-center" />
                                     )}
                                 </div>
                             </div>
