@@ -73,34 +73,34 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (user) {
-            // AsyncFetcher({
-            //     url: '/api/fetch/workspaces',
-            //     cb: ({ workspaces }) => {
-            //         const tmpVideos = []
-            //         new Map(Object.entries(workspaces)).forEach(v => tmpVideos.push(v))
-            //         setWorkspaces(tmpVideos);
-            //     }
-            // });
+            AsyncFetcher({
+                url: '/api/fetch/workspaces',
+                cb: ({ workspaces }) => {
+                    const tmpVideos = []
+                    new Map(Object.entries(workspaces)).forEach(v => tmpVideos.push(v))
+                    setWorkspaces(tmpVideos);
+                }
+            });
             AsyncFetcher({
                 url: `/api/fetch/chart?chart=1`,
                 cb: (totalEditors) => setChartData(totalEditors)
             });
-            // AsyncFetcher({
-            //     url: '/api/fetch/videos',
-            //     cb: ({ videos }) => {
-            //         const reviewPendingVideos = []
-            //         const uploadPendingVideos = []
-            //         videos.filter(v => {
-            //             if (v.status == 'reviewPending') reviewPendingVideos.push(v);
-            //             else if (v.status == 'uploadPending') uploadPendingVideos.push(v);
-            //         })
-            //         setPendingVideos({
-            //             review: reviewPendingVideos,
-            //             upload: uploadPendingVideos
-            //         });
-            //         setisReviewVideos(true);
-            //     },
-            // });
+            AsyncFetcher({
+                url: '/api/fetch/videos',
+                cb: ({ videos }) => {
+                    const reviewPendingVideos = []
+                    const uploadPendingVideos = []
+                    videos.filter(v => {
+                        if (v.status == 'reviewPending') reviewPendingVideos.push(v);
+                        else if (v.status == 'uploadPending') uploadPendingVideos.push(v);
+                    })
+                    setPendingVideos({
+                        review: reviewPendingVideos,
+                        upload: uploadPendingVideos
+                    });
+                    setisReviewVideos(true);
+                },
+            });
         }
     }, [user])
 
@@ -177,7 +177,6 @@ const Dashboard = () => {
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
                                                             <motion.div
-                                                                key={idx}
                                                                 whilehover={{ scale: 1.05 }}
                                                                 transition={{ type: 'spring', stiffness: 180 }}
                                                                 className={`relative w-24 h-24 rounded-full overflow-hidden border-4 ${ws.disconnected ? 'border-red-500 cursor-pointer' : 'cursor-pointer border-secondary '}`}
@@ -250,7 +249,7 @@ const Dashboard = () => {
                         transition={{ delay: 0.2 }}
                     >
                         <p className="text-lg font-semibold mb-2">Contribution</p>
-                        <Contribution chartData={chartData} />
+                        <Contribution chartData={chartData} user={user} />
                     </motion.div>
                 </div >
 

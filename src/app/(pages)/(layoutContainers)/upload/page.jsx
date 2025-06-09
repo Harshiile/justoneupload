@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import { useEffect, useRef, useState } from 'react';
 import { toast } from "sonner";
-// import { useUser } from '@/context/user';
+import { useUser } from '@/hooks/store/user'
 import { UploadCloud } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { UploaderDrawer, FileInfo, ChooseWS, Schedule, CustomCalendar, YoutuberView } from './components'
@@ -25,6 +25,8 @@ const fadeIn = {
 };
 
 const Upload = () => {
+    const TWO_MB_IN_BYTES = 2097152;
+    const ONE_HOUR_IN_MILISECONDS = 60 * 60 * 1000;
     const navigate = useRouter();
     const [file, setFile] = useState(null);
     const [thumbnailFile, setThumbnailFile] = useState(null);
@@ -44,13 +46,7 @@ const Upload = () => {
     const [isThumbnail, setIsThumbnail] = useState(null);
     const [chosenWs, setChosenWs] = useState(null);
     const [workspacesForChooseWS, setWorkspacesForChooseWS] = useState(null)
-
-    // const [user] = useUser();
-    const [user] = useState({
-        id: 'sdsd',
-        userType: 'editor',
-        name: "Habibib"
-    });
+    const user = useUser(state => state.user);
 
     useEffect(() => {
         AsyncFetcher({
@@ -102,9 +98,9 @@ const Upload = () => {
         e.preventDefault();
 
         if (!videoType) return toast.error("Type of Video is required");
-        if (date && date.getTime() < Date.now()) return toast.warning("Uploading Time must be 1 hour ahead of current time");
+        if (date && date.getTime() < Date.now() + ONE_HOUR_IN_MILISECONDS) return toast.warning("Uploading Time must be 1 hour ahead of current time");
         if (isMadeForKids == null) return toast.error("Audience Type is required");
-        if (thumbnailFile && thumbnailFile.size >= 2097152) return toast.error("Thumbnail size must be under 2 MB");
+        if (thumbnailFile && thumbnailFile.size >= TWO_MB_IN_BYTES) return toast.error("Thumbnail size must be under 2 MB");
         if (!file) return toast.error("Please select a video first");
 
         const formData = new FormData();
