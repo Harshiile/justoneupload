@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { PieChart, Pie, Cell, Legend, ResponsiveContainer } from 'recharts';
 import { AsyncFetcher } from '@/lib/fetcher';
 import { Loader } from '@/components/Loader';
+import { AnimatePresence, motion } from "framer-motion"
 
 const Contribution = ({ user, chartData }) => {
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];

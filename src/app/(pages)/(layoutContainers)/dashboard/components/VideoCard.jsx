@@ -128,7 +128,7 @@ const VideoCard = ({ video, userType, showChangeScheduleButton, isForDrawer, cha
                                 if (date.getTime() < Date.now()) toast.error('New Schedule Time must be ahead of current time');
 
                                 AsyncFetcher({
-                                    url: `/api/videos/update-schedule?id=${video.id}&schedule=${date.getTime()}`,
+                                    url: `/api/videos / update - schedule ? id = ${video.id} & schedule= ${date.getTime()}`,
                                     cb: ({ message }) => { toast.success(message); setIsDialogOpen(false) }
                                 })
                             }}
@@ -138,150 +138,131 @@ const VideoCard = ({ video, userType, showChangeScheduleButton, isForDrawer, cha
                 </DialogContent>
             </Dialog>
 
+
             <motion.div
                 initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, ease: 'easeOut' }}
-                className='my-4'
+                transition={{ duration: 0.4, ease: 'easeOut', type: "spring", stiffness: 200, damping: 20 }}
+                key={video.id}
+                onClick={e => video.status !== 'uploaded' && e.preventDefault()}
+                whileHover={{ scale: 1.01 }}
+                className={`flex flex-col md:flex-row items-start md:items-center justify-between rounded-lg overflow-hidden bg-primary shadow-sm transition-shadow hover:shadow-xl text-white cursor-auto py-3 px-3 gap-4 md:gap-6 ${className}`}
             >
-                <div
-                    key={video.id}
-                    onClick={e => video.status !== 'uploaded' && e.preventDefault()}
-                    whilehover={{ scale: 1.01 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                    className={`flex items-center justify-between rounded-lg overflow-hidden bg-primary shadow-sm transition-shadow over:shadow-xl text-white cursor-auto py-3 px-3 ${className}`}
-                >
+                {/* Left Section */}
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6 flex-1 w-full">
+                    <div className="relative flex-shrink-0 w-full max-w-xs md:w-[140px] md:h-[80px] rounded-md overflow-hidden group">
+                        <Image
+                            src={thumbnailUrl}
+                            alt={video.title}
+                            width={1280}
+                            height={720}
+                            quality={100}
+                            placeholder="empty"
+                            className="w-full h-auto md:h-full object-cover rounded-md group-hover:scale-105 transition-transform duration-300"
+                        />
+                        {video.duration && (
+                            <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1 rounded">
+                                {convertDuration(video.duration)}
+                            </span>
+                        )}
+                    </div>
 
-                    {/* Left Section */}
-                    <div className="flex items-start gap-x-4 flex-1">
-                        <div className="relative h-[80px] w-[140px] flex-shrink-0 overflow-hidden rounded-md group">
-                            <Image
-                                src={thumbnailUrl}
-                                alt={video.title}
-                                width={1280}
-                                height={720}
-                                quality={100}
-                                placeholder="empty"
-                                className="h-full w-full object-cover rounded-md group-hover:scale-105 transition-transform duration-300"
-                            />
-                            {video.duration && (
-                                <span className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1 rounded">
-                                    {convertDuration(video.duration)}
+                    {/* Video info */}
+                    <div className="flex flex-col justify-between flex-1 w-full">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="text-base font-semibold line-clamp-2 max-w-full">{video.title}</h3>
+                            {video.videoType && (
+                                <span className={`text-xs font-bold rounded px-2 py-0.5 ${getTypeBadgeStyle(video.videoType)}`}>
+                                    {video.videoType.toUpperCase()}
                                 </span>
                             )}
                         </div>
-                        {/* Video info */}
-                        <div className="flex flex-col justify-between flex-1 gap-y-1">
-                            <div className="flex items-center gap-2">
-                                <h3 className="text-base font-semibold line-clamp-2">{video.title}</h3>
-                                {video.videoType && (
-                                    <span className={`text-xs font-bold rounded px-2 py-0.5 ${getTypeBadgeStyle(video.videoType)}`}>
-                                        {video.videoType.toUpperCase()}
-                                    </span>
-                                )}
+
+                        {(!isForDrawer || (userType === 'editor' && video.status === 'uploaded')) && !isForDrawer && (
+                            <span className="text-sm text-muted-foreground truncate">{video.userHandle || video.channelHandle}</span>
+                        )}
+
+                        {video.status === 'uploaded' ? (
+                            <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mt-1">
+                                <div className="flex items-center gap-1">
+                                    <Eye className="h-3.5 w-3.5" />
+                                    <span>{convertViews(video.views)}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <Clock className="h-3.5 w-3.5" />
+                                    <span>{convertPublishTime(video.publishedAt)}</span>
+                                </div>
                             </div>
-                            {(!isForDrawer || (userType === 'editor' && video.status == 'uploaded')) && (
-                                !isForDrawer
-                                &&
-                                <span className='text-sm text-muted-foreground'>
-                                    {!isForDrawer ? video.userHandle : video.channelHandle}
-                                </span>
-                            )}
-                            {video.status === 'uploaded' ? (
-                                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                    <div className="flex items-center gap-1">
-                                        <Eye className="h-3.5 w-3.5" />
-                                        <span>{convertViews(video.views)}</span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <Clock className="h-3.5 w-3.5" />
-                                        <span>{convertPublishTime(video.publishedAt)}</span>
-                                    </div>
-                                    {console.log(Date.now())}
+                        ) : (
+                            video.willUploadAt ? (
+                                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mt-1">
+                                    <Clock className="h-3.5 w-3.5" />
+                                    {showChangeScheduleButton ? (
+                                        <span>Scheduled to upload on {convertDate(video.willUploadAt)}</span>
+                                    ) : (
+                                        <span>Previous Schedule Time: {convertDate(video.willUploadAt)}</span>
+                                    )}
+                                    {showChangeScheduleButton && (
+                                        <button
+                                            className="border border-secondary px-2 py-1 rounded-md ml-4 text-white hover:border-white"
+                                            onClick={() => {
+                                                setDate(new Date());
+                                                setIsDialogOpen(true);
+                                            }}
+                                        >
+                                            Change Schedule Time
+                                        </button>
+                                    )}
                                 </div>
                             ) : (
-                                video.willUploadAt ?
-                                    <div className="flex items-center gap-x-2 text-sm text-muted-foreground">
-                                        <Clock className="h-3.5 w-3.5" />
-                                        {
-                                            showChangeScheduleButton ?
-                                                <span>
-                                                    Scheduled to upload on {convertDate(video.willUploadAt)}
-                                                </span>
-                                                :
-                                                <span>
-                                                    Previous Scheudle Time : {convertDate(video.willUploadAt)}
-                                                </span>
-                                        }
-                                        {
-                                            showChangeScheduleButton &&
-                                            <button
-                                                className='border border-secondary px-2 py-1 rounded-md ml-4 text-white hover:border-white'
-                                                onClick={_ => {
-                                                    setDate(new Date())
-                                                    setIsDialogOpen(true)
-                                                }}
-                                            >
-                                                Change Schedule Time
-                                            </button>
-                                        }
-                                    </div>
-                                    :
-                                    <p className='text-sm text-muted-foreground'>Will Upload immediately after youtuber approval</p>
-
-                            )}
-                        </div>
+                                <p className="text-sm text-muted-foreground mt-1">Will upload immediately after YouTuber approval</p>
+                            )
+                        )}
                     </div>
+                </div>
 
-                    {/* Right Badge + Button */}
-                    <div className='flex gap-x-4 items-center'>
-                        <span
-                            className={`text-xs rounded-md px-3 py-1 flex items-center gap-x-2 ${getStatusBadgeStyle(video.status)}`}
+                {/* Right Badge + Button */}
+                <div className="flex flex-wrap items-center gap-4 mt-2 md:mt-0">
+                    <span className={`text-xs rounded-md px-3 py-1 flex items-center gap-x-2 ${getStatusBadgeStyle(video.status)}`}>
+                        <p className="font-bold text-md">@{video.editor}</p>
+                    </span>
+                    <span className={`text-xs rounded-md px-3 py-2 flex items-center gap-x-2 ${getStatusBadgeStyle(video.status)}`}>
+                        <Clock className="w-4 h-4" />
+                        <p className="font-bold text-md">{getStatusLabel(video.status)}</p>
+                    </span>
+
+                    {isForDrawer && userType === 'youtuber' && video.status === 'reviewPending' && (
+                        <motion.div
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 250 }}
                         >
-                            <p className="font-bold text-md">@{video.editor}</p>
-                        </span>
-                        <span
-                            className={`text-xs rounded-md px-3 py-2 flex items-center gap-x-2 ${getStatusBadgeStyle(video.status)}`}
-                        >
-                            <Clock className="w-4 h-4" />
-                            <p className="font-bold text-md">{getStatusLabel(video.status)}</p>
-                        </span>
-
-                        {
-                            (isForDrawer && userType === 'youtuber' && video.status === 'reviewPending') && (
-                                <motion.div
-                                    whilehover={{ scale: 1.03 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    transition={{ type: "spring", stiffness: 250 }}
-                                >
-
-                                    <CustomButton
-                                        title={'Review'}
-                                        cb={() =>
-                                            AsyncFetcher({
-                                                url: '/api/fetch/videos/review/generate',
-                                                methodType: 'POST',
-                                                body: {
-                                                    name: channel.name,
-                                                    avatar: channel.avatar,
-                                                    userHandle: channel.userHandle,
-                                                    id: video.id,
-                                                    title: video.title,
-                                                    fileId: video.fileId,
-                                                    willUploadAt: video.willUploadAt
-                                                },
-                                                cb: ({ link }) => {
-                                                    window.open(link, '_blank')
-                                                }
-                                            })
-
+                            <CustomButton
+                                title={'Review'}
+                                cb={() =>
+                                    AsyncFetcher({
+                                        url: '/api/fetch/videos/review/generate',
+                                        methodType: 'POST',
+                                        body: {
+                                            name: channel.name,
+                                            avatar: channel.avatar,
+                                            userHandle: channel.userHandle,
+                                            id: video.id,
+                                            title: video.title,
+                                            fileId: video.fileId,
+                                            willUploadAt: video.willUploadAt
+                                        },
+                                        cb: ({ link }) => {
+                                            window.open(link, '_blank');
                                         }
-                                    />
-                                </motion.div>
-                            )}
-                    </div>
-                </div >
-            </motion.div >
+                                    })
+                                }
+                            />
+                        </motion.div>
+                    )}
+                </div>
+            </motion.div>
+
         </>
     );
 }

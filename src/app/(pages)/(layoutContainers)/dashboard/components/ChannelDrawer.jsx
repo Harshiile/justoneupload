@@ -65,33 +65,36 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 40 }}
                         transition={{ duration: 0.4, ease: "easeOut" }}
+                        aria-modal="true"
+                        role="dialog"
                     >
-                        <DrawerContent className="h-[80vh] w-screen border-none bg-primary text-white">
+                        <DrawerContent className="h-[80vh] w-screen max-w-full border-none bg-primary text-white flex flex-col">
                             <DrawerHeader>
-                                <div className="flex items-center justify-between border-b border-border/40 px-6 py-4 bg-primary">
-                                    <div className="flex items-center gap-4">
-                                        <Avatar className="h-12 w-12">
+                                <div className="flex flex-col md:flex-row items-center justify-between border-b border-border/40 px-6 py-4 bg-primary gap-4">
+                                    <div className="flex items-center gap-4 w-full md:w-auto">
+                                        <Avatar className="h-12 w-12 flex-shrink-0">
                                             <AvatarImage src={channel.avatar || "/placeholder.svg"} alt={channel.name} />
                                             <AvatarFallback>{channel.name.substring(0, 2)}</AvatarFallback>
                                         </Avatar>
-                                        <div>
-                                            <h2 className="text-xl font-bold">{channel.name}</h2>
-                                            <p className="text-sm text-muted-foreground">
+                                        <div className="min-w-0">
+                                            <h2 className="text-xl font-bold truncate">{channel.name}</h2>
+                                            <p className="text-sm text-muted-foreground truncate">
                                                 {channel.userHandle} • {convertViews(channel.subscribers.toString())} subscribers
                                             </p>
                                         </div>
                                     </div>
-                                    {user?.userType === 'youtuber' && (
-                                        <motion.div whilehover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+
+                                    {user?.userType === "youtuber" && (
+                                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                             <CustomButton
-                                                title={'Generate Link'}
+                                                title="Generate Link"
                                                 cb={() =>
                                                     AsyncFetcher({
                                                         url: `/api/fetch/workspaces/join/link/generate?ws=${channel.id}`,
                                                         cb: ({ link }) => {
                                                             navigator.clipboard.writeText(link);
-                                                            toast.success('Link Copied')
-                                                        }
+                                                            toast.success("Link Copied");
+                                                        },
                                                     })
                                                 }
                                             />
@@ -100,14 +103,18 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                 </div>
                             </DrawerHeader>
 
-                            <div className="overflow-auto p-6">
-                                <div className="flex items-center justify-between mb-7">
-                                    <h3 className="text-lg font-semibold">Channel Videos</h3>
-                                    <div className="flex items-center gap-x-4">
-                                        {user?.userType === 'editor' && (
-                                            <motion.div whilehover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                                                <Link href="/upload">
-                                                    <Button className="bg-white text-black font-bold">New Upload</Button>
+                            <div className="overflow-auto flex-1 p-6 flex flex-col">
+                                {/* Header + Controls */}
+                                <div className="flex flex-col md:flex-row items-center justify-between mb-7 gap-4 md:gap-0">
+                                    <h3 className="text-lg font-semibold flex-shrink-0">Channel Videos</h3>
+
+                                    <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                                        {user?.userType === "editor" && (
+                                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                <Link href="/upload" passHref>
+                                                    <Button as="a" className="bg-white text-black font-bold">
+                                                        New Upload
+                                                    </Button>
                                                 </Link>
                                             </motion.div>
                                         )}
@@ -115,17 +122,20 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                         {/* FILTER */}
                                         <DropdownMenu>
                                             <DropdownMenuTrigger>
-                                                <motion.div whilehover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                                                    <Button className="bg-white text-black font-bold rounded-md hover:bg-white hover:text-black">Filter</Button>
+                                                <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                                                    <Button className="bg-white text-black font-bold rounded-md hover:bg-white hover:text-black">
+                                                        Filter
+                                                    </Button>
                                                 </motion.div>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent className="text-[#e3e3e3] border-secondary shadow-lg translate-y-3 bg-primary flex flex-col gap-y-4 p-6 rounded-lg">
-                                                <DropdownMenuGroup className="flex gap-x-3 justify-center">
-                                                    {['time', 'views'].map((param) => (
-                                                        <motion.div key={param} whilehover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                            <DropdownMenuContent className="text-[#e3e3e3] border-secondary shadow-lg translate-y-3 bg-primary flex flex-col gap-y-4 p-6 rounded-lg max-w-xs w-full md:max-w-md">
+                                                <DropdownMenuGroup className="flex gap-x-3 justify-center flex-wrap">
+                                                    {["time", "views"].map((param) => (
+                                                        <motion.div key={param} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                                             <DropdownMenuItem
                                                                 onClick={() => toggleParams(param)}
-                                                                className={`border border-secondary ${filterParams[param] ? 'bg-green-400 text-black font-bold' : ''}`}
+                                                                className={`border border-secondary cursor-pointer px-3 py-1 rounded-md ${filterParams[param] ? "bg-green-400 text-black font-bold" : ""
+                                                                    }`}
                                                             >
                                                                 {param.charAt(0).toUpperCase() + param.slice(1)}
                                                             </DropdownMenuItem>
@@ -133,12 +143,13 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                                     ))}
                                                 </DropdownMenuGroup>
 
-                                                <DropdownMenuGroup className="flex gap-x-3 justify-center">
-                                                    {['public', 'private', 'unlisted'].map((type) => (
-                                                        <motion.div key={type} whilehover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                <DropdownMenuGroup className="flex gap-x-3 justify-center flex-wrap">
+                                                    {["public", "private", "unlisted"].map((type) => (
+                                                        <motion.div key={type} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                                             <DropdownMenuItem
                                                                 onClick={() => setVideoType(type)}
-                                                                className={`border border-secondary ${filterParams.videoType === type ? 'bg-green-400 text-black font-bold' : ''}`}
+                                                                className={`border border-secondary cursor-pointer px-3 py-1 rounded-md ${filterParams.videoType === type ? "bg-green-400 text-black font-bold" : ""
+                                                                    }`}
                                                             >
                                                                 {type.charAt(0).toUpperCase() + type.slice(1)}
                                                             </DropdownMenuItem>
@@ -146,14 +157,15 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                                     ))}
                                                 </DropdownMenuGroup>
 
-                                                <DropdownMenuGroup className="flex gap-x-3 justify-center">
-                                                    {['reviewPending', 'uploadPending', 'uploaded'].map((status) => (
-                                                        <motion.div key={status} whilehover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                <DropdownMenuGroup className="flex gap-x-3 justify-center flex-wrap">
+                                                    {["reviewPending", "uploadPending", "uploaded"].map((status) => (
+                                                        <motion.div key={status} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                                             <DropdownMenuItem
                                                                 onClick={() => setVideoStatus(status)}
-                                                                className={`border border-secondary ${filterParams.status === status ? 'bg-green-400 text-black font-bold' : ''}`}
+                                                                className={`border border-secondary cursor-pointer px-3 py-1 rounded-md ${filterParams.status === status ? "bg-green-400 text-black font-bold" : ""
+                                                                    }`}
                                                             >
-                                                                {status.replace(/([A-Z])/g, ' $1').trim()}
+                                                                {status.replace(/([A-Z])/g, " $1").trim()}
                                                             </DropdownMenuItem>
                                                         </motion.div>
                                                     ))}
@@ -163,23 +175,28 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
 
                                         <Input
                                             placeholder="Search"
-                                            className="font-bold w-[25vw]"
+                                            className="font-bold w-full max-w-xs md:max-w-[25vw]"
                                             onChange={searchOnChange}
-
+                                            aria-label="Search videos"
                                         />
+
                                         <ArrowUpDown
-                                            onClick={() => setIsAscending(prev => !prev)}
-                                            className={`w-12 h-8 cursor-pointer transition-all ${isAscending && 'bg-white text-black rounded'} p-1`}
+                                            onClick={() => setIsAscending((prev) => !prev)}
+                                            className={`w-12 h-8 cursor-pointer transition-all p-1 rounded ${isAscending ? "bg-white text-black" : ""
+                                                }`}
+                                            aria-pressed={isAscending}
+                                            role="button"
+                                            tabIndex={0}
                                         />
                                     </div>
                                 </div>
 
                                 {/* VIDEO LIST */}
-                                <div className="space-y-4">
+                                <div className="space-y-4 flex-1 overflow-auto">
                                     {filterVideos != null ? (
                                         filterVideos.length > 0 ? (
                                             <AnimatePresence>
-                                                {filterVideos.map(video => (
+                                                {filterVideos.map((video) => (
                                                     <motion.div
                                                         key={video.id}
                                                         initial={{ opacity: 0, y: 10 }}
@@ -204,7 +221,7 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                             </p>
                                         )
                                     ) : (
-                                        <Loader className="absolute top-1/2 left-1/2  text-center" />
+                                        <Loader className="absolute top-1/2 left-1/2 text-center" />
                                     )}
                                 </div>
                             </div>
@@ -213,5 +230,6 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                 </Drawer>
             )}
         </AnimatePresence>
+
     );
 };

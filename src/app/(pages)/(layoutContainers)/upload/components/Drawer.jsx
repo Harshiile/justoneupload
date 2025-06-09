@@ -18,7 +18,6 @@ const UploaderDrawer = ({ isUploading, setIsUploading, progress }) => {
 
   return (
     <AnimatePresence>
-      {/* {isUploading && ( */}
       <motion.div
         variants={drawerVariants}
         initial="hidden"
@@ -26,28 +25,28 @@ const UploaderDrawer = ({ isUploading, setIsUploading, progress }) => {
         exit="exit"
       >
         <Drawer open={isUploading} onOpenChange={onDrawerChange}>
-          <input
-            type="submit"
-            value="Upload"
-            className="w-full bg-white text-black px-2 py-2 rounded-md mt-4 font-semibold mb-8 hover:bg-gray-200 transition"
-          />
-          <DrawerContent className="bg-primary w-[55%] mx-auto flex flex-col gap-y-4 rounded-lg shadow-lg border border-gray-700">
-            <div className="flex justify-between px-20 items-center text-center text-white text-xl mb-2">
-              <DrawerTitle className="text-white font-semibold">Uploading</DrawerTitle>
+          <DrawerContent className="bg-primary w-[95%] sm:w-[85%] md:w-[65%] lg:w-[55%] mx-auto flex flex-col gap-y-4 rounded-lg shadow-lg border border-gray-700">
+            <div className="flex flex-col sm:flex-row justify-between px-6 sm:px-12 md:px-20 items-center text-white text-center text-base sm:text-xl mb-2 gap-2 sm:gap-0">
+              <DrawerTitle className="text-white font-semibold">
+                Uploading
+              </DrawerTitle>
               <DrawerTitle className="text-white font-semibold flex items-center gap-2">
-                {progress} %{' '}
-                {progress < 100 && <Loader2 className="w-5 h-5 animate-spin text-white" />}
+                {progress} %
+                {progress < 100 && (
+                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-white" />
+                )}
               </DrawerTitle>
             </div>
+
             <Progress
               value={progress}
-              className="h-3 w-[85%] mx-auto mb-5 bg-[#39393b] [&>*]:bg-white rounded-full"
+              className="h-3 w-[90%] sm:w-[85%] mx-auto mb-5 bg-[#39393b] [&>*]:bg-white rounded-full"
             />
           </DrawerContent>
         </Drawer>
       </motion.div>
-      {/* )} */}
-    </AnimatePresence >
+    </AnimatePresence>
+
   );
 };
 

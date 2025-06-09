@@ -43,7 +43,7 @@ const PendingVideos = ({ videos, isReviewVideos, user, channel }) => {
             ))
             :
             <motion.div
-                className="text-muted-foreground text-center h-full grid place-items-center"
+                className={`text-muted-foreground text-center h-full grid place-items-center`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
             >
@@ -81,10 +81,10 @@ const Dashboard = () => {
             //         setWorkspaces(tmpVideos);
             //     }
             // });
-            // AsyncFetcher({
-            //     url: `/api/fetch/chart?chart=1`,
-            //     cb: (totalEditors) => setChartData(totalEditors)
-            // });
+            AsyncFetcher({
+                url: `/api/fetch/chart?chart=1`,
+                cb: (totalEditors) => setChartData(totalEditors)
+            });
             AsyncFetcher({
                 url: '/api/videos',
                 cb: ({ videos }) => {
@@ -107,21 +107,22 @@ const Dashboard = () => {
     return (
         <>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className='bg-primary border-none py-10'>
+                <DialogContent className='bg-primary border-none py-10 px-6 w-[90vw] max-w-md max-h-[90vh] overflow-y-auto'>
                     <DialogHeader className='mx-auto mb-3'>
-                        <DialogTitle>Connect Youtube Account</DialogTitle>
+                        <DialogTitle className='text-center'>Connect YouTube Account</DialogTitle>
                     </DialogHeader>
                     <CustomButton
                         title={'Connect'}
-                        cb={() => AsyncFetcher({
-                            url: '/api/youtube/connect',
-                            cb: ({ url }) => {
-                            }
-                        })}
-                        className='bg-red-600 hover:bg-red-600 text-white text-md hover:text-white'
+                        cb={() =>
+                            AsyncFetcher({
+                                url: '/api/youtube/connect',
+                                cb: ({ url }) => { },
+                            })
+                        }
+                        className='bg-red-600 hover:bg-red-600 text-white text-md hover:text-white w-full'
                     />
                 </DialogContent>
-            </Dialog >
+            </Dialog>
 
             <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -142,7 +143,7 @@ const Dashboard = () => {
                 <div className="w-full h-[30vh] flex gap-x-6">
                     {/* WorkSpaces Panel */}
                     <motion.div
-                        className="relative group w-[30%] border-2 border-secondary rounded-md p-4"
+                        className="relative group w-full lg:w-1/3 border-2 border-secondary rounded-md p-4"
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
@@ -243,7 +244,7 @@ const Dashboard = () => {
 
                     {/* Contribution Panel */}
                     <motion.div
-                        className="w-[70%] border-2 border-secondary rounded-md p-4 text-xl relative"
+                        className="w-full lg:w-2/3 border-2 border-secondary rounded-md p-4 text-xl relative"
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
@@ -255,9 +256,8 @@ const Dashboard = () => {
 
                 {/* Pending Videos */}
                 <motion.div
-                    className="w-full h-[63vh] border-2 border-secondary rounded-md p-4 relative"
-                    initial={{ opacity: 0, y: 20 }
-                    }
+                    className="w-full min-h-[60vh] border-2 border-secondary rounded-md p-4 relative mt-6"
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
                 >
@@ -268,9 +268,10 @@ const Dashboard = () => {
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
-                                        disabled={!pendingVideos.review}
-                                        className='bg-white text-black font-bold hover:bg-white hover:text-black hover:ont-bold hover:cursor-pointer'
-                                        onClick={_ => setisReviewVideos(!isReviewVideos)}
+                                        className={`bg-white text-black font-bold hover:bg-white hover:text-black hover:ont-bold hover:cursor-pointer ${isReviewVideos == null && 'hover:cursor-not-allowed'}`}
+                                        onClick={_ => {
+                                            isReviewVideos != null && setisReviewVideos(!isReviewVideos)
+                                        }}
                                     >{isReviewVideos ? 'Review Pending' : 'Upload Pending'}
                                     </Button>
                                 </TooltipTrigger>
@@ -281,7 +282,7 @@ const Dashboard = () => {
                         </TooltipProvider>
 
                     </div>
-                    <div className="w-full h-[95%] overflow-y-auto custom-scroll">
+                    <div className="w-full max-h-[50vh] overflow-y-auto custom-scroll">
                         <AnimatePresence>
                             {
                                 isReviewVideos == null ?

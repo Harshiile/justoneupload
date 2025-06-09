@@ -15,13 +15,16 @@ const FileInfo = ({ file, setFile, setVideoPreviewUrl, type }) => {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="relative bg-[#18181b] border border-secondary rounded-xl p-4 shadow-lg flex items-center gap-4 text-sm text-[#d4d4d8] mt-4 hover:shadow-xl transition-shadow duration-300"
+            className="relative bg-[#18181b] border border-secondary rounded-xl p-4 shadow-lg flex flex-col sm:flex-row items-start sm:items-center gap-4 text-sm text-[#d4d4d8] mt-4 hover:shadow-xl transition-shadow duration-300"
         >
-            <FileText className="w-10 h-10 text-white flex-shrink-0" />
-            <div className="flex flex-col gap-1 overflow-hidden">
-                <p className="text-md font-medium text-[#f4f4f5] truncate">{file.name}</p>
+            <FileText className="w-8 h-8 sm:w-10 sm:h-10 text-white flex-shrink-0" />
+
+            <div className="flex flex-col gap-1 overflow-hidden flex-1">
+                <p className="text-sm sm:text-md font-medium text-[#f4f4f5] truncate">
+                    {file.name}
+                </p>
                 <p
-                    className={`text-xs font-medium ${type === 'thumbnail' && file.size >= 2097152 ? 'text-red-500' : 'text-white'
+                    className={`text-xs sm:text-sm font-medium ${type === "thumbnail" && file.size >= 2097152 ? "text-red-500" : "text-white"
                         }`}
                 >
                     Size: {(file.size / (1024 * 1024)).toFixed(2)} MB
@@ -38,13 +41,14 @@ const FileInfo = ({ file, setFile, setVideoPreviewUrl, type }) => {
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
+                    if (e.key === "Enter" || e.key === " ") {
                         setFile(null);
                         setVideoPreviewUrl(null);
                     }
                 }}
             />
         </motion.div>
+
     );
 };
 

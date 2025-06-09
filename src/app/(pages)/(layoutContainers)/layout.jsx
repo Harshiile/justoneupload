@@ -9,6 +9,8 @@ import { CustomButton } from '@/components/CustomButton';
 import { useRef, useState, useEffect } from 'react'
 import { LayoutDashboard, LogOut, Video } from 'lucide-react'
 import { Loader } from '@/components/Loader';
+import { SidebarToggleIcon } from 'lucide-react';
+import { useMediaQuery } from 'react-responsive'; // Install this package
 
 import { useUser } from '@/hooks/store/user'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -26,6 +28,7 @@ export default function Layout({ children }) {
     const buttonRef = useRef()
     const router = useRouter()
     const pathname = usePathname()
+    const isMobile = useMediaQuery({ maxWidth: 768 });
 
     useEffect(() => {
         !user && fetchMe(setUser)
@@ -157,7 +160,7 @@ export default function Layout({ children }) {
 
 
                 {/* Child Content */}
-                < div className='fixed top-0 left-[10vw] w-[90vw] h-screen grid place-items-center' >
+                < div className={`fixed top-0 left-[10vw] w-[90vw] h-screen grid place-items-center ${isMobile && 'w-full'}`} >
                     {children}
                 </div >
             </div>

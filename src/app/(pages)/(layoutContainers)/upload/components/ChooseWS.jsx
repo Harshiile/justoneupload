@@ -6,63 +6,58 @@ import { Loader } from '@/components/Loader';
 const ChooseWS = ({ setChosenWs, workspacesForChooseWS }) => {
     const [isSelected, setIsSelected] = useState(null)
     return (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary px-10 border border-secondary rounded-xl w-max">
-            <p className="text-xl font-semibold text-center my-5">Choose Workspace</p>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-primary px-4 sm:px-8 md:px-10 border border-secondary rounded-xl w-[95vw] sm:w-[80vw] md:w-[65vw] lg:w-[50vw] xl:w-[40vw]">
+            <p className="text-lg sm:text-xl font-semibold text-center my-5">Choose Workspace</p>
 
-            <div className={`w-max flex gap-6 mt-8 mb-20`}>
+            <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-8 mb-20">
                 {
-                    !workspacesForChooseWS ?
+                    !workspacesForChooseWS ? (
                         <Loader />
-                        :
-                        workspacesForChooseWS.length <= 0 ?
-                            <p>No workspace, Join Any Workspace</p>
-                            :
-                            workspacesForChooseWS.map((workspace, index) => {
-                                const ws = workspace[1]
-                                return (
-                                    <div
-                                        key={index}
-                                        onClick={() => setIsSelected(prev => prev?.id == ws.id ? null : ws)}
-                                        className={`
-                                flex items-center gap-x-4 border border-secondary py-4 px-5 rounded-xl
-                                hover:scale-105 transition-all duration-300 ease-in-out group cursor-pointer
-                                ${isSelected?.userHandle == ws.userHandle && 'bg-[#222224]'}
-                            `}
-                                    >
-                                        <img
-                                            src={ws.avatar}
-                                            className="rounded-full w-14 h-14 object-cover"
-                                            alt="Channel Avatar"
-                                        />
+                    ) : workspacesForChooseWS.length <= 0 ? (
+                        <p className="text-center text-sm sm:text-base">No workspace, Join Any Workspace</p>
+                    ) : (
+                        workspacesForChooseWS.map((workspace, index) => {
+                            const ws = workspace[1];
+                            return (
+                                <div
+                                    key={index}
+                                    onClick={() => setIsSelected(prev => prev?.id === ws.id ? null : ws)}
+                                    className={`
+                                    flex items-center gap-3 sm:gap-4 border border-secondary py-3 px-4 rounded-xl
+                                    hover:scale-105 transition-all duration-300 ease-in-out group cursor-pointer
+                                    ${isSelected?.userHandle === ws.userHandle ? 'bg-[#222224]' : ''}
+                                    w-full sm:w-[46%] md:w-[45%] lg:w-[40%]
+                                `}
+                                >
+                                    <img
+                                        src={ws.avatar}
+                                        className="rounded-full w-12 h-12 sm:w-14 sm:h-14 object-cover"
+                                        alt="Channel Avatar"
+                                    />
 
-                                        <div className={`leading-tight opacity-60 group-hover:opacity-100 group-hover:blur-0 transition-all duration-300 ${isSelected?.handle == ws.handle && 'opacity-100'}`}>
-                                            <p className="text-lg font-semibold">{ws.name}</p>
-                                            <p className="text-sm text-gray-500">{ws.userHandle}</p>
-                                        </div>
+                                    <div className={`leading-tight opacity-60 group-hover:opacity-100 transition-all duration-300 ${isSelected?.handle === ws.handle ? 'opacity-100' : ''}`}>
+                                        <p className="text-base sm:text-lg font-semibold">{ws.name}</p>
+                                        <p className="text-sm text-gray-500">{ws.userHandle}</p>
                                     </div>
-                                );
-                            })
+                                </div>
+                            );
+                        })
+                    )
                 }
             </div>
 
             <div
-                onClick={_ => {
-                    if (!isSelected) toast.warning('Please Select Any Workspace')
-                    setChosenWs(isSelected)
-                }
-                }
-                className='bg-white text-black w-max py-1 px-4 rounded-sm text-lg font-semibold absolute bottom-5 right-5'>Next</div>
-        </div >
+                onClick={() => {
+                    if (!isSelected) toast.warning('Please Select Any Workspace');
+                    setChosenWs(isSelected);
+                }}
+                className="bg-white text-black w-max py-2 px-5 rounded-md text-base font-semibold absolute bottom-4 right-4 hover:scale-105 transition-transform"
+            >
+                Next
+            </div>
+        </div>
+
     )
 }
 
 export default ChooseWS
-
-const channels = [
-    {
-        id: 1,
-        avatar: "https://i.ytimg.com/vi/VFJOwFBgFRI/hq720.jpg",
-        name: "Harshil",
-        handle: "@harshiile"
-    },
-];

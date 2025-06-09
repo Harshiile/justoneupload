@@ -52,18 +52,22 @@ const Schedule = ({ date, setDate, className }) => {
                 </Button>
             </SheetTrigger>
 
-            <SheetContent side="right" className="w-[50vw] h-screen border-secondary rounded-xl p-0" >
+            {/* Responsive SheetContent */}
+            <SheetContent
+                side={typeof window !== "undefined" && window.innerWidth < 640 ? "bottom" : "right"}
+                className="w-full sm:w-[50vw] h-[70vh] sm:h-screen border-secondary rounded-t-xl sm:rounded-xl p-0"
+            >
                 <AnimatePresence>
                     {isOpen && (
                         <motion.div
-                            className="h-full flex flex-col bg-primary text-white rounded-xl"
+                            className="h-full flex flex-col bg-primary text-white rounded-t-xl sm:rounded-xl"
                             variants={fadeInUp}
                             initial="hidden"
                             animate="visible"
                             exit="exit"
                         >
                             {/* Calendar Picker */}
-                            <div className="p-4 rounded-t-xl overflow-auto justify-center mt-2.5">
+                            <div className="p-4 overflow-auto justify-center mt-2.5">
                                 <CustomCalendar selectedDate={date} onDateSelect={setDate} />
                             </div>
 
@@ -71,17 +75,14 @@ const Schedule = ({ date, setDate, className }) => {
 
                             {/* Time Picker */}
                             <div className="flex flex-col">
-                                <p className="bg-primary text-white text-center py-2 font-medium flex items-center justify-center gap-1 pb-3 rounded-b-xl">
+                                <p className="text-center py-2 font-medium flex items-center justify-center gap-1 pb-3">
                                     <Clock className="w-4 h-4" /> Time
                                 </p>
 
-                                <div className="flex flex-col sm:flex-row flex-1 divide-y sm:divide-y-0 sm:divide-x">
+                                <div className="flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x">
                                     {["hour", "minute", "ampm"].map((type) => (
-                                        <ScrollArea
-                                            key={type}
-                                            className={cn("bg-primary text-white flex-1 h-auto rounded-none")}
-                                        >
-                                            <div className="flex sm:flex-col p-2 gap-2">
+                                        <ScrollArea key={type} className="bg-primary text-white flex-1 h-auto">
+                                            <div className="flex sm:flex-col flex-wrap p-2 gap-2 justify-center">
                                                 {(type === "hour"
                                                     ? hours.slice().reverse()
                                                     : type === "minute"
@@ -102,7 +103,7 @@ const Schedule = ({ date, setDate, className }) => {
                                                             size="icon"
                                                             variant="ghost"
                                                             className={cn(
-                                                                "sm:w-full shrink-0 aspect-square transition",
+                                                                "sm:w-full aspect-square transition",
                                                                 isSelected
                                                                     ? "bg-white text-black font-semibold"
                                                                     : "hover:bg-secondary/50 hover:text-white"
@@ -123,6 +124,7 @@ const Schedule = ({ date, setDate, className }) => {
                 </AnimatePresence>
             </SheetContent>
         </Sheet>
+
     );
 }
 
