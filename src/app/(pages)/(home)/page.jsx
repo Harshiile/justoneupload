@@ -46,7 +46,7 @@ export default function LandingPage() {
 
 
     return (
-        <div className="bg-black text-white min-h-screen font-sans overflow-x-hidden relative w-full">
+        <div className="bg-black text-white min-h-screen font-sans overflow-x-hidde relative w-full">
             {/* Diagonally Falling Stars */}
             {stars.map((star) => (
                 <motion.div

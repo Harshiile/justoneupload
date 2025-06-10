@@ -28,164 +28,61 @@ export const SendAuthorizeMail = async (data: AuthorizeInterface) => {
 }
 
 const AuthorizeMailTemplate = (data: AuthorizeInterface): string => {
-
     return `
  <!DOCTYPE html>
-<html lang='en'>
+<html lang="en">
 
 <head>
-    <meta charset='UTF-8' />
-    <title>Authorize Editor Access - JustOneUpload</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000;
-            color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .container {
-            max-width: 640px;
-            margin: auto;
-            background-color: #111;
-            border: 1px solid #222;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid #222;
-        }
-
-        .avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            margin-right: 12px;
-        }
-
-        .channel-info h2 {
-            margin: 0;
-            color: #aaa;
-            font-size: 1.25rem;
-        }
-
-        .channel-info p {
-            margin: 2px 0 0 0;
-            color: #aaa;
-            font-size: 0.9rem;
-        }
-
-        .content {
-            padding: 24px 20px;
-        }
-
-        .intro {
-            color: #ccc;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .button-wrapper {
-            text-align: center;
-            padding: 10px 0 30px;
-        }
-
-        .btn {
-            background-color: #fff;
-            color: #000;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-block;
-            margin: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .btn:hover {
-            background-color: #eaeaea;
-        }
-
-        .footer {
-            padding: 16px 20px;
-            font-size: 0.8rem;
-            color: #666;
-            border-top: 1px solid #222;
-            text-align: center;
-            position: relative;
-        }
-
-        .logo {
-            margin-top: 20px;
-        }
-
-        .logo img {
-        width:60px;
-            height: 60px;
-            opacity: 0.6;
-        }
-
-        .tagline {
-            text-align: center;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #4ac1ff;
-            margin-bottom: 10px;
-            font-style: italic;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Authorize Editor Access - JustOneUpload</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
-<body>
-    <div class='container'>
-        <!-- Header -->
-        <div class='header'>
-            <img src='${data.wsAvatar}' alt='Avatar' class='avatar' />
-            <div class='channel-info'>
-                <h2>${data.wsName}</h2>
-                <p>${data.wsUserHandle}</p>
-            </div>
-        </div>
+<body style="margin: 0; padding: 0; background-color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;">
+  <div style="margin: auto; background-color: #111111; border-radius: 12px; overflow: hidden; box-shadow: 0 0 10px rgba(255,255,255,0.05); width: 100%;">
 
-        <!-- Content -->
-        <div class='content'>
-            <div class='intro'>
-                <strong>${data.editorName}</strong> (<a style='color: #4ac1ff;'
-                    href='mailto:${data.editorName}'>${data.editorMail}</a>)
-                has requested permission to join your workspace <strong>${data.wsName}</strong> on
-                <strong>JustOneUpload</strong>
-                <br /><br />
-                By authorizing, you grant the editor the ability to upload and schedule videos on your channel through
-                our platform, while maintaining full control over your content
-                <br /><br />
-                If you trust this request, please click the <strong>Authorize</strong> button below to proceed.
-                Otherwise, you may safely ignore this email
-            </div>
-
-            <!-- CTA Button -->
-            <div class='button-wrapper'>
-                <a href=${generateAuthorizeURL(data)} class='btn'>🔓 Authorize</a>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class='footer'>
-            If you did not expect this request, please disregard this message.<br />
-            This authorization link will expire in 24 hours for your security
-            <div class='logo'>
-                <img src=${process.env.CLOUDINARY_LOGO} alt='JustOneUpload' />
-            </div>
-        </div>
+    <!-- Header -->
+    <div style="display: flex; align-items: center; padding: 20px; border-bottom: 1px solid #222;">
+      <img src="https://yt3.googleusercontent.com/ytc/AOPolaR3y9Pp9Yc-kLPQvgGJ0KZGhBhZnDnn0msGHjDC=s176-c-k-c0x00ffffff-no-rj" alt="Avatar" style="width: 48px; height: 48px; border-radius: 50%; margin-right: 12px;" />
+      <div>
+        <h2 style="margin: 0; color: #eee; font-size: 1.25rem;">TechVerse Edits</h2>
+        <p style="margin: 2px 0 0 0; color: #aaa; font-size: 0.9rem;">@techverseofficial</p>
+      </div>
     </div>
+
+    <!-- Content -->
+    <div style="padding: 24px 20px;">
+      <p style="font-size: 1rem; color: #ccc;">
+        <strong>Harsh Patel</strong>
+        (<a href="mailto:harsh.patel.editing@gmail.com" style="color: #4ac1ff;">harsh.patel.editing@gmail.com</a>)
+        has requested permission to join your workspace <strong>TechVerse Edits</strong> on <strong>JustOneUpload</strong>.
+      </p>
+
+      <p style="font-size: 0.95rem; color: #bbb; line-height: 1.6; margin-top: 12px;">
+        By authorizing, you grant the editor permission to upload and schedule videos on your behalf via our platform — you remain in full control.
+        <br /><br />
+        If you recognize this request, click <strong>Authorize</strong> below. Otherwise, feel free to ignore this email.
+      </p>
+
+      <!-- CTA Button -->
+      <div style="text-align: center; padding: 30px 0 20px;">
+        <a href="https://justoneupload.com/authorize?ws=techverse&editor=harsh.patel.editing@gmail.com&token=abc123"
+          style="background-color: #22c55e; color: #000; padding: 12px 24px; border-radius: 8px; font-weight: bold; text-decoration: none; display: inline-block;">
+          🔓 Authorize
+        </a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding: 16px 20px 36px; font-size: 0.8rem; color: #666; border-top: 1px solid #222; text-align: center; position: relative;">
+      If you didn’t expect this request, you can safely ignore it. This link will expire in 24 hours for your security.
+      <div style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 8px;">
+        <img src="https://res.cloudinary.com/demo/image/upload/v1717956012/jou-logo.png" alt="JustOneUpload Logo" style="width: 60px; height: 60px; opacity: 0.6;" />
+      </div>
+    </div>
+  </div>
 </body>
 
 </html>
-
     `
 }

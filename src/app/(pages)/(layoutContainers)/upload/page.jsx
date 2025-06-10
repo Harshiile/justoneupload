@@ -17,6 +17,7 @@ import { UploaderDrawer, FileInfo, ChooseWS, Schedule } from './components'
 import { useRouter } from 'next/navigation';
 import { AsyncFetcher } from '@/lib/fetcher';
 import { socket } from "./socket"
+import Prevention from '@/components/Prevention'
 
 const fadeIn = {
     hidden: { opacity: 0, scale: 0.95 },
@@ -153,7 +154,8 @@ const Upload = () => {
             className={`w-full h-full bg-primary text-[#e3e3e3] shadow-xl flex flex-col overflow-y-auto ${user.userType != 'youtuber' && 'px-4 md:px-8'}`}
         >
             {user.userType === 'youtuber' ? (
-                <p className='h-full grid place-items-center text-center p-6'>Not for Youtuber</p>
+                <Prevention title={'Not for Youtuber'} />
+                // <p className='h-full grid place-items-center text-center p-6'>Not for Youtuber</p>
             ) : !chosenWs ? (
                 <ChooseWS setChosenWs={setChosenWs} workspacesForChooseWS={workspacesForChooseWS} />
             ) : (

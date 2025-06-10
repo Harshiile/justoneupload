@@ -13,7 +13,8 @@
 # testing
 /coverage
 /src/app/api/test/
-./.txt
+.txt
+tmp.html
 
 # next.js
 /.next/
