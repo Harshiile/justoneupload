@@ -1,6 +1,0 @@
-What is remaining?
-Pi Chart - Editor
-Scheduling time : Remove that 1 hour time slot
-Video Approval mails mail - Reject/Approval - 2 in 1 mail
-Reject authorization mail
-Better UI

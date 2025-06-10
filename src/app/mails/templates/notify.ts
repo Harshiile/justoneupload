@@ -27,17 +27,19 @@ export interface VideoNofityMail {
     uploadingStatus: string
     editorId: string
 }
-interface WorkspaceMail {
-    avatar: string,
+
+export interface WorkSpace {
     name: string,
-    handle: string
+    userHandle: string,
+    avatar: string
 }
+
 export const SendNotifyMail = async (video: VideoNofityMail, workspaceId: string) => {
     const ws = await fetchWorkspaceMetadata(workspaceId, null)
-    const workspace: WorkspaceMail = {
+    const workspace: WorkSpace = {
         avatar: ws?.avatar!,
         name: ws?.name!,
-        handle: ws?.userHandle!
+        userHandle: ws?.userHandle!
     }
 
     const editor = await fetchEditor(video.editorId)
@@ -49,7 +51,7 @@ export const SendNotifyMail = async (video: VideoNofityMail, workspaceId: string
     await SendMail(youtuber.email, '🎉 Success! Your Video Is Available on YouTube', htmlYoutuberText)
     await SendMail(editor.email, '🎉 Success! Your Video Is Available on YouTube', htmlEditorText)
 }
-const NotifyMailTemplate = (workspace: WorkspaceMail, video: VideoNofityMail, name: String) => {
+const NotifyMailTemplate = (workspace: WorkSpace, video: VideoNofityMail, name: String) => {
     return `
     <html lang="en" >
         <head>
@@ -65,7 +67,7 @@ const NotifyMailTemplate = (workspace: WorkspaceMail, video: VideoNofityMail, na
                                     <img src="${workspace.avatar}" alt = "${workspace.name}" style = "width:48px;height:48px;border-radius:50%;margin-right:12px;" data - avatar />
                                         <div>
                                         <h2 style="margin:0;color:#eee;font-size:1.25rem;" data - workspace - name > ${workspace.name} </h2>
-                                            < p style = "margin:2px 0 0 0;color:#aaa;font-size:0.9rem;" data - workspace - handle > ${workspace.handle} </p>
+                                            < p style = "margin:2px 0 0 0;color:#aaa;font-size:0.9rem;" data - workspace - handle > ${workspace.userHandle} </p>
                                                 </div>
                                                 </div>
 
@@ -106,13 +108,14 @@ We’re pleased to inform you that the following video has been successfully upl
     </div>
 
     < !--Footer -->
-        <div style="padding:16px 20px 36px;font-size:0.8rem;color:#666;border-top:1px solid #222;text-align:center;" data - section="email-footer" >
-            This message confirms a successful upload through your JustOneUpload workspace.< br />
-                If you were not expecting this activity, please review your workspace permissions.
-        < div style = "margin-top:20px;" >
-    <img src="${process.env.CLOUDINARY_LOGO}" alt = "JustOneUpload" style = "width:60px;height:60px;opacity:0.6;" data - logo />
+        <div style="padding:16px 10px 36px;font-size:0.8rem;color:#666;border-top:1px solid #222;text-align:center;" data-section="email-footer">
+        If this disconnection was unintentional or temporary, you can safely reconnect anytime using the link above.<br />
+        If you no longer use JustOneUpload, you may ignore this message.<br />
+        <div style="margin-top:20px;">
+          <img src="${process.env.CLOUDINARY_LOGO}" alt="JustOneUpload" style="width:60px;height:60px;opacity:0.6;" data-logo />
         </div>
-        </div>
+      </div>
+
         </div>
         </body>
         </html>

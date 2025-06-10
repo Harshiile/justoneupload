@@ -1,9 +1,10 @@
-import { db } from "@/db"
-import { WorkspaceTable } from "@/db/schema"
-import { JOUError } from "@/lib/error"
+import { db } from "../../../../db/index.ts"
+import { WorkspaceTable } from "../../../../db/schema.ts"
+import { JOUError } from "../../../../lib/error.ts"
 import { eq } from "drizzle-orm"
-import { oauth2Client } from "../../utils/screats"
 import { NextResponse } from "next/server"
+import { getReconnectUrl } from "./utils/getReconnect.ts"
+
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
@@ -16,19 +17,8 @@ export async function GET(req: Request) {
             .from(WorkspaceTable)
             .where(eq(WorkspaceTable.id, id))
 
-        const scopes = [
-            'https://www.googleapis.com/auth/youtube.upload',
-            'https://www.googleapis.com/auth/youtube.readonly',
-            'https://www.googleapis.com/auth/userinfo.email',
-        ]
 
-        const url = oauth2Client.generateAuthUrl({
-            access_type: 'offline',
-            prompt: 'consent',
-            scope: scopes,
-            login_hint: ws.email
-        })
-        return NextResponse.json({ url })
+        return NextResponse.json({ url: getReconnectUrl(ws.email) })
     } catch (error) {
         return JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1027`)
     }

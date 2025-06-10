@@ -241,7 +241,7 @@ const VideoCard = ({ video, userType, showChangeScheduleButton, isForDrawer, cha
                                 title={'Review'}
                                 cb={() =>
                                     AsyncFetcher({
-                                        url: '/api/fetch/videos/review/generate',
+                                        url: '/api/videos/review/generate',
                                         methodType: 'POST',
                                         body: {
                                             name: channel.name,

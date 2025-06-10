@@ -180,14 +180,13 @@ const ApprovalMailTemplate = (video: ApprovalInterface, editor: User, youtuber: 
         </div>
 
         <!-- Footer -->
-        <div
-            style="padding: 16px 20px 36px; font-size: 0.8rem; color: #666; border-top: 1px solid #222; text-align: center; position: relative;">
-            You're receiving this email because you're subscribed to updates from JustOneUpload.
-            <div style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 8px;">
-                <img src="https://res.cloudinary.com/demo/image/upload/v1717956012/jou-logo.png"
-                    alt="JustOneUpload Logo" style="width: 60px; height: 60px; opacity: 0.6;" />
-            </div>
+       <div style="padding:16px 10px 36px;font-size:0.8rem;color:#666;border-top:1px solid #222;text-align:center;" data-section="email-footer">
+        If this disconnection was unintentional or temporary, you can safely reconnect anytime using the link above.<br />
+        If you no longer use JustOneUpload, you may ignore this message.<br />
+        <div style="margin-top:20px;">
+          <img src="${process.env.CLOUDINARY_LOGO}" alt="JustOneUpload" style="width:60px;height:60px;opacity:0.6;" data-logo />
         </div>
+      </div>
 
     </div>
 

@@ -155,7 +155,6 @@ const Upload = () => {
         >
             {user.userType === 'youtuber' ? (
                 <Prevention title={'Not for Youtuber'} />
-                // <p className='h-full grid place-items-center text-center p-6'>Not for Youtuber</p>
             ) : !chosenWs ? (
                 <ChooseWS setChosenWs={setChosenWs} workspacesForChooseWS={workspacesForChooseWS} />
             ) : (

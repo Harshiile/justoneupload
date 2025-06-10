@@ -6,6 +6,7 @@ import { and, eq, getTableColumns } from 'drizzle-orm';
 import { VideoTable, VideoWorkspaceJoinTable, WorkspaceTable } from '../../../db/schema.ts';
 import { getFileFromDrive } from '../drive/utils/index.ts';
 import * as Notify from '../../mails/templates/notify.ts';
+import { SendReconnectMail } from '../../mails/templates/reconnect.ts';
 
 const drive = google.drive({
     version: 'v3', auth: new google.auth.GoogleAuth({
@@ -96,7 +97,14 @@ const uploadVideoOnYoutuber = async (fileId: string, workspaceId: string) => {
             media: {
                 body: videoStream
             }
-        }).catch(_ => { throw new Error("Video Uploading On Youtube Error"); })
+        }).catch(async err => {
+            if (err.response?.status === 400 && err.response?.data?.error === 'invalid_grant') {
+                console.log('Mail Sending ------------------- ');
+                // handle invalid refresh token
+                await SendReconnectMail(workspaceId)
+            }
+            throw new Error("Video Uploading On Youtube Error");
+        })
 
 
         printCommands('2. Video Uploading Finish ...');

@@ -73,34 +73,34 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (user) {
+            AsyncFetcher({
+                url: '/api/fetch/workspaces',
+                cb: ({ workspaces }) => {
+                    const tmpVideos = []
+                    new Map(Object.entries(workspaces)).forEach(v => tmpVideos.push(v))
+                    setWorkspaces(tmpVideos);
+                }
+            });
             // AsyncFetcher({
-            //     url: '/api/fetch/workspaces',
-            //     cb: ({ workspaces }) => {
-            //         const tmpVideos = []
-            //         new Map(Object.entries(workspaces)).forEach(v => tmpVideos.push(v))
-            //         setWorkspaces(tmpVideos);
-            //     }
+            //     url: `/api/fetch/chart?chart=1`,
+            //     cb: (totalEditors) => setChartData(totalEditors)
             // });
-            AsyncFetcher({
-                url: `/api/fetch/chart?chart=1`,
-                cb: (totalEditors) => setChartData(totalEditors)
-            });
-            AsyncFetcher({
-                url: '/api/videos',
-                cb: ({ videos }) => {
-                    const reviewPendingVideos = []
-                    const uploadPendingVideos = []
-                    videos.filter(v => {
-                        if (v.status == 'reviewPending') reviewPendingVideos.push(v);
-                        else if (v.status == 'uploadPending') uploadPendingVideos.push(v);
-                    })
-                    setPendingVideos({
-                        review: reviewPendingVideos,
-                        upload: uploadPendingVideos
-                    });
-                    setisReviewVideos(true);
-                },
-            });
+            // AsyncFetcher({
+            //     url: '/api/videos',
+            //     cb: ({ videos }) => {
+            //         const reviewPendingVideos = []
+            //         const uploadPendingVideos = []
+            //         videos.filter(v => {
+            //             if (v.status == 'reviewPending') reviewPendingVideos.push(v);
+            //             else if (v.status == 'uploadPending') uploadPendingVideos.push(v);
+            //         })
+            //         setPendingVideos({
+            //             review: reviewPendingVideos,
+            //             upload: uploadPendingVideos
+            //         });
+            //         setisReviewVideos(true);
+            //     },
+            // });
         }
     }, [user])
 

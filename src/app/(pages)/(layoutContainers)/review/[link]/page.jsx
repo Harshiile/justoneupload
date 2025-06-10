@@ -9,6 +9,7 @@ import { motion } from 'framer-motion'
 import { AsyncFetcher } from '@/lib/fetcher'
 import { toast } from 'sonner'
 import { useUser } from '@/hooks/store/user'
+import Prevention from '@/components/Prevention'
 
 export default function Review({ params }) {
     const user = useUser(state => state.user)
@@ -30,7 +31,7 @@ export default function Review({ params }) {
         const link = resolvedParams.link
         if (link) {
             AsyncFetcher({
-                url: `/api/fetch/videos/review/validate?link=${link}`,
+                url: `/api/videos/review/validate?link=${link}`,
                 cb: ({ error, videoDetails }) => {
                     console.log({
                         error,
@@ -64,7 +65,7 @@ export default function Review({ params }) {
         <>
             {
                 isVideoProcessDone ?
-                    <p>Video Process Already Done ...</p>
+                    <Prevention title={'Video Process Already Done ...'} />
                     :
                     <>
                         {!video ?
