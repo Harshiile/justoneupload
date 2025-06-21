@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 export default function LandingPage() {
@@ -77,13 +78,15 @@ export default function LandingPage() {
                 <p className="text-lg md:text-2xl max-w-xl">
                     Revolutionizing content delivery for YouTubers & Editors with a seamless, one-click upload platform.
                 </p>
-                <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="mt-8 px-6 py-3 rounded-xl text-black font-semibold bg-white shadow-lg hover:bg-gray-300"
-                >
-                    Get Started
-                </motion.button>
+                <Link href={'/login'}>
+                    <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="mt-8 px-6 py-3 rounded-xl text-black font-semibold bg-white shadow-lg hover:bg-gray-300"
+                    >
+                        Get Started
+                    </motion.button>
+                </Link>
             </motion.section>
 
             {/* Fancy Screenshot Sections */}

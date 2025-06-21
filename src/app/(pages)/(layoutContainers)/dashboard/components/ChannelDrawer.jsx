@@ -108,7 +108,7 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                 <div className="flex flex-col md:flex-row items-center justify-between mb-7 gap-4 md:gap-0">
                                     <h3 className="text-lg font-semibold flex-shrink-0">Channel Videos</h3>
 
-                                    <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                                    <div className="flex items-center gap-4 w-full md:w-auto">
                                         {user?.userType === "editor" && (
                                             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                                 <Link href="/upload" passHref>
@@ -120,7 +120,7 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                         )}
 
                                         {/* FILTER */}
-                                        <DropdownMenu>
+                                        {/* <DropdownMenu>
                                             <DropdownMenuTrigger>
                                                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                                                     <Button className="bg-white text-black font-bold rounded-md hover:bg-white hover:text-black">
@@ -171,7 +171,7 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                                     ))}
                                                 </DropdownMenuGroup>
                                             </DropdownMenuContent>
-                                        </DropdownMenu>
+                                        </DropdownMenu> */}
 
                                         <Input
                                             placeholder="Search"
@@ -180,14 +180,14 @@ export const ChannelDrawer = ({ open, onOpenChange, videos, filterVideos, setFil
                                             aria-label="Search videos"
                                         />
 
-                                        <ArrowUpDown
+                                        {/* <ArrowUpDown
                                             onClick={() => setIsAscending((prev) => !prev)}
                                             className={`w-12 h-8 cursor-pointer transition-all p-1 rounded ${isAscending ? "bg-white text-black" : ""
                                                 }`}
                                             aria-pressed={isAscending}
                                             role="button"
                                             tabIndex={0}
-                                        />
+                                        /> */}
                                     </div>
                                 </div>
 

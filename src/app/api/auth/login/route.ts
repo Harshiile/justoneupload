@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
                 return Res
             }
-            return JOUError(401, "Incorrect Password")
+            else return JOUError(401, "Incorrect Password")
         }
         return JOUError(404, "User not Found")
     }

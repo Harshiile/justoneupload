@@ -1,16 +1,10 @@
 import { JOUError } from "../../../lib/error.ts"
 import { drive } from "../utils/screats.ts"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { Readable } from "stream"
 import { getFileFromDrive } from "./utils/index.ts"
 
-// Video Delete
-export const deleteOnDrive = async (fileId: string) => {
-    await drive.files.delete({ fileId }).catch(err => { JOUError(err.status, "Deletion Failed") })
-}
-
-
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
 
     const fileId = searchParams.get('id')

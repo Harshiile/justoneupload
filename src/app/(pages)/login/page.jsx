@@ -202,6 +202,7 @@ const Login = () => {
                         if (!isLogin && !name) throw new Error('Name is required');
                         if (!isLogin && !role) throw new Error('Role is required');
                         if (!isLogin && (!hasMinLength || !hasNumber || !hasSpecialChar)) throw new Error('Invalid Password');
+
                         AsyncFetcher({
                             url: '/api/auth/login',
                             methodType: 'POST',

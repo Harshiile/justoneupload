@@ -24,7 +24,6 @@ export interface VideoNofityMail {
     videoType: string
     duration: string
     id: string
-    uploadingStatus: string
     editorId: string
 }
 
@@ -51,72 +50,71 @@ export const SendNotifyMail = async (video: VideoNofityMail, workspaceId: string
     await SendMail(youtuber.email, '🎉 Success! Your Video Is Available on YouTube', htmlYoutuberText)
     await SendMail(editor.email, '🎉 Success! Your Video Is Available on YouTube', htmlEditorText)
 }
-const NotifyMailTemplate = (workspace: WorkSpace, video: VideoNofityMail, name: String) => {
+const NotifyMailTemplate = (workspace: WorkSpace, video: VideoNofityMail, name: string) => {
     return `
-    <html lang="en" >
-        <head>
-        <meta charset="UTF-8" />
-            <title>Upload Confirmation - JustOneUpload </title>
-                < meta name = "viewport" content = "width=device-width, initial-scale=1.0" />
-                    </head>
-                    < body style = "margin:0;padding:0;background-color:#fff;color:#fff;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" >
-                        <div style=" margin:auto;background-color:#111;border:1px solid #222;border-radius:12px;overflow:hidden;width:100%;" >
-
-                            <!--Header -->
-                                <div style="display:flex;align-items:center;padding:20px;border-bottom:1px solid #222;" data - section="email-header" >
-                                    <img src="${workspace.avatar}" alt = "${workspace.name}" style = "width:48px;height:48px;border-radius:50%;margin-right:12px;" data - avatar />
-                                        <div>
-                                        <h2 style="margin:0;color:#eee;font-size:1.25rem;" data - workspace - name > ${workspace.name} </h2>
-                                            < p style = "margin:2px 0 0 0;color:#aaa;font-size:0.9rem;" data - workspace - handle > ${workspace.userHandle} </p>
-                                                </div>
-                                                </div>
-
-                                                < !--Content -->
-                                                    <div style="padding:24px 20px;" data - section="email-body" >
-                                                        <div style="color:#ccc;font-size:0.95rem;line-height:1.6;margin-bottom:20px;" data - greeting >
-                                                            Hello < strong data - username > ${name} </strong>,<br / > <br />
-We’re pleased to inform you that the following video has been successfully uploaded to your YouTube channel via < strong > JustOneUpload < /strong>.<br / > <br />
-          You can now review it live on YouTube and share it with your audience.
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Upload Confirmation - JustOneUpload</title>
+    </head>
+    <body style="margin:0;padding:0;background-color:#fff;color:#fff;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+      <div style="margin:auto;background-color:#111;border:1px solid #222;border-radius:12px;overflow:hidden;width:100%;">
+        
+        <!-- Header -->
+        <div style="display:flex;align-items:center;padding:20px;border-bottom:1px solid #222;">
+          <img src="${workspace.avatar}" alt="${workspace.name}" style="width:48px;height:48px;border-radius:50%;margin-right:12px;" />
+          <div>
+            <h2 style="margin:0;color:#eee;font-size:1.25rem;">${workspace.name}</h2>
+            <p style="margin:2px 0 0 0;color:#aaa;font-size:0.9rem;">${workspace.userHandle}</p>
+          </div>
         </div>
-
-    < !--Video Card-- >
-        <div style="display: flex; background-color: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; margin-bottom: 20px; gap: 16px; align-items: center; flex-wrap: wrap;" data - section="video-card" >
-            <img src="${video.thumbnail}" alt = "${video.title}" style = "width: 160px; height: 90px; object-fit: cover; border-radius: 8px; flex-shrink: 0;" data - thumbnail />
-
-                <div style="flex: 1; min-width: 180px; padding-left:1rem;" >
-                    <div style="font-size: 1.05rem; font-weight: 600; color: #fff; margin-bottom: 4px;" data - title >
-                        ${video.title}
-</div>
-
-    < div style = "display: flex; flex-wrap: wrap; align-items: center; gap: 0px 10px; font-size: 0.85rem; color: #ccc; margin-bottom: 6px;" data - meta >
-        <span style="background-color: #4ac1ff; color: #000; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; line-height: 1;" data - video - type > ${video.videoType} </span>
-            < span style = "color: #aaa;" data - duration >⏱ ${convertDuration(video.duration)} </span>
-                </div>
-
-                < div style = "font-size: 0.85rem; color: #aaa;" data - published - date >
-              📅 Published on: ${new Date(video.publishedAt).toDateString()}
-</div>
-    </div>
-    </div>
-
-    < !--CTA Button-- >
-        <div style="text-align:center;padding:10px 0 30px;" data - section="cta-button" >
-            <a href="https://www.youtube.com/watch?v=${video.id}" target = "_blank" style = "background-color:#4ac1ff;color:#000;padding:12px 24px;border-radius:8px;font-weight:bold;text-decoration:none;display:inline-block;margin:8px;" data - watch - link >
-            ▶ Watch on YouTube
-    </a>
-    </div>
-    </div>
-
-    < !--Footer -->
-        <div style="padding:16px 10px 36px;font-size:0.8rem;color:#666;border-top:1px solid #222;text-align:center;" data-section="email-footer">
-        If this disconnection was unintentional or temporary, you can safely reconnect anytime using the link above.<br />
-        If you no longer use JustOneUpload, you may ignore this message.<br />
-        <div style="margin-top:20px;">
-          <img src="${process.env.CLOUDINARY_LOGO}" alt="JustOneUpload" style="width:60px;height:60px;opacity:0.6;" data-logo />
+  
+        <!-- Body -->
+        <div style="padding:24px 20px;">
+          <div style="color:#ccc;font-size:0.95rem;line-height:1.6;margin-bottom:20px;">
+            Hello <strong>${name}</strong>,<br /><br />
+            We’re pleased to inform you that the following video has been successfully uploaded to your YouTube channel via <strong>JustOneUpload</strong>.<br /><br />
+            You can now review it live on YouTube and share it with your audience.
+          </div>
+  
+          <!-- Video Card -->
+          <div style="display: flex; background-color: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; margin-bottom: 20px; gap: 16px; align-items: center; flex-wrap: wrap;">
+            <img src="${video.thumbnail}" alt="${video.title}" style="width: 160px; height: 90px; object-fit: cover; border-radius: 8px; flex-shrink: 0;" />
+            <div style="flex: 1; min-width: 180px; padding-left:1rem;">
+              <div style="font-size: 1.05rem; font-weight: 600; color: #fff; margin-bottom: 4px;">
+                ${video.title}
+              </div>
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 0.85rem; color: #ccc; margin-bottom: 6px;">
+                <span style="background-color: #4ac1ff; color: #000; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; line-height: 1; text-transform: capitalize;">
+                  ${video.videoType}
+                </span>
+                <span style="color: #aaa; margin:0 0 0 10px;"> ${convertDuration(video.duration)}</span>
+              </div>
+              <div style="font-size: 0.85rem; color: #aaa;">
+                Published on : ${new Date(video.publishedAt).toDateString()}
+              </div>
+            </div>
+          </div>
+  
+          <!-- CTA Button -->
+          <div style="text-align:center;padding:10px 0 30px;">
+            <a href="https://www.youtube.com/watch?v=${video.id}" target="_blank" style="background-color:#4ac1ff;color:#000;padding:12px 24px;border-radius:8px;font-weight:bold;text-decoration:none;display:inline-block;margin:8px;">
+              ▶ Watch on YouTube
+            </a>
+          </div>
+        </div>
+  
+        <!-- Footer -->
+        <div style="padding:16px 10px 36px;font-size:0.8rem;color:#666;border-top:1px solid #222;text-align:center;">
+          If this disconnection was unintentional or temporary, you can safely reconnect anytime using the link above.<br />
+          If you no longer use JustOneUpload, you may ignore this message.<br />
+          <div style="margin-top:20px;">
+            <img src="${process.env.CLOUDINARY_LOGO}" alt="JustOneUpload" style="width:60px;height:60px;opacity:0.6;" />
+          </div>
         </div>
       </div>
-
-        </div>
-        </body>
-        </html>
-`};
+    </body>
+  </html>
+  `;
+};

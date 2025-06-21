@@ -3,13 +3,12 @@ import { useState, useEffect, use } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Building2, Users } from 'lucide-react';
 import { AsyncFetcher } from '@/lib/fetcher'
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { convertViews } from '../../(layoutContainers)/dashboard/components/VideoCard';
 import { CustomButton } from '@/components/CustomButton';
 
 const JoinWs = ({ params }) => {
-    const searchParams = useSearchParams();
     const [workspace, setWorkspace] = useState(null)
     const router = useRouter()
     const resolvedParams = use(params)

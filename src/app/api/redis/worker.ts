@@ -139,7 +139,6 @@ const uploadVideoOnYoutuber = async (fileId: string, workspaceId: string) => {
             videoType: resUpload.data.status?.privacyStatus!,
             duration: resUpload.data.contentDetails?.duration!,
             id: resUpload.data.id!,
-            uploadingStatus: resUpload.data.status?.uploadStatus!,
             editorId: video.editor
         }
         await Notify.SendNotifyMail(videoMailObject, workspaceId)

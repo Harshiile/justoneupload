@@ -1,14 +1,14 @@
 "use client"
 import { useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { toast } from 'sonner'
 import { AsyncFetcher } from '@/lib/fetcher';
 
 const YoutubeInfo = () => {
-    const searchParams = useSearchParams();
+    const params = useParams();
     const router = useRouter()
     useEffect(() => {
-        const code = searchParams.get('code')
+        const code = params['code']
         if (code) {
             AsyncFetcher({
                 url: `/api/youtube/connect?code=${code}`,

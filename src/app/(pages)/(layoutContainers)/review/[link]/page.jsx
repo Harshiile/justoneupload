@@ -53,9 +53,9 @@ export default function Review({ params }) {
             methodType: 'POST',
             body: {
                 isApprove,
-                schedule: video.video.willUploadAt,
-                fileId: video.video.fileId,
-                workspaceId: video.workspaceId
+                schedule: video.willUploadAt,
+                fileId: video.fileId,
+                workspaceId: video.channelId
             },
             cb: ({ message }) => toast.success(message)
         })
@@ -87,8 +87,8 @@ export default function Review({ params }) {
                                                 {/* Channel Avatar */}
                                                 <div className='h-10 w-10 flex-shrink-0'>
                                                     <img
-                                                        src={video?.channel?.avatar}
-                                                        alt={video?.channel?.name}
+                                                        src={video?.channelAvatar}
+                                                        alt={video?.channelName}
                                                         className='w-full h-full rounded-full object-cover border border-secondary'
                                                     />
                                                 </div>
@@ -96,12 +96,12 @@ export default function Review({ params }) {
                                                 {/* Channel Info */}
                                                 <div className='flex-1 flex flex-col justify-center'>
                                                     <div className='flex items-center space-x-1'>
-                                                        <span className='font-bold text-gray-100'>{video?.channel?.name}</span>
+                                                        <span className='font-bold text-gray-100'>{video?.channelName}</span>
                                                         <span className='text-gray-400 text-sm'>
-                                                            {video?.channel?.userHandle}
+                                                            {video?.channelUserHandle}
                                                         </span>
                                                     </div>
-                                                    <div className='text-gray-400 text-xs line-clamp-1'>{video?.video?.title}</div>
+                                                    <div className='text-gray-400 text-xs line-clamp-1'>{video?.title}</div>
                                                 </div>
 
                                                 {/* Review Status */}
@@ -126,7 +126,7 @@ export default function Review({ params }) {
                                                     onLoadedData={_ => setisLoading(false)}
                                                 >
                                                     <source
-                                                        src={`http://localhost:3000/api/drive?type=video&id=${video?.video?.fileId}`}
+                                                        src={`http://localhost:3000/api/drive?type=video&id=${video?.fileId}`}
                                                         type='video/mp4'
                                                     />
                                                 </video>
@@ -137,11 +137,8 @@ export default function Review({ params }) {
                                                     animate={isVideoHovered ? { y: 0, opacity: 1 } : { y: -50, opacity: 0 }}
                                                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                                     className="absolute top-0 left-0 m-4 p-2 rounded-md text-white font-bold text-lg max-w-[90%]"
-                                                    style={{
-                                                        // backgroundColor: 'rgba(255, 255, 255, 0.15)',  // light translucent white
-                                                    }}
                                                 >
-                                                    {video?.video?.title}
+                                                    {video?.title}
                                                 </motion.div>
 
                                             </div>

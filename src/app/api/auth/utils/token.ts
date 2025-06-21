@@ -1,5 +1,10 @@
 import { JwtGenerate } from "@/app/api/utils/jwt"
-import { User } from "../login/route"
+
+interface User {
+    id: string,
+    name: string,
+    userType: 'youtuber' | 'editor',
+}
 
 export const generateTokens = (userData: User) => {
     const accessToken = JwtGenerate(userData, process.env.ACCESS_TOKEN_EXPIRY!)

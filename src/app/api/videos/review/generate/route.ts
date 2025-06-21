@@ -22,6 +22,6 @@ export async function POST(req: NextRequest) {
     })
 }
 
-export const generateReviewUrl = (channel: Channel, video: Video) => {
+const generateReviewUrl = (channel: Channel, video: Video) => {
     return `${process.env.PRODUCT_URL}/review/${JwtGenerate({ channel, video })}`
 }

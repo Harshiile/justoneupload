@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     let [{ count }] = await db
         .select({ count: sql<number>`count(*)` })
         .from(WorkspaceTable)
-        .where(eq(WorkspaceTable.owner, 'd2954789-e40b-4ac1-bc84-de6b5c227ce0'));
+        .where(eq(WorkspaceTable.owner, UserId));
 
 
     if (count >= Number(process.env.WORKSPACE_CAPICITY)) return JOUError(401, "Workspace Limits Reached");
@@ -86,6 +86,8 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ message: "Workspace Created", })
     } catch (error) {
+        console.log(error);
+
         return JOUError(404, "Unauthorized Code")
     }
 }

@@ -109,20 +109,20 @@ const ApprovalMailTemplate = (video: ApprovalInterface, editor: User, youtuber: 
 
         <!-- Header -->
         <div style="display: flex; align-items: center; padding: 20px; border-bottom: 1px solid #222;">
-            <img src="https://i.pravatar.cc/100?img=7" alt="Avatar"
+            <img src=${workspace.avatar} alt=${workspace.name}
                 style="width: 48px; height: 48px; border-radius: 50%; margin-right: 12px;" />
             <div>
-                <h2 style="margin: 0; color: #eee; font-size: 1.25rem;">TechVerse Edits</h2>
-                <p style="margin: 2px 0 0 0; color: #aaa; font-size: 0.9rem;">@techverseofficial</p>
+                <h2 style="margin: 0; color: #eee; font-size: 1.25rem;">${workspace.name}</h2>
+                <p style="margin: 2px 0 0 0; color: #aaa; font-size: 0.9rem;">${workspace.userHandle}</p>
             </div>
         </div>
 
         <!-- Body -->
         <div style="padding: 24px 20px;">
-            <p style="font-size: 1.1rem; color: #ccc;">Hey Aayush Gupta,</p>
+            <p style="font-size: 1.1rem; color: #ccc;">Hey ${youtuber.name},</p>
             <p style="color: #bbb; font-size: 0.95rem; line-height: 1.6;">
-                Just a heads-up — your editor <strong>Harsh Patel</strong> has uploaded a brand new video titled
-                <strong>"Mastering Docker in 15 Minutes"</strong> to your workspace <strong>TechVerse Edits</strong>.
+                Just a heads-up — your editor <strong>${editor.name}</strong> has uploaded a brand new video titled
+                <strong>"${video.title}"</strong> to your workspace <strong>${workspace.name}</strong>.
                 <br /><br />
                 It's neatly packaged, beautifully edited, and awaiting your final word. Whether you’re sipping your
                 coffee or in between takes, now’s the perfect time to give it a watch and hit <strong>approve</strong>
@@ -138,24 +138,24 @@ const ApprovalMailTemplate = (video: ApprovalInterface, editor: User, youtuber: 
 
               <!-- Thumbnail (Smaller on large screen, full on small) -->
               <div style="flex: 0 0 160px; max-width: 160px; width: 100%; background-color: #000;">
-                <img src="https://i.ytimg.com/vi/3c-iBn73dDE/maxresdefault.jpg" alt="Docker thumbnail"
+                <img src=${video.thumbnail} alt=${video.title}
                   style="width: 100%; height: auto; display: block;" />
               </div>
 
               <!-- Video Info -->
               <div style="flex: 1 1 auto; padding: 16px; min-width: 240px;">
                 <div style="font-size: 1rem; font-weight: bold; margin-bottom: 6px; color: #fff;">
-                  Mastering Docker in 15 Minutes
+                  ${video.title}
                 </div>
                 <div style="font-size: 0.85rem; color: #bbb; margin-bottom: 6px;">
                   <span
                     style="display: inline-block; background-color: #8b5cf6; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; color: #fff; margin-right: 8px;">
-                    Tutorial
+                    ${video.videoType}
                   </span>
-                  Duration: 00:14:37
+                  Duration : ${convertDuration(video.duration)}
                 </div>
                 <div style="font-size: 0.85rem; color: #bbb;">
-                  Publishing: Jun 12, 2025, 06:00 PM IST
+                   Schedule On : ${video.willUploadAt ? convertDate(video.willUploadAt) : 'Just after your approval'}
                 </div>
               </div>
             </div>
@@ -165,14 +165,14 @@ const ApprovalMailTemplate = (video: ApprovalInterface, editor: User, youtuber: 
             <div style="margin: 20px 0; text-align: center;">
                 <p style="font-size: 1rem; font-weight: 600; color: #fff; margin-bottom: 6px;">Edited by</p>
                 <p style="font-style: italic; font-size: 0.95rem; color: #bbb; margin: 0;">
-                    Harsh Patel — <a href="mailto:harsh.patel.editing@gmail.com"
-                        style="color: #3b82f6;">harsh.patel.editing@gmail.com</a>
+                    ${editor.name} — <a href="mailto:${editor.email}"
+                        style="color: #3b82f6;">${editor.email}</a>
                 </p>
             </div>
 
             <!-- CTA Button -->
             <div style="text-align: center; padding: 24px 0;">
-                <a href="https://justoneupload.com/review/techverse?fileId=docker-15min&title=Mastering%20Docker%20in%2015%20Minutes&scheduled=Jun%2012%2C%202025%2C%2006%3A00%20PM"
+                <a href="${generateReviewUrl(workspace, video)}"
                     style="background-color: #22c55e; color: #000; padding: 12px 24px; border-radius: 8px; font-weight: bold; text-decoration: none; display: inline-block;">
                     👀 Review Now
                 </a>

@@ -1,11 +1,10 @@
 import { oauth2Client } from "@/app/api/utils/screats";
 import { db } from "@/db";
 import { UserTable, VideoTable, VideoWorkspaceJoinTable, WorkspaceTable } from "@/db/schema";
-import { CustomNextRequest } from "@/lib/customRequest";
 import { JOUError } from "@/lib/error";
 import { eq } from "drizzle-orm";
 import { google } from "googleapis";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export interface VideoMetaData {
     id: string;
@@ -22,7 +21,7 @@ export interface VideoMetaData {
 }
 
 
-export async function GET(req: CustomNextRequest) {
+export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const workspace = searchParams.get('ws')
 
@@ -66,12 +65,6 @@ export async function GET(req: CustomNextRequest) {
     } catch (error) {
         return JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1010`)
     }
-
-    console.log('Non-Uploaded Videos ------------');
-    nonUploadedVideos.forEach(v => console.table(v));
-
-    console.log('Uploaded Videos ------------');
-    uploadedVideos.forEach(v => console.table(v));
 
     const metadata: VideoMetaData[] = nonUploadedVideos || [];
 
