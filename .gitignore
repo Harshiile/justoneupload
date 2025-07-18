@@ -22,7 +22,6 @@ tmp.html
 
 # production
 /build
-/public
 
 # misc
 .DS_Store

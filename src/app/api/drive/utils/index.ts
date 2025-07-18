@@ -1,5 +1,5 @@
 import * as GoogleAPIs from "googleapis-common";
-import { drive } from "../../utils/screats.ts";
+import { drive } from "../../utils/secrets.ts";
 // import { buffer } from "node:stream/consumers";
 // import Redis from "ioredis";
 import Stream from "node:stream";

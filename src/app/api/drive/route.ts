@@ -1,5 +1,5 @@
 import { JOUError } from "../../../lib/error.ts";
-import { drive } from "../utils/screats.ts";
+import { drive } from "../utils/secrets.ts";
 import { NextRequest, NextResponse } from "next/server";
 import { Readable } from "stream";
 import { getFileFromDrive } from "./utils/index.ts";
