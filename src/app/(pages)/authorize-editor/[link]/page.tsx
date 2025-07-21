@@ -5,10 +5,7 @@ import { toast } from "sonner";
 import { AsyncFetcher } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
 import { CustomButton } from "@/components/CustomButton";
-
-interface Params {
-  [key: string]: Usable<string>;
-}
+import { PageProps } from "../../../../../.next/types/app/layout";
 
 interface Data {
   editorId: string;
@@ -19,19 +16,21 @@ interface Data {
   editorName: string;
   editorMail: string;
 }
-const Authorize = ({ params }: Params) => {
+const Authorize = ({ params }: PageProps) => {
   const [data, setData] = useState<Data | null>(null);
   const router = useRouter();
-  const resolvedParams = use(params);
+  const resolvedParams = params;
 
   useEffect(() => {
-    const link = resolvedParams.link;
-    AsyncFetcher({
-      url: `/api/auth/authorize-editor/validate?link=${link}`,
-      cb: ({ decryptData }: { decryptData: Data }) => {
-        setData(decryptData);
-      },
-    });
+    (async () => {
+      const link = (await resolvedParams).link;
+      AsyncFetcher({
+        url: `/api/auth/authorize-editor/validate?link=${link}`,
+        cb: ({ decryptData }: { decryptData: Data }) => {
+          setData(decryptData);
+        },
+      });
+    })();
   }, []);
 
   const handleAuthorize = (approve: boolean) => {

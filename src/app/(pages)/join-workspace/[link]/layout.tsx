@@ -1,9 +1,9 @@
-import { Children } from "../../types/reactChildren";
+import { LayoutProps } from "../../../../../.next/types/app/layout";
 
 export const metadata = {
   title: "Join Workspace - JustOneUpload",
 };
 
-export default function RootLayout({ children }: Children) {
+export default function RootLayout({ children }: LayoutProps) {
   return children;
 }

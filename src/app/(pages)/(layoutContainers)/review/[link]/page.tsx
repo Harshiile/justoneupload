@@ -16,10 +16,8 @@ import { AsyncFetcher } from "@/lib/fetcher";
 import { toast } from "sonner";
 import { useUser } from "@/hooks/store/user";
 import Prevention from "@/components/Prevention";
+import { PageProps } from "../../../../../../.next/types/app/layout";
 
-interface Params {
-  [key: string]: Usable<string>;
-}
 interface VideoDetails {
   channel: {
     id: string;
@@ -33,7 +31,7 @@ interface VideoDetails {
     willUploadAt: string | null;
   };
 }
-export default function Review({ params }: Params) {
+export default function Review({ params }: PageProps) {
   const user = useUser((state) => state.user);
   const [isVideoProcessDone, setIsVideoProcessDone] = useState(false);
   const [isVideoHovered, setIsVideoHovered] = useState(false);
@@ -46,25 +44,29 @@ export default function Review({ params }: Params) {
   }>();
   const [isLoading, setisLoading] = useState(true);
   const [video, setVideo] = useState<VideoDetails | null>(null);
-  const resolvedParams = use(params);
+  const resolvedParams = params;
 
   useEffect(() => {
-    const link = resolvedParams.link;
-    if (link) {
-      AsyncFetcher({
-        url: `/api/videos/review/validate?link=${link}`,
-        cb: ({
-          error,
-          videoDetails,
-        }: {
-          error: boolean;
-          videoDetails: VideoDetails;
-        }) => {
-          if (error) setIsVideoProcessDone(true);
-          else setVideo(videoDetails);
-        },
-      });
-    }
+    (async () => {
+      const link = (await resolvedParams).link;
+      if (link) {
+        AsyncFetcher({
+          url: `/api/videos/review/validate?link=${link}`,
+          cb: ({
+            error,
+            videoDetails,
+          }: {
+            error: boolean;
+            videoDetails: VideoDetails;
+          }) => {
+            console.log(videoDetails);
+
+            if (error) setIsVideoProcessDone(true);
+            else setVideo(videoDetails);
+          },
+        });
+      }
+    })();
   }, []);
 
   const handleApprove = (isApprove: boolean) => {

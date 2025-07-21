@@ -1,10 +1,7 @@
 export const metadata = {
-    title: "Dashboard - JustOneUpload",
+  title: "Dashboard - JustOneUpload",
 };
 
-export default function RootLayout({
-    children,
-}) {
-    return children
-        ;
+export default function RootLayout({ children }) {
+  return children;
 }

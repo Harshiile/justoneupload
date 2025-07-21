@@ -7,10 +7,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { convertViews } from "../../(layoutContainers)/dashboard/components/VideoCard";
 import { CustomButton } from "@/components/CustomButton";
+import { PageProps } from "../../../../../.next/types/app/layout";
 
-interface Params {
-  [key: string]: Usable<string>;
-}
 interface Workspace {
   avatar: string;
   name: string;
@@ -20,20 +18,20 @@ interface Workspace {
   userHandle: string;
   totalVideos: number;
 }
-const JoinWs = ({ params }: Params) => {
+const JoinWs = ({ params }: PageProps) => {
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const router = useRouter();
-  const resolvedParams = use(params);
+  const resolvedParams = params;
   useEffect(() => {
-    const link = resolvedParams;
-    console.log("Link : ", link);
-
-    // AsyncFetcher({
-    //   url: `/api/fetch/workspaces/join/link/validate?link=${link}`,
-    //   cb: ({ workspace }) => {
-    //     setWorkspace(workspace);
-    //   },
-    // });
+    (async () => {
+      const link = resolvedParams;
+      // AsyncFetcher({
+      //   url: `/api/fetch/workspaces/join/link/validate?link=${link}`,
+      //   cb: ({ workspace }) => {
+      //     setWorkspace(workspace);
+      //   },
+      // });
+    })();
   }, []);
 
   const cardVariants = {

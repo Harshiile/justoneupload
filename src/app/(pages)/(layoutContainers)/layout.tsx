@@ -34,8 +34,9 @@ import { AsyncFetcher } from "@/lib/fetcher";
 import Link from "next/link";
 import { fetchMe } from "@/lib/fetchMe";
 import { useRouter, usePathname } from "next/navigation";
+import { LayoutProps } from "../../../../.next/types/app/layout";
 
-export default function Layout({ children }: { children: ReactNode }) {
+export default function Layout({ children }: LayoutProps) {
   const user = useUser((state) => state.user);
   const setUser = useUser((state) => state.setUser);
   const [open, setOpen] = useState(false);

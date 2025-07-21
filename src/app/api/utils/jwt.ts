@@ -1,5 +1,5 @@
 import JWT from "jsonwebtoken";
-import { JWTPayload, jwtVerify } from "jose";
+import { jwtVerify } from "jose";
 
 export const JwtValidate = async <T>(token: string): Promise<T> => {
   try {
