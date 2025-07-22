@@ -1,16 +1,29 @@
-"use client"
-import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
-import { Progress } from '@/components/ui/progress';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+"use client";
+import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
+import { Progress } from "@/components/ui/progress";
+import { motion, AnimatePresence } from "framer-motion";
+import { Loader2 } from "lucide-react";
+import { Dispatch, SetStateAction } from "react";
 
 const drawerVariants = {
-  hidden: { x: '100%' },
-  visible: { x: '0%', transition: { type: 'spring', stiffness: 250, damping: 30 } },
-  exit: { x: '100%', transition: { ease: 'easeInOut' } },
+  hidden: { x: "100%" },
+  visible: {
+    x: "0%",
+    transition: { type: "spring", stiffness: 250, damping: 30 },
+  },
+  exit: { x: "100%", transition: { ease: "easeInOut" } },
 };
 
-const UploaderDrawer = ({ isUploading, setIsUploading, progress }) => {
+interface UploaderDrawerProps {
+  isUploading: boolean;
+  setIsUploading: Dispatch<SetStateAction<boolean>>;
+  progress: number;
+}
+const UploaderDrawer = ({
+  isUploading,
+  setIsUploading,
+  progress,
+}: UploaderDrawerProps) => {
   const onDrawerChange = () => {
     if (isUploading) return;
     setIsUploading(true);
@@ -46,7 +59,6 @@ const UploaderDrawer = ({ isUploading, setIsUploading, progress }) => {
         </Drawer>
       </motion.div>
     </AnimatePresence>
-
   );
 };
 

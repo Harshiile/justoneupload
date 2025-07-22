@@ -1,18 +1,12 @@
-import { create } from 'zustand'
+import { Workspace } from "@/app/(pages)/types/workspace";
+import { create } from "zustand";
 
-interface Workspace {
-    id: string
-    userHandle: string
-    name: string
-    avatar: string
-    subscribers: string
-    desc: string
-    totalVideos: string
-    disconnected: boolean
-    email: string
+interface WorkSpaceStore {
+  workspaces: null | Array<Workspace>;
+  setWorkspaces: (workspaces: Array<Workspace>) => void;
 }
-
-export const useWorkspaces = create(set => ({
-    workspaces: null,
-    setWorkspaces: (_workspaces: Array<Workspace>) => set({ workspaces: _workspaces })
-}))
+export const useWorkspaces = create<WorkSpaceStore>((set) => ({
+  workspaces: null,
+  setWorkspaces: (_workspaces: Array<Workspace>) =>
+    set({ workspaces: _workspaces }),
+}));

@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 interface User {
   id: string;
-  userType: string;
+  userType: "youtuber" | "editor";
   name: string;
 }
 

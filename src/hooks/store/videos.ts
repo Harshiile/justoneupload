@@ -1,7 +1,11 @@
-import { VideoMetaData } from '@/app/api/fetch/workspaces/videos/route'
-import { create } from 'zustand'
+import { Video } from "@/app/(pages)/(layoutContainers)/dashboard/components/VideoCard";
+import { create } from "zustand";
 
-export const useVideos = create(set => ({
-    videos: null,
-    setVideos: (_videos: Array<VideoMetaData>) => set({ videos: _videos })
-}))
+interface VideoStore {
+  videos: Array<Video> | null;
+  setVideos: (videos: Array<Video> | null) => void;
+}
+export const useVideos = create<VideoStore>((set) => ({
+  videos: null,
+  setVideos: (_videos: Array<Video> | null) => set({ videos: _videos }),
+}));
