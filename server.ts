@@ -1,21 +1,21 @@
+// index.ts
 import next from "next";
 import { createServer } from "http";
-import { Server as IOServer } from "socket.io";
-import { setSocket } from "./src/app/api/utils/socket.ts";
+import { parse } from "url";
+import { IncomingMessage, ServerResponse } from "http";
 
-const port = Number(process.env.PORT) || 3000;
+const port = parseInt(process.env.PORT || "3000", 10);
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
-const handler = app.getRequestHandler();
-
-let io: IOServer | null = null;
+const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
-  const httpServer = createServer((req, res) => handler(req, res));
+  const server = createServer((req: IncomingMessage, res: ServerResponse) => {
+    const parsedUrl = parse(req.url!, true);
+    handle(req, res, parsedUrl);
+  });
 
-  setSocket(httpServer);
-
-  httpServer.listen(port, () => {
-    console.log(`> Server running at http://localhost:${port}`);
+  server.listen(port, () => {
+    console.log(`> Ready on http://localhost:${port}`);
   });
 });

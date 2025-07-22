@@ -1,5 +1,4 @@
 "use client";
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,7 +29,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { UploaderDrawer, FileInfo, ChooseWS, Schedule } from "./components";
 import { useRouter } from "next/navigation";
 import { AsyncFetcher } from "@/lib/fetcher";
-import { socket } from "./socket";
 import Prevention from "@/components/Prevention";
 import { Workspace } from "../../types/workspace";
 
@@ -78,13 +76,13 @@ const Upload = () => {
         );
       },
     });
-    socket.connect();
-    socket.on("uploading-progress", (test: any) => {
-      console.log("Socket Test : ", test);
-    });
-    return () => {
-      socket.off("uploading-progress");
+    const es = new EventSource("/api/drive/upload/progress");
+
+    es.onmessage = (e) => {
+      const percentage = JSON.parse(e.data);
+      setProgress(percentage);
     };
+    return () => es.close();
   }, []);
 
   useEffect(() => {
@@ -122,50 +120,43 @@ const Upload = () => {
   const handleUpload = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // if (!videoType) return toast.error("Type of Video is required");
-    // if (date && date.getTime() < Date.now() + ONE_HOUR_IN_MS)
-    //   return toast.warning(
-    //     "Uploading Time must be 1 hour ahead of current time"
-    //   );
-    // if (isMadeForKids == null) return toast.error("Audience Type is required");
-    // if (thumbnailFile && thumbnailFile.size >= TWO_MB_IN_BYTES)
-    //   return toast.error("Thumbnail size must be under 2 MB");
-    // if (!file) return toast.error("Please select a video first");
+    if (!videoType) return toast.error("Type of Video is required");
+    if (date && date.getTime() < Date.now() + ONE_HOUR_IN_MS)
+      return toast.warning(
+        "Uploading Time must be 1 hour ahead of current time"
+      );
+    if (isMadeForKids == null) return toast.error("Audience Type is required");
+    if (thumbnailFile && thumbnailFile.size >= TWO_MB_IN_BYTES)
+      return toast.error("Thumbnail size must be under 2 MB");
+    if (!file) return toast.error("Please select a video first");
 
     const formData = new FormData();
-    // formData.append("title", title);
-    // formData.append("desc", desc === "" ? "" : desc);
-    // formData.append("duration", duration || "");
-    // formData.append("videoType", videoType);
-    // formData.append("isMadeForKids", String(isMadeForKids));
-    // formData.append("willUploadAt", date ? String(date.getTime()) : "");
-    // if (chosenWs) formData.append("workspace", chosenWs.id);
-    // formData.append("video", file);
-    // if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
+    formData.append("title", title);
+    formData.append("desc", desc === "" ? "" : desc);
+    formData.append("duration", duration || "");
+    formData.append("videoType", videoType);
+    formData.append("isMadeForKids", String(isMadeForKids));
+    formData.append("willUploadAt", date ? String(date.getTime()) : "");
+    if (chosenWs) formData.append("workspace", chosenWs.id);
+    formData.append("video", file);
+    if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
 
-    if (socket.id) {
-      const res = await fetch(`/api/drive/upload`, {
-        method: "POST",
-        body: formData,
-        headers: {
-          socket: socket.id,
-        },
-      });
+    const res = await fetch(`/api/drive/upload`, {
+      method: "POST",
+      body: formData,
+    });
 
-      if (!res.ok) {
-        if (res.status === 999) {
-          const renewed = await AsyncFetcher({ url: "/api//auth/renew-token" });
-          if (renewed) {
-            handleUpload(e);
-          } else toast.error("Please Login Again");
-        }
-      } else {
-        const resJson = await res.json();
-        toast.success(resJson.message);
-        // navigate.push('/dashboard');
+    if (!res.ok) {
+      if (res.status === 999) {
+        const renewed = await AsyncFetcher({ url: "/api//auth/renew-token" });
+        if (renewed) {
+          handleUpload(e);
+        } else toast.error("Please Login Again");
       }
     } else {
-      console.log("Wait for socket initialized");
+      const resJson = await res.json();
+      toast.success(resJson.message);
+      navigate.push("/dashboard");
     }
   };
 
