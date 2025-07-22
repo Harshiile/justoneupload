@@ -30,8 +30,8 @@
     ".next/types/**/*.ts",
     "src/app/layout.tsx",
     "src/app/page.jsx",
-    "src/app/[pages]/login/index.jsxsx",
-    "server.ts"
+    "src/app/[pages]/login/index.jsx",
+    "index.ts"
   ],
   "exclude": ["node_modules"]
 }

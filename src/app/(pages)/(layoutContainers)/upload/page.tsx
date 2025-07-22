@@ -141,6 +141,7 @@ const Upload = () => {
     formData.append("video", file);
     if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
 
+    setIsUploading(true);
     const res = await fetch(`/api/drive/upload`, {
       method: "POST",
       body: formData,
@@ -156,6 +157,7 @@ const Upload = () => {
     } else {
       const resJson = await res.json();
       toast.success(resJson.message);
+      setIsUploading(false);
       navigate.push("/dashboard");
     }
   };

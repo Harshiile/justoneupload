@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "ts-node server.ts",
+    "dev": "ts-node index.ts",
     "worker": "ts-node -r tsconfig-paths/register ./src/app/api/redis/worker.ts",
     "build": "next build",
-    "start": "NODE_ENV=production node server.ts",
+    "start": "NODE_ENV=production node index.ts",
     "lint": "next lint"
   },
   "dependencies": {
