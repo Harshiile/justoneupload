@@ -12,9 +12,15 @@ import {
   isToday,
 } from "date-fns";
 import { ArrowRightCircle, ArrowLeftCircle } from "lucide-react";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
-const CustomCalendar = ({ selectedDate, onDateSelect }) => {
+const CustomCalendar = ({
+  selectedDate,
+  onDateSelect,
+}: {
+  selectedDate: Date | null;
+  onDateSelect: Dispatch<SetStateAction<Date | null>>;
+}) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const renderHeader = () => (
@@ -64,7 +70,7 @@ const CustomCalendar = ({ selectedDate, onDateSelect }) => {
 
         week.push(
           <div
-            key={thisDay}
+            key={thisDay.toString()}
             className={`flex py-2.5 items-center justify-center text-sm cursor-pointer rounded-md select-none transition 
               ${!isCurrentMonth ? "text-gray-400" : ""}
               ${today ? "border border-white" : ""}
@@ -83,7 +89,7 @@ const CustomCalendar = ({ selectedDate, onDateSelect }) => {
         day = addDays(day, 1);
       }
       dateMatrix.push(
-        <div key={day} className="grid grid-cols-7">
+        <div key={day.toString()} className="grid grid-cols-7">
           {week}
         </div>
       );

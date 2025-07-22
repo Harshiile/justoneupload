@@ -16,6 +16,7 @@ interface Data {
   editorName: string;
   editorMail: string;
 }
+
 const Authorize = ({ params }: PageProps) => {
   const [data, setData] = useState<Data | null>(null);
   const router = useRouter();

@@ -333,7 +333,7 @@ const VideoCard = ({
                         name: channel?.name,
                         avatar: channel?.avatar,
                         userHandle: channel?.userHandle,
-                        id: video.id,
+                        id: channel?.id,
                         title: video.title,
                         fileId: video.fileId,
                         willUploadAt: video.willUploadAt,

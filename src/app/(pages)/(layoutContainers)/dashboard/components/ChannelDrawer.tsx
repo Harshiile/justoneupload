@@ -28,10 +28,10 @@ import { Workspace } from "@/app/(pages)/types/workspace";
 interface ChannelDrawerProps {
   open: boolean;
   onOpenChange: Dispatch<SetStateAction<boolean>>;
-  videos: Array<Video>;
-  filterVideos: Array<Video>;
-  setFilterVideos: Dispatch<SetStateAction<Array<Video>>>;
-  channel: Workspace;
+  videos: Array<Video> | null;
+  filterVideos: Array<Video> | null;
+  setFilterVideos: Dispatch<SetStateAction<Array<Video> | null>>;
+  channel: Workspace | null;
 }
 export const ChannelDrawer = ({
   open,
@@ -51,7 +51,8 @@ export const ChannelDrawer = ({
   const [isAscending, setIsAscending] = useState(true);
 
   const searchOnChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFilterVideos(videos?.filter((v) => v.title.startsWith(e.target.value)));
+    if (videos)
+      setFilterVideos(videos.filter((v) => v.title.startsWith(e.target.value)));
   };
 
   if (!channel) return null;

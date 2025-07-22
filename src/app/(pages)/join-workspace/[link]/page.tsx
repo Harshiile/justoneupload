@@ -18,13 +18,18 @@ interface Workspace {
   userHandle: string;
   totalVideos: number;
 }
+// interface PageProps {
+//   params: {
+//     link: string;
+//   };
+// }
 const JoinWs = ({ params }: PageProps) => {
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const router = useRouter();
   const resolvedParams = params;
   useEffect(() => {
     (async () => {
-      const link = resolvedParams;
+      const link = (await resolvedParams).link;
       // AsyncFetcher({
       //   url: `/api/fetch/workspaces/join/link/validate?link=${link}`,
       //   cb: ({ workspace }) => {

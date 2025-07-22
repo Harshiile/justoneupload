@@ -1,4 +1,12 @@
 "use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
+import { Plus } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -12,26 +20,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { CustomButton } from "@/components/CustomButton";
+import { Loader } from "@/components/Loader";
 
 import { AsyncFetcher } from "@/lib/fetcher";
-import { useEffect, useState } from "react";
-import { Loader } from "@/components/Loader";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus } from "lucide-react";
-import { toast } from "sonner";
-
 import { useUser } from "@/hooks/store/user";
 import { useVideos } from "@/hooks/store/videos";
 import { useWorkspaces } from "@/hooks/store/workspaces";
 
 import { ChannelDrawer, Contribution, VideoCard } from "./components";
-import Image from "next/image";
-import { User } from "../../types/user";
-import { Video } from "./components/VideoCard";
-import { Workspace } from "../../types/workspace";
 import { EditorContribution } from "./components/Contribution";
+
+import { User } from "../../types/user";
+import { Workspace } from "../../types/workspace";
+import { Video } from "./components/VideoCard";
 
 interface PendingVideosProps {
   videos: Array<Video>;
@@ -39,14 +41,15 @@ interface PendingVideosProps {
   user: User;
   channel: Workspace;
 }
+
 const PendingVideos = ({
   videos,
   isReviewVideos,
   user,
   channel,
 }: PendingVideosProps) => {
-  return videos?.length > 0 ? (
-    videos?.map((video) => (
+  return videos.length > 0 ? (
+    videos.map((video) => (
       <motion.div
         key={video.id}
         initial={{ opacity: 0, y: 10 }}
@@ -66,7 +69,7 @@ const PendingVideos = ({
     ))
   ) : (
     <motion.div
-      className={`text-muted-foreground text-center h-full grid place-items-center`}
+      className="text-muted-foreground text-center h-full grid place-items-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
@@ -81,59 +84,53 @@ const Dashboard = () => {
   const setVideos = useVideos((state) => state.setVideos);
   const workspaces = useWorkspaces((state) => state.workspaces);
   const setWorkspaces = useWorkspaces((state) => state.setWorkspaces);
-  // const navigate = useNavigate()
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [chartData, setChartData] = useState<
     Workspace[] | EditorContribution[] | null
   >(null);
-  const [filterVideos, setFilterVideos] = useState<null | Array<Video>>(null);
-  const [pendingVideos, setPendingVideos] = useState<{
-    review: Array<Video> | null;
-    upload: Array<Video> | null;
-  }>({
-    review: null,
-    upload: null,
+  const [filterVideos, setFilterVideos] = useState<Array<Video> | null>(null);
+  const [pendingVideos, setPendingVideos] = useState({
+    review: null as Array<Video> | null,
+    upload: null as Array<Video> | null,
   });
-  const [channel, setChannel] = useState<null | Workspace>(null);
+  const [channel, setChannel] = useState<Workspace | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isReviewVideos, setisReviewVideos] = useState<boolean | null>(null);
+  const [isReviewVideos, setIsReviewVideos] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (user) {
-      AsyncFetcher({
-        url: "/api/fetch/workspaces",
-        cb: ({ workspaces }: { workspaces: Array<Workspace> }) => {
-          const tmpVideos: Array<Workspace> = [];
-          new Map(Object.entries(workspaces)).forEach((v) => tmpVideos.push(v));
-          setWorkspaces(tmpVideos);
-        },
-      });
-      AsyncFetcher({
-        url: `/api/fetch/chart?chart=1`,
-        cb: (totalEditors: Workspace[] | EditorContribution[]) =>
-          setChartData(totalEditors),
-      });
-      AsyncFetcher({
-        url: "/api/videos",
-        cb: ({ videos }: { videos: Array<Video> }) => {
-          const reviewPendingVideos: Array<Video> = [];
-          const uploadPendingVideos: Array<Video> = [];
-          videos.filter((v) => {
-            if (v.status == "reviewPending") reviewPendingVideos.push(v);
-            else if (v.status == "uploadPending") uploadPendingVideos.push(v);
-          });
-          setPendingVideos({
-            review: reviewPendingVideos,
-            upload: uploadPendingVideos,
-          });
-          setisReviewVideos(true);
-        },
-      });
-    }
+    if (!user) return;
+
+    AsyncFetcher({
+      url: "/api/fetch/workspaces",
+      cb: ({ workspaces }: { workspaces: Workspace[] }) => {
+        const tmpVideos: Array<Workspace> = [];
+        new Map(Object.entries(workspaces)).forEach((v) => tmpVideos.push(v));
+        setWorkspaces(tmpVideos);
+      },
+    });
+
+    AsyncFetcher({
+      url: `/api/fetch/chart?chart=1`,
+      cb: (data: Workspace[] | EditorContribution[]) => {
+        setChartData(data);
+      },
+    });
+
+    AsyncFetcher({
+      url: "/api/videos",
+      cb: ({ videos }: { videos: Video[] }) => {
+        const review = videos.filter((v) => v.status === "reviewPending");
+        const upload = videos.filter((v) => v.status === "uploadPending");
+        setPendingVideos({ review: review!, upload: upload! });
+        setIsReviewVideos(true);
+      },
+    });
   }, [user]);
 
   return (
     <>
+      {/* Connect Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="bg-primary border-none py-10 px-6 w-[90vw] max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader className="mx-auto mb-3">
@@ -142,11 +139,13 @@ const Dashboard = () => {
             </DialogTitle>
           </DialogHeader>
           <CustomButton
-            title={"Connect"}
+            title="Connect"
             cb={() =>
               AsyncFetcher({
                 url: "/api/youtube/connect",
-                cb: ({ url }: { url: string }) => {},
+                cb: ({ url }: { url: string }) => {
+                  window.location.href = url;
+                },
               })
             }
             className="bg-red-600 hover:bg-red-600 text-white text-md hover:text-white w-full"
@@ -154,6 +153,7 @@ const Dashboard = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Main Dashboard */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -163,44 +163,42 @@ const Dashboard = () => {
         <ChannelDrawer
           open={isDrawerOpen}
           onOpenChange={setIsDrawerOpen}
-          filterVideos={filterVideos}
-          setFilterVideos={setFilterVideos}
+          filterVideos={filterVideos!}
+          setFilterVideos={setFilterVideos!}
           videos={videos}
           channel={channel}
         />
 
-        {/* Top Panels */}
+        {/* Workspaces and Contributions */}
         <div className="w-full h-[30vh] flex gap-x-6">
-          {/* WorkSpaces Panel */}
+          {/* Workspaces */}
           <motion.div
             className="relative group w-full lg:w-1/3 border-2 border-secondary rounded-md p-4"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            {user?.userType == "youtuber" && (
+            {user?.userType === "youtuber" && (
               <motion.button
                 className="absolute top-2 right-2 bg-white text-primary p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
-                title="Add New WorkSpace"
+                title="Add New Workspace"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={(_) => setIsDialogOpen(true)}
+                onClick={() => setIsDialogOpen(true)}
               >
                 <Plus size={16} />
               </motion.button>
             )}
             <p className="text-lg font-semibold mb-3">Workspaces</p>
-
-            <div className="flex flex-wrap gap-4 h-full justify-center  ">
+            <div className="flex flex-wrap gap-4 h-full justify-center">
               {!workspaces ? (
                 <Loader />
               ) : workspaces.length > 0 ? (
-                workspaces?.map((workspace, idx) => {
-                  const ws = workspace;
+                workspaces.map((ws) => {
                   const wsAvatar = ws.disconnected ? "/invalid.jpg" : ws.avatar;
 
                   return (
-                    <TooltipProvider>
+                    <TooltipProvider key={ws.id}>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <motion.div
@@ -209,7 +207,7 @@ const Dashboard = () => {
                             className={`relative w-24 h-24 rounded-full overflow-hidden border-4 ${
                               ws.disconnected
                                 ? "border-red-500 cursor-pointer"
-                                : "cursor-pointer border-secondary "
+                                : "cursor-pointer border-secondary"
                             }`}
                             onClick={() => {
                               if (ws.disconnected) {
@@ -217,12 +215,13 @@ const Dashboard = () => {
                                   <div className="flex items-center justify-between gap-4">
                                     <span>Workspace is Inactive</span>
                                     <Button
-                                      className="px-3 py-1 h-auto bg-white text-black font-semibold hover:bg-white hover:text-black hover:font-semibold hover:cursor-pointer"
+                                      className="px-3 py-1 h-auto bg-white text-black font-semibold"
                                       onClick={() => {
                                         AsyncFetcher({
                                           url: `/api/youtube/reconnect?ws=${ws.id}`,
-                                          cb: ({ url }: { url: string }) =>
-                                            (window.location.href = url),
+                                          cb: ({ url }: { url: string }) => {
+                                            window.location.href = url;
+                                          },
                                         });
                                       }}
                                     >
@@ -232,17 +231,15 @@ const Dashboard = () => {
                                 );
                                 return;
                               }
+
                               setVideos(null);
                               setFilterVideos(null);
-                              setIsDrawerOpen(!isDrawerOpen);
+                              setIsDrawerOpen(true);
                               setChannel(ws);
+
                               AsyncFetcher({
                                 url: `/api/fetch/workspaces/videos?ws=${ws.id}`,
-                                cb: ({
-                                  metadata,
-                                }: {
-                                  metadata: Array<Video>;
-                                }) => {
+                                cb: ({ metadata }: { metadata: Video[] }) => {
                                   setVideos(metadata);
                                   setFilterVideos(metadata);
                                 },
@@ -254,7 +251,7 @@ const Dashboard = () => {
                               alt={ws.name!}
                               width={100}
                               height={100}
-                              className={`w-full h-full object-cover`}
+                              className="w-full h-full object-cover"
                             />
                           </motion.div>
                         </TooltipTrigger>
@@ -277,7 +274,7 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-          {/* Contribution Panel */}
+          {/* Contributions */}
           <motion.div
             className="w-full lg:w-2/3 border-2 border-secondary rounded-md p-4 text-xl relative"
             initial={{ opacity: 0, x: 20 }}
@@ -285,7 +282,7 @@ const Dashboard = () => {
             transition={{ delay: 0.2 }}
           >
             <p className="text-lg font-semibold mb-2">Contribution</p>
-            <Contribution chartData={chartData} user={user!} />
+            <Contribution chartData={chartData!} user={user!} />
           </motion.div>
         </div>
 
@@ -298,18 +295,17 @@ const Dashboard = () => {
         >
           <div className="flex items-start gap-x-5">
             <p className="text-lg font-semibold mb-3">Pending Videos</p>
-
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    className={`bg-white text-black font-bold hover:bg-white hover:text-black hover:ont-bold hover:cursor-pointer ${
-                      isReviewVideos == null && "hover:cursor-not-allowed"
+                    className={`bg-white text-black font-bold hover:bg-white hover:text-black hover:font-bold ${
+                      isReviewVideos === null && "hover:cursor-not-allowed"
                     }`}
-                    onClick={(_) => {
-                      isReviewVideos != null &&
-                        setisReviewVideos(!isReviewVideos);
-                    }}
+                    onClick={() =>
+                      isReviewVideos !== null &&
+                      setIsReviewVideos(!isReviewVideos)
+                    }
                   >
                     {isReviewVideos ? "Review Pending" : "Upload Pending"}
                   </Button>
@@ -323,14 +319,15 @@ const Dashboard = () => {
               </Tooltip>
             </TooltipProvider>
           </div>
+
           <div className="w-full max-h-[50vh] overflow-y-auto custom-scroll">
             <AnimatePresence>
-              {isReviewVideos == null ? (
+              {isReviewVideos === null || !user || !channel ? (
                 <Loader />
               ) : (
                 <PendingVideos
-                  user={user!}
-                  channel={channel!}
+                  user={user}
+                  channel={channel}
                   isReviewVideos={isReviewVideos}
                   videos={
                     isReviewVideos

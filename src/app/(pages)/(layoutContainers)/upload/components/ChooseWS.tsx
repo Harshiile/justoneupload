@@ -2,7 +2,7 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { toast } from "sonner";
 import { Loader } from "@/components/Loader";
-import { Workspace } from "../page";
+import { Workspace } from "@/app/(pages)/types/workspace";
 
 interface ChooseWSProps {
   setChosenWs: Dispatch<SetStateAction<Workspace | null>>;

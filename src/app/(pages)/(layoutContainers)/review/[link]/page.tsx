@@ -31,6 +31,7 @@ interface VideoDetails {
     willUploadAt: string | null;
   };
 }
+
 export default function Review({ params }: PageProps) {
   const user = useUser((state) => state.user);
   const [isVideoProcessDone, setIsVideoProcessDone] = useState(false);
@@ -71,7 +72,6 @@ export default function Review({ params }: PageProps) {
 
   const handleApprove = (isApprove: boolean) => {
     setConfirmDialog(false);
-
     AsyncFetcher({
       url: "/api/youtube/video-approval",
       methodType: "POST",
