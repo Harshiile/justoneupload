@@ -58,7 +58,9 @@ function createProgressStream(totalBytes: number) {
   });
 }
 
-const DriveUpload = async (file: File) => {
+const DriveUpload = async (file: File, socketId: string) => {
+  if (!socketId) throw new Error("Socket not found");
+
   const mimeType = mime.getType(file.name);
 
   const fileMetadata = {
@@ -95,7 +97,10 @@ const DriveUpload = async (file: File) => {
               (Number(uploaded) / Number(totalSize)) * 100
             );
             console.log(`${mimeType} - Uploading -- ${percent}%`);
-            // io.to(headers['socket']!).emit('uploading-progress', { percentage: percent })
+            const io = getSocket();
+            io.to(socketId).emit("uploading-progress", {
+              percentage: percent,
+            });
           }
         },
       }
@@ -109,96 +114,109 @@ const DriveUpload = async (file: File) => {
 
 export async function POST(req: NextRequest) {
   const { id: editorId } = getUser(req);
-  const form = await req.formData();
-  const videoMetadata: Record<string, string | boolean | null> = {
-    title: null,
-    desc: null,
-    duration: null,
-    videoType: null,
-    willUploadAt: null,
-    isMadeForKids: null,
-    workspace: null,
-  };
-  const fileIds: {
-    video: null | string;
-    thumbnail: null | string;
-  } = {
-    video: null,
-    thumbnail: null,
-  };
-  const fileStream = {
-    thumbnail:
-      form.get("thumbnail") == "null" ? null : (form.get("thumbnail") as File),
-    video: form.get("video") == "null" ? null : (form.get("video") as File),
-  };
-  form.forEach((value, key) => {
-    if (typeof value == "string") videoMetadata[key] = parseFieldData(value);
+  const socketId = req.headers.get("socket");
+  console.log("Backend socket : ", socketId);
+
+  const io = getSocket();
+  io.to(socketId!).emit("uploading-progress", {
+    percentage: 66,
   });
+  // const form = await req.formData();
+  // const videoMetadata: Record<string, string | boolean | null> = {
+  //   title: null,
+  //   desc: null,
+  //   duration: null,
+  //   videoType: null,
+  //   willUploadAt: null,
+  //   isMadeForKids: null,
+  //   workspace: null,
+  // };
+  // const fileIds: {
+  //   video: null | string;
+  //   thumbnail: null | string;
+  // } = {
+  //   video: null,
+  //   thumbnail: null,
+  // };
+  // const fileStream = {
+  //   thumbnail:
+  //     form.get("thumbnail") == "null" ? null : (form.get("thumbnail") as File),
+  //   video: form.get("video") == "null" ? null : (form.get("video") as File),
+  // };
+  // form.forEach((value, key) => {
+  //   if (typeof value == "string") videoMetadata[key] = parseFieldData(value);
+  // });
 
-  const uploadPromises: Array<Promise<void>> = [];
-  if (!fileStream.video) throw JOUError(404, "Video Not Found");
+  // const uploadPromises: Array<Promise<void>> = [];
+  // if (!fileStream.video) throw JOUError(404, "Video Not Found");
 
-  // Video Upload
-  const uploadVideoPromise = DriveUpload(fileStream.video)
-    .then((res) => {
-      fileIds.video = res;
-    })
-    .catch((err) => {
-      console.error("Upload Error:", err);
-      throw JOUError(400, "Uploading Failed, Please Try Again");
-    });
-  uploadPromises.push(uploadVideoPromise);
+  // // Video Upload
+  // const uploadVideoPromise = DriveUpload(
+  //   fileStream.video,
+  //   req.headers.get("socket") as string
+  // )
+  //   .then((res) => {
+  //     fileIds.video = res;
+  //   })
+  //   .catch((err) => {
+  //     console.error("Upload Error:", err);
+  //     throw JOUError(400, "Uploading Failed, Please Try Again");
+  //   });
+  // uploadPromises.push(uploadVideoPromise);
 
-  if (fileStream.thumbnail) {
-    const uploadThumbnailPromise = DriveUpload(fileStream.thumbnail)
-      .then((res) => {
-        fileIds.thumbnail = res;
-      })
-      .catch((err) => {
-        console.error("Upload Error:", err);
-        throw JOUError(400, "Uploading Failed, Please Try Again");
-      });
-    uploadPromises.push(uploadThumbnailPromise);
-  }
+  // if (fileStream.thumbnail) {
+  //   const uploadThumbnailPromise = DriveUpload(
+  //     fileStream.thumbnail,
+  //     req.headers.get("socket") as string
+  //   )
+  //     .then((res) => {
+  //       fileIds.thumbnail = res;
+  //     })
+  //     .catch((err) => {
+  //       console.error("Upload Error:", err);
+  //       throw JOUError(400, "Uploading Failed, Please Try Again");
+  //     });
+  //   uploadPromises.push(uploadThumbnailPromise);
+  // }
 
-  try {
-    await Promise.all(uploadPromises);
+  // try {
+  //   await Promise.all(uploadPromises);
 
-    console.log("Video Uploaded, Now Inserting in DB");
+  //   console.log("Video Uploaded, Now Inserting in DB");
 
-    const mailInput = {
-      title: videoMetadata.title as string,
-      desc: videoMetadata.desc as string,
-      videoType: videoMetadata.videoType as VideoType,
-      duration: videoMetadata.duration as string,
-      isMadeForKids: videoMetadata.isMadeForKids as boolean,
-      willUploadAt: videoMetadata.willUploadAt as string | null,
-      editor: editorId,
-      workspace: videoMetadata.workspace as string,
-      thumbnail: fileIds.thumbnail,
-      fileId: fileIds.video as string,
-    };
+  //   const mailInput = {
+  //     title: videoMetadata.title as string,
+  //     desc: videoMetadata.desc as string,
+  //     videoType: videoMetadata.videoType as VideoType,
+  //     duration: videoMetadata.duration as string,
+  //     isMadeForKids: videoMetadata.isMadeForKids as boolean,
+  //     willUploadAt: videoMetadata.willUploadAt as string | null,
+  //     editor: editorId,
+  //     workspace: videoMetadata.workspace as string,
+  //     thumbnail: fileIds.thumbnail,
+  //     fileId: fileIds.video as string,
+  //   };
 
-    // DB Insertion
-    await db
-      .insert(VideoTable)
-      .values({
-        ...mailInput,
-        status: "reviewPending",
-      })
-      .catch((_) =>
-        JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1004`)
-      );
+  //   // DB Insertion
+  //   await db
+  //     .insert(VideoTable)
+  //     .values({
+  //       ...mailInput,
+  //       status: "reviewPending",
+  //     })
+  //     .catch((_) =>
+  //       JOUError(400, `${process.env.SERVER_ERROR_MESSAGE} - 1004`)
+  //     );
 
-    console.log("Video Inserted in DB");
+  //   console.log("Video Inserted in DB");
 
-    // Send mail to youtuber - workspaceId
-    await SendApprovalMail(mailInput);
+  //   // Send mail to youtuber - workspaceId
+  //   await SendApprovalMail(mailInput);
 
-    // resolve();
-    return NextResponse.json({ message: "Video Uploaded" });
-  } catch (err) {
-    console.error("One or more uploads failed:", err);
-    return JOUError(400, "Upload failed");
-  }
+  //   // resolve();
+  //   return NextResponse.json({ message: "Video Uploaded" });
+  // } catch (err) {
+  //   console.error("One or more uploads failed:", err);
+  //   return JOUError(400, "Upload failed");
+  // }
 }

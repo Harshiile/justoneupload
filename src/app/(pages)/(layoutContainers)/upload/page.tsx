@@ -79,11 +79,11 @@ const Upload = () => {
       },
     });
     socket.connect();
-    socket.on("test", (test: any) => {
+    socket.on("uploading-progress", (test: any) => {
       console.log("Socket Test : ", test);
     });
     return () => {
-      socket.off("test");
+      socket.off("uploading-progress");
     };
   }, []);
 
@@ -122,26 +122,26 @@ const Upload = () => {
   const handleUpload = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!videoType) return toast.error("Type of Video is required");
-    if (date && date.getTime() < Date.now() + ONE_HOUR_IN_MS)
-      return toast.warning(
-        "Uploading Time must be 1 hour ahead of current time"
-      );
-    if (isMadeForKids == null) return toast.error("Audience Type is required");
-    if (thumbnailFile && thumbnailFile.size >= TWO_MB_IN_BYTES)
-      return toast.error("Thumbnail size must be under 2 MB");
-    if (!file) return toast.error("Please select a video first");
+    // if (!videoType) return toast.error("Type of Video is required");
+    // if (date && date.getTime() < Date.now() + ONE_HOUR_IN_MS)
+    //   return toast.warning(
+    //     "Uploading Time must be 1 hour ahead of current time"
+    //   );
+    // if (isMadeForKids == null) return toast.error("Audience Type is required");
+    // if (thumbnailFile && thumbnailFile.size >= TWO_MB_IN_BYTES)
+    //   return toast.error("Thumbnail size must be under 2 MB");
+    // if (!file) return toast.error("Please select a video first");
 
     const formData = new FormData();
-    formData.append("title", title);
-    formData.append("desc", desc === "" ? "" : desc);
-    formData.append("duration", duration || "");
-    formData.append("videoType", videoType);
-    formData.append("isMadeForKids", String(isMadeForKids));
-    formData.append("willUploadAt", date ? String(date.getTime()) : "");
-    if (chosenWs) formData.append("workspace", chosenWs.id);
-    formData.append("video", file);
-    if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
+    // formData.append("title", title);
+    // formData.append("desc", desc === "" ? "" : desc);
+    // formData.append("duration", duration || "");
+    // formData.append("videoType", videoType);
+    // formData.append("isMadeForKids", String(isMadeForKids));
+    // formData.append("willUploadAt", date ? String(date.getTime()) : "");
+    // if (chosenWs) formData.append("workspace", chosenWs.id);
+    // formData.append("video", file);
+    // if (thumbnailFile) formData.append("thumbnail", thumbnailFile);
 
     if (socket.id) {
       const res = await fetch(`/api/drive/upload`, {
