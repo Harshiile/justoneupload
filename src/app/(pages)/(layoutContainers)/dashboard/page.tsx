@@ -111,22 +111,22 @@ const Dashboard = () => {
       },
     });
 
-    AsyncFetcher({
-      url: `/api/fetch/chart?chart=1`,
-      cb: (data: Workspace[] | EditorContribution[]) => {
-        setChartData(data);
-      },
-    });
+    // AsyncFetcher({
+    //   url: `/api/fetch/chart?chart=1`,
+    //   cb: (data: Workspace[] | EditorContribution[]) => {
+    //     setChartData(data);
+    //   },
+    // });
 
-    AsyncFetcher({
-      url: "/api/videos",
-      cb: ({ videos }: { videos: Video[] }) => {
-        const review = videos.filter((v) => v.status === "reviewPending");
-        const upload = videos.filter((v) => v.status === "uploadPending");
-        setPendingVideos({ review: review, upload: upload });
-        setIsReviewVideos(true);
-      },
-    });
+    // AsyncFetcher({
+    //   url: "/api/videos",
+    //   cb: ({ videos }: { videos: Video[] }) => {
+    //     const review = videos.filter((v) => v.status === "reviewPending");
+    //     const upload = videos.filter((v) => v.status === "uploadPending");
+    //     setPendingVideos({ review: review, upload: upload });
+    //     setIsReviewVideos(true);
+    //   },
+    // });
   }, [user]);
 
   return (
@@ -141,6 +141,7 @@ const Dashboard = () => {
           </DialogHeader>
           <CustomButton
             title="Connect"
+            className="bg-white hover:bg-red-600 text-white text-md hover:text-white w-full"
             cb={() =>
               AsyncFetcher({
                 url: "/api/youtube/connect",
@@ -149,7 +150,6 @@ const Dashboard = () => {
                 },
               })
             }
-            className="bg-red-600 hover:bg-red-600 text-white text-md hover:text-white w-full"
           />
         </DialogContent>
       </Dialog>

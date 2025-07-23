@@ -165,12 +165,12 @@ const Authorize = ({ params }: PageProps) => {
             className="flex flex-col sm:flex-row justify-center gap-4 mt-4"
           >
             <CustomButton
-              className="bg-green-500 text-white hover:text-white text-md h-12 px-6 sm:px-7"
+              className="bg-green-500 hover:bg-green-500 text-white hover:text-white text-md h-12 px-6 sm:px-7"
               title="Authorize"
               cb={() => handleAuthorize(true)}
             />
             <CustomButton
-              className="bg-red-500 text-white hover:text-white text-md h-12 px-6 sm:px-7"
+              className="bg-red-500 hover:bg-red-500 text-white hover:text-white text-md h-12 px-6 sm:px-7"
               title="Decline"
               cb={() => handleAuthorize(false)}
             />

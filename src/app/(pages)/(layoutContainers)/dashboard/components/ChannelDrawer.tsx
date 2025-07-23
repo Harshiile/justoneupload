@@ -93,6 +93,7 @@ export const ChannelDrawer = ({
                     >
                       <CustomButton
                         title="Generate Link"
+                        className="bg-white hover:bg-amber-50"
                         cb={() =>
                           AsyncFetcher({
                             url: `/api/fetch/workspaces/join/link/generate?ws=${channel.id}`,
@@ -221,6 +222,7 @@ export const ChannelDrawer = ({
                               channel={channel}
                               isForDialog={false}
                               isForDrawer={true}
+                              showChangeScheduleButton={true}
                             />
                             <Separator className="bg-secondary" />
                           </motion.div>

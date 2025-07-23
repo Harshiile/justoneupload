@@ -329,7 +329,7 @@ export default function Review({ params }: PageProps) {
                           className={`${
                             dialogData?.cta == "Approve"
                               ? "bg-green-500 hover:bg-green-500"
-                              : "bg-red-500 hover:bg-red-500"
+                              : "bg-red-500 hover:bg-red-500 text-white hover:text-white"
                           }`}
                           title={dialogData?.cta!}
                           cb={() =>

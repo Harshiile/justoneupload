@@ -13,7 +13,7 @@ export const CustomButton = ({ title, cb, className }: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   return (
     <Button
-      className={`bg-white text-primary hover:bg-[#fffffffd] hover:cursor-pointer font-bold hover:text-black !${className}`}
+      className={`${className} text-primary hover:cursor-pointer font-bold`}
       disabled={isLoading}
       onClick={async () => {
         setIsLoading(true);

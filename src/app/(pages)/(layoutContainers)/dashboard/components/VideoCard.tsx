@@ -172,19 +172,28 @@ const VideoCard = ({
 
             <CustomButton
               title={"Change"}
+              className="bg-white hover:bg-amber-50"
               cb={() => {
-                if (date!.getTime() == Number(video.willUploadAt))
+                if (!date) {
+                  toast.error("Invalid Date");
+                  return;
+                }
+
+                if (date.getTime() == Number(video.willUploadAt))
                   toast.warning("Time is as same as Previous");
-                if (date!.getTime() < Date.now())
+                if (date.getTime() < Date.now()) {
                   toast.error(
                     "New Schedule Time must be ahead of current time"
                   );
+                  return;
+                }
 
                 AsyncFetcher({
-                  url: `/api/videos / update - schedule ? id = ${
+                  url: `/api/videos/update-schedule?id=${
                     video.id
-                  } & schedule= ${date?.getTime()}`,
+                  }&schedule=${date?.getTime()}`,
                   cb: ({ message }: { message: string }) => {
+                    video.willUploadAt = date.getTime().toString();
                     toast.success(message);
                     setIsDialogOpen(false);
                   },
@@ -325,6 +334,7 @@ const VideoCard = ({
               >
                 <CustomButton
                   title={"Review"}
+                  className="bg-white hover:bg-amber-50"
                   cb={() =>
                     AsyncFetcher({
                       url: "/api/videos/review/generate",

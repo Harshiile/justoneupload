@@ -1,22 +1,24 @@
 import { db } from "@/db";
 import { VideoTable } from "@/db/schema";
 import { JOUError } from "@/lib/error";
+import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
+  const { searchParams } = new URL(req.url);
 
-    const videoId = searchParams.get('id')
-    const newSchedule = searchParams.get('schedule')
+  const videoId = searchParams.get("id");
+  const newSchedule = searchParams.get("schedule");
 
-    if (!videoId || !newSchedule) return JOUError(404, "Invalid Params");
+  if (!videoId || !newSchedule) return JOUError(404, "Invalid Params");
 
-    await db
-        .update(VideoTable)
-        .set({
-            willUploadAt: newSchedule
-        })
-        .catch(_ => JOUError(400, "Update Schedule Failed, Try Again"));
+  await db
+    .update(VideoTable)
+    .set({
+      willUploadAt: newSchedule,
+    })
+    .where(eq(VideoTable.id, videoId))
+    .catch((_) => JOUError(400, "Update Schedule Failed, Try Again"));
 
-    return NextResponse.json({ message: "Scheudle Time Changed" })
+  return NextResponse.json({ message: "Scheudle Time Changed" });
 }

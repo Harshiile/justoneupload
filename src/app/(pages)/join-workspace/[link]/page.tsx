@@ -30,12 +30,14 @@ const JoinWs = ({ params }: PageProps) => {
   useEffect(() => {
     (async () => {
       const link = (await resolvedParams).link;
-      // AsyncFetcher({
-      //   url: `/api/fetch/workspaces/join/link/validate?link=${link}`,
-      //   cb: ({ workspace }) => {
-      //     setWorkspace(workspace);
-      //   },
-      // });
+      AsyncFetcher({
+        url: `/api/fetch/workspaces/join/link/validate?link=${link}`,
+        cb: ({ workspace }: { workspace: Workspace }) => {
+          console.log(workspace);
+
+          setWorkspace(workspace);
+        },
+      });
     })();
   }, []);
 
@@ -182,6 +184,7 @@ const JoinWs = ({ params }: PageProps) => {
               >
                 <CustomButton
                   title="Join Workspace"
+                  className="bg-white hover:bg-white"
                   cb={() => {
                     AsyncFetcher({
                       url: `/api/fetch/workspaces/join/initial?ws=${workspace.id}`,

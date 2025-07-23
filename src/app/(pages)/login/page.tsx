@@ -239,7 +239,7 @@ const Login = () => {
 
         {/* Submit Button */}
         <CustomButton
-          className="w-full text-base sm:text-md"
+          className="bg-white hover:bg-amber-50 w-full text-base sm:text-md"
           title={isLogin ? "Log In" : "Sign Up"}
           cb={() => {
             if (!email) throw new Error("Email is required");

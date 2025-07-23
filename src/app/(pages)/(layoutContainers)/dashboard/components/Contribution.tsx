@@ -1,6 +1,13 @@
 "use client";
 import { useState } from "react";
-import { PieChart, Pie, Cell, Legend, ResponsiveContainer } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 import { AsyncFetcher } from "@/lib/fetcher";
 import { Loader } from "@/components/Loader";
 import { User } from "@/app/(pages)/types/user";
@@ -23,9 +30,57 @@ interface SelectedEditor {
   videoUploaded: number;
 }
 
+const COLORS = [
+  "#6366f1", // indigo
+  "#10b981", // emerald
+  "#f59e0b", // amber
+  "#ef4444", // red
+  "#3b82f6", // blue
+  "#8b5cf6", // violet
+];
+
+const CustomTooltip = ({ active, payload, msgPrefix, msgSuffix }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-2 rounded-md shadow text-black text-sm">
+        <p className="font-semibold">{payload[0].name}</p>
+        <p>{`${msgPrefix} : ${payload[0].value} ${
+          msgSuffix ? msgSuffix : ""
+        }`}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
+const CustomLabel = ({ percent, midAngle, cx, cy, outerRadius }: any) => {
+  const RADIAN = Math.PI / 180;
+  const radius = outerRadius + 10;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  return percent > 0 ? `${percent * 100}%` : "";
+};
+
+const CustomContent = ({ payload }: any) => (
+  <ul className="-ml-36 text-white text-sm space-y-1">
+    {payload?.map((entry: any, index: number) => (
+      <li key={`item-${index}`} className="flex items-center space-x-1">
+        <div
+          style={{
+            width: 10,
+            height: 10,
+            backgroundColor: entry.color,
+            borderRadius: "50%",
+          }}
+        />
+        <span>{entry.value}</span>
+      </li>
+    ))}
+  </ul>
+);
 const Contribution = ({ user, chartData }: ContributionProps) => {
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
   const [selectedEditors, setSelectedEditors] = useState<SelectedEditor[]>([]);
+  const [chartKey, setChartKey] = useState(0);
 
   const filteredData =
     user?.userType === "youtuber"
@@ -59,37 +114,18 @@ const Contribution = ({ user, chartData }: ContributionProps) => {
                     cy="50%"
                     innerRadius={35}
                     outerRadius={80}
-                    label={({
-                      name,
-                      percent,
-                      midAngle,
-                      cx,
-                      cy,
-                      outerRadius,
-                    }) => {
-                      const RADIAN = Math.PI / 180;
-                      const radius = outerRadius + 10;
-                      const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                      const y = cy + radius * Math.sin(-midAngle * RADIAN);
-                      return (
-                        <text
-                          x={x}
-                          y={y}
-                          textAnchor={x > cx ? "start" : "end"}
-                          dominantBaseline="central"
-                          fill="#ffffff"
-                          fontSize={15}
-                        >
-                          {`${name} ${(percent * 100).toFixed(1)}%`}
-                        </text>
-                      );
-                    }}
+                    paddingAngle={4}
+                    cornerRadius={10}
+                    isAnimationActive={true}
+                    label={CustomLabel}
                     labelLine={false}
                   >
                     {filteredData.map((entry, index) => (
                       <Cell
                         key={entry.id}
                         fill={COLORS[index % COLORS.length]}
+                        stroke="#0f172a"
+                        strokeWidth={2}
                       />
                     ))}
                   </Pie>
@@ -97,15 +133,38 @@ const Contribution = ({ user, chartData }: ContributionProps) => {
                     layout="vertical"
                     verticalAlign="middle"
                     align="right"
-                    iconType="square"
-                    formatter={(value) => {
-                      const item = filteredData.find((d) => d.name === value);
-                      return (
-                        <span style={{ color: "white", fontSize: 15 }}>
-                          {`${item?.value} Videos`}
-                        </span>
-                      );
-                    }}
+                    iconType="circle"
+                    content={({ payload }) => (
+                      <ul className="-ml-36 text-white text-sm space-y-1">
+                        {payload?.map((entry, index) => (
+                          <li
+                            key={`item-${index}`}
+                            className="flex items-center space-x-1"
+                          >
+                            <div
+                              style={{
+                                width: 10,
+                                height: 10,
+                                backgroundColor: entry.color,
+                                borderRadius: "50%",
+                              }}
+                            />
+                            <span>
+                              Video Edited{" - "}
+                              {entry.payload?.value}
+                              {" ( "}
+                              {entry.value}
+                              {" )"}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  />
+                  <Tooltip
+                    content={(props) => (
+                      <CustomTooltip {...props} msgPrefix={"Video Edited"} />
+                    )}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -124,31 +183,10 @@ const Contribution = ({ user, chartData }: ContributionProps) => {
                       cy="50%"
                       innerRadius={35}
                       outerRadius={80}
-                      label={({
-                        name,
-                        percent,
-                        midAngle,
-                        cx,
-                        cy,
-                        outerRadius,
-                      }) => {
-                        const RADIAN = Math.PI / 180;
-                        const radius = outerRadius + 10;
-                        const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                        const y = cy + radius * Math.sin(-midAngle * RADIAN);
-                        return (
-                          <text
-                            x={x}
-                            y={y}
-                            textAnchor={x > cx ? "start" : "end"}
-                            dominantBaseline="central"
-                            fill="#ffffff"
-                            fontSize={15}
-                          >
-                            {`${name} ${(percent * 100).toFixed(1)}%`}
-                          </text>
-                        );
-                      }}
+                      paddingAngle={4}
+                      cornerRadius={10}
+                      isAnimationActive={true}
+                      label={CustomLabel}
                       labelLine={false}
                       onClick={(entry: any) => {
                         AsyncFetcher({
@@ -159,6 +197,7 @@ const Contribution = ({ user, chartData }: ContributionProps) => {
                               videoUploaded: Number(item.videoUploaded),
                             }));
                             setSelectedEditors(sanitized);
+                            setChartKey((prev) => prev + 1);
                           },
                         });
                       }}
@@ -167,6 +206,8 @@ const Contribution = ({ user, chartData }: ContributionProps) => {
                         <Cell
                           key={`cell-${index}`}
                           fill={COLORS[index % COLORS.length]}
+                          stroke="#0f172a"
+                          strokeWidth={2}
                         />
                       ))}
                     </Pie>
@@ -174,15 +215,13 @@ const Contribution = ({ user, chartData }: ContributionProps) => {
                       layout="vertical"
                       verticalAlign="middle"
                       align="right"
-                      iconType="square"
-                      formatter={(value) => {
-                        const item = filteredData.find((d) => d.name === value);
-                        return (
-                          <span style={{ color: "white", fontSize: 15 }}>
-                            {`${item?.value} Editors`}
-                          </span>
-                        );
-                      }}
+                      iconType="circle"
+                      content={CustomContent}
+                    />
+                    <Tooltip
+                      content={(props) => (
+                        <CustomTooltip {...props} msgPrefix={"Total Editors"} />
+                      )}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -194,6 +233,7 @@ const Contribution = ({ user, chartData }: ContributionProps) => {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
+                        key={chartKey}
                         data={selectedEditors}
                         dataKey="videoUploaded"
                         nameKey="editorName"
@@ -201,37 +241,20 @@ const Contribution = ({ user, chartData }: ContributionProps) => {
                         cy="50%"
                         innerRadius={40}
                         outerRadius={80}
+                        paddingAngle={4}
+                        cornerRadius={10}
+                        isAnimationActive={true}
                         labelLine={false}
-                        label={({
-                          name,
-                          percent,
-                          midAngle,
-                          cx,
-                          cy,
-                          outerRadius,
-                        }) => {
-                          const RADIAN = Math.PI / 180;
-                          const radius = outerRadius + 10;
-                          const x = cx + radius * Math.cos(-midAngle * RADIAN);
-                          const y = cy + radius * Math.sin(-midAngle * RADIAN);
-                          return (
-                            <text
-                              x={x}
-                              y={y}
-                              textAnchor={x > cx ? "start" : "end"}
-                              dominantBaseline="central"
-                              fill="#ffffff"
-                              fontSize={14}
-                            >
-                              {`${name} ${(percent * 100).toFixed(1)}%`}
-                            </text>
-                          );
-                        }}
+                        label={CustomLabel}
+                        startAngle={90}
+                        endAngle={-270}
                       >
                         {selectedEditors.map((entry, index) => (
                           <Cell
                             key={entry.editorId}
                             fill={COLORS[index % COLORS.length]}
+                            stroke="#0f172a"
+                            strokeWidth={2}
                           />
                         ))}
                       </Pie>
@@ -239,23 +262,46 @@ const Contribution = ({ user, chartData }: ContributionProps) => {
                         layout="vertical"
                         verticalAlign="middle"
                         align="right"
-                        iconType="square"
-                        formatter={(value) => {
-                          const item = selectedEditors.find(
-                            (e) => e.editorName === value
-                          );
-                          return (
-                            <span style={{ color: "white", fontSize: 14 }}>
-                              {value}: {item?.videoUploaded}
-                            </span>
-                          );
-                        }}
+                        iconType="circle"
+                        content={({ payload }) => (
+                          <ul className="-ml-36 text-white text-sm space-y-1">
+                            {payload?.map((entry, index) => (
+                              <li
+                                key={`item-${index}`}
+                                className="flex items-center space-x-1"
+                              >
+                                <div
+                                  style={{
+                                    width: 10,
+                                    height: 10,
+                                    backgroundColor: entry.color,
+                                    borderRadius: "50%",
+                                  }}
+                                />
+                                <span>
+                                  {entry.value} : Video Edtied{" - "}
+                                  {entry.payload?.value}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      />
+                      <Tooltip
+                        content={(props) => (
+                          <CustomTooltip
+                            {...props}
+                            msgPrefix={"Total Video Edited"}
+                          />
+                        )}
                       />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <p className="text-white">No editors in this workspace.</p>
+                <p className="text-white text-[16px] w-[50%] flex justify-center items-center">
+                  No editors in this workspace
+                </p>
               )}
             </>
           )}

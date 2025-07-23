@@ -4,7 +4,7 @@ import { WorkspaceTable } from "../../../../../db/schema.ts";
 import { eq } from "drizzle-orm";
 import { google } from "googleapis";
 
-interface WorkSpaces {
+interface WorkSpace {
   id: string;
   disconnected?: boolean;
   userHandle?: string;
@@ -19,7 +19,7 @@ interface WorkSpaces {
 export const fetchWorkspaceMetadata = async (
   wsId: string,
   refToken: string | null
-): Promise<WorkSpaces | null> => {
+): Promise<WorkSpace | null> => {
   const youtube = google.youtube({ version: "v3", auth: oauth2Client });
   let refTkn = refToken;
   if (!refTkn) {
