@@ -42,13 +42,6 @@ export const ChannelDrawer = ({
   channel,
 }: ChannelDrawerProps) => {
   const user = useUser((state) => state.user);
-  const [filterParams, setFilterParams] = useState({
-    views: false,
-    time: false,
-    videoType: null,
-    status: null,
-  });
-  const [isAscending, setIsAscending] = useState(true);
 
   const searchOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (videos)
@@ -209,7 +202,7 @@ export const ChannelDrawer = ({
                 </div>
 
                 {/* VIDEO LIST */}
-                <div className="space-y-4 flex-1 overflow-auto">
+                <div className="flex-1 overflow-auto">
                   {filterVideos != null ? (
                     filterVideos.length > 0 ? (
                       <AnimatePresence>
@@ -220,6 +213,7 @@ export const ChannelDrawer = ({
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
                             transition={{ duration: 0.3 }}
+                            className="overflow-x-hidden"
                           >
                             <VideoCard
                               video={video}

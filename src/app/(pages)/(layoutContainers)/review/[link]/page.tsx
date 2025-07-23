@@ -18,17 +18,27 @@ import { useUser } from "@/hooks/store/user";
 import Prevention from "@/components/Prevention";
 import { PageProps } from "../../../../../../.next/types/app/layout";
 
+interface Channel {
+  id: string;
+  name: string;
+  avatar: string;
+  userHandle: string;
+}
 interface VideoDetails {
-  channel: {
-    id: string;
-    name: string;
-    avatar: string;
-    userHandle: string;
-  };
+  channel: Channel;
   video: {
+    id: string;
     title: string;
+    desc: string | null;
+    videoType: "public" | "private" | "unlisted";
+    thumbnail: string | null;
     fileId: string;
+    duration: string;
+    isMadeForKids: boolean;
+    status: "reviewPending" | "uploadPending";
     willUploadAt: string | null;
+    editor: string;
+    workspace: string;
   };
 }
 
@@ -38,6 +48,9 @@ export default function Review({ params }: PageProps) {
   const [isVideoHovered, setIsVideoHovered] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(false);
   const [open, setOpen] = useState(false);
+  const [isThumbnailHovered, setIsThumbnailHovered] = useState(false);
+  const [isDescriptionHovered, setIsDescriptionHovered] = useState(false);
+
   const [dialogData, setDialogData] = useState<{
     title: string;
     desc: string;
@@ -55,15 +68,15 @@ export default function Review({ params }: PageProps) {
           url: `/api/videos/review/validate?link=${link}`,
           cb: ({
             error,
-            videoDetails,
+            videoEntireDetails,
           }: {
             error: boolean;
-            videoDetails: VideoDetails;
+            videoEntireDetails: VideoDetails;
           }) => {
-            console.log(videoDetails);
+            console.log(videoEntireDetails);
 
             if (error) setIsVideoProcessDone(true);
-            else setVideo(videoDetails);
+            else setVideo(videoEntireDetails);
           },
         });
       }
@@ -92,7 +105,7 @@ export default function Review({ params }: PageProps) {
       ) : (
         <>
           {!video ? (
-            <p>Full Loading ...</p>
+            <p>Fetching Details</p>
           ) : (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -136,53 +149,108 @@ export default function Review({ params }: PageProps) {
                     </div>
                   </div>
 
-                  {isLoading && <p>Full Loading...</p>}
                   {/* Video */}
                   <div
                     className="relative w-full h-[85vh] group"
                     onMouseEnter={() => setIsVideoHovered(true)}
                     onMouseLeave={() => setIsVideoHovered(false)}
                   >
-                    {/* Video Player or Fallback Image */}
-                    <video
-                      controls
-                      controlsList="nodownload"
-                      disablePictureInPicture
-                      className="w-full h-full object-cover"
-                      onLoadedData={(_) => setisLoading(false)}
-                    >
-                      <source
+                    {!setisLoading ? (
+                      <p className="w-full h-full grid place-items-center">
+                        Video Loading...
+                      </p>
+                    ) : (
+                      <>
+                        {/* Video Player or Fallback Image */}
+                        <video
+                          controls
+                          controlsList="nodownload"
+                          disablePictureInPicture
+                          className="w-full h-full object-cover"
+                          onLoadedData={(_) => setisLoading(false)}
+                        >
+                          {/* <source
                         src={`http://localhost:3000/api/drive?type=video&id=${video?.video?.fileId}`}
                         type="video/mp4"
-                      />
-                    </video>
+                      /> */}
+                        </video>
 
-                    {/* Title Overlay - shown when video is paused or on hover */}
-                    <motion.div
-                      initial={{ y: -50, opacity: 0 }}
-                      animate={
-                        isVideoHovered
-                          ? { y: 0, opacity: 1 }
-                          : { y: -50, opacity: 0 }
-                      }
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 30,
-                      }}
-                      className="absolute top-0 left-0 m-4 p-2 rounded-md text-white font-bold text-lg max-w-[90%]"
-                    >
-                      {video?.video?.title}
-                    </motion.div>
+                        {/* Title Overlay - shown when video is paused or on hover */}
+                        <motion.div
+                          initial={{ y: -50, opacity: 0 }}
+                          animate={
+                            isVideoHovered
+                              ? { y: 0, opacity: 1 }
+                              : { y: -50, opacity: 0 }
+                          }
+                          transition={{
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 30,
+                          }}
+                          className="absolute top-0 left-0 m-4 p-2 rounded-md text-white font-bold text-lg max-w-[90%]"
+                        >
+                          {video?.video?.title}
+                        </motion.div>
+                      </>
+                    )}
                   </div>
-
-                  {/* MetaData */}
 
                   {/* Footer */}
                   <div className="p-4 bg-primary border-t border-secondary flex justify-between items-center">
+                    {/* Thumbnail Hovering Section */}
+                    <motion.div
+                      initial={{ y: 100, opacity: 0 }}
+                      animate={
+                        isThumbnailHovered
+                          ? { y: 0, opacity: 1 }
+                          : { y: 100, opacity: 0 }
+                      }
+                      transition={{
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 25,
+                      }}
+                      className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-black border border-secondary p-2 rounded-xl shadow-lg z-50"
+                    >
+                      <img
+                        src={
+                          video?.video.thumbnail
+                            ? video?.video.thumbnail
+                            : "/invalid.jpg"
+                        }
+                        alt={video?.video.title}
+                        className="w-128 h-64 object-cover rounded"
+                      />
+                    </motion.div>
+
+                    {/* Description Hovering Section */}
+                    <motion.div
+                      initial={{ x: "100%" }}
+                      animate={
+                        isDescriptionHovered ? { x: "0%" } : { x: "100%" }
+                      }
+                      transition={{
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 25,
+                      }}
+                      className="fixed top-[calc(16rem)] right-0 w-[700px] h-[85vh] bg-secondary text-white p-6 z-50 rounded-l-xl shadow-xl overflow-y-auto"
+                      onMouseEnter={() => setIsDescriptionHovered(true)}
+                      onMouseLeave={() => setIsDescriptionHovered(false)}
+                    >
+                      <h2 className="text-xl font-bold mb-4">
+                        Video Description
+                      </h2>
+                      <p>
+                        {video?.video.desc
+                          ? video?.video.desc
+                          : "No Description"}
+                      </p>
+                    </motion.div>
+
                     <div className="flex items-center gap-3 w-full md:w-auto justify-end">
                       <button
-                        // onClick={onRejectClick}
                         className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 
                                 bg-red-900 text-white 
                                 hover:bg-red-600  hover:text-gray-200 hover:font-bold`}
@@ -204,7 +272,6 @@ export default function Review({ params }: PageProps) {
                       </button>
 
                       <button
-                        // onClick={onApproveClick}
                         className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300
                             bg-white/90 text-black   animate-pulse'
                                  hover:bg-white hover:font-bold`}
@@ -223,6 +290,23 @@ export default function Review({ params }: PageProps) {
                           <ThumbsUp size={18} />
                           <span>Approve</span>
                         </div>
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+                      <button
+                        onMouseEnter={() => setIsThumbnailHovered(true)}
+                        onMouseLeave={() => setIsThumbnailHovered(false)}
+                        className="px-4 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-600 transition"
+                      >
+                        Show Thumbnail
+                      </button>
+
+                      <button
+                        onMouseEnter={() => setIsDescriptionHovered(true)}
+                        onMouseLeave={() => setIsDescriptionHovered(false)}
+                        className="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600 transition"
+                      >
+                        Show Description
                       </button>
                     </div>
                   </div>

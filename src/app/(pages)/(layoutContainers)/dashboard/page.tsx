@@ -39,7 +39,7 @@ interface PendingVideosProps {
   videos: Array<Video>;
   isReviewVideos: boolean;
   user: User;
-  channel: Workspace;
+  channel?: Workspace;
 }
 
 const PendingVideos = ({
@@ -56,6 +56,7 @@ const PendingVideos = ({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.3 }}
+        className="overflow-x-hidden"
       >
         <VideoCard
           video={video}
@@ -122,7 +123,7 @@ const Dashboard = () => {
       cb: ({ videos }: { videos: Video[] }) => {
         const review = videos.filter((v) => v.status === "reviewPending");
         const upload = videos.filter((v) => v.status === "uploadPending");
-        setPendingVideos({ review: review!, upload: upload! });
+        setPendingVideos({ review: review, upload: upload });
         setIsReviewVideos(true);
       },
     });
@@ -322,12 +323,11 @@ const Dashboard = () => {
 
           <div className="w-full max-h-[50vh] overflow-y-auto custom-scroll">
             <AnimatePresence>
-              {isReviewVideos === null || !user || !channel ? (
+              {isReviewVideos === null || !user ? (
                 <Loader />
               ) : (
                 <PendingVideos
                   user={user}
-                  channel={channel}
                   isReviewVideos={isReviewVideos}
                   videos={
                     isReviewVideos

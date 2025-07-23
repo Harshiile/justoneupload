@@ -14,8 +14,8 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import Schedule from "../../upload/components/Schedule";
 import { toast } from "sonner";
-import Image from "next/image";
 import { Workspace } from "@/app/(pages)/types/workspace";
+import Image from "next/image";
 
 export const getTypeBadgeStyle = (type: string) => {
   switch (type.toLowerCase()) {
@@ -208,10 +208,10 @@ const VideoCard = ({
         key={video.id}
         onClick={(e) => video.status !== "uploaded" && e.preventDefault()}
         whileHover={{ scale: 1.01 }}
-        className={`flex flex-col md:flex-row items-start md:items-center justify-between rounded-lg overflow-hidden bg-primary shadow-sm transition-shadow hover:shadow-xl text-white cursor-auto py-3 px-3 gap-4 md:gap-6 ${className}`}
+        className={`flex flex-col md:flex-row items-start md:items-center justify-between rounded-lg overflow-hidden shadow-sm transition-shadow hover:shadow-xl text-white cursor-auto p-3 gap-x-4 md:gap-6 ${className}`}
       >
         {/* Left Section */}
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6 flex-1 w-full">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-x-4 md:gap-6 flex-1 w-full">
           <div className="relative flex-shrink-0 w-full max-w-xs md:w-[140px] md:h-[80px] rounded-md overflow-hidden group">
             <Image
               src={thumbnailUrl}
@@ -330,13 +330,11 @@ const VideoCard = ({
                       url: "/api/videos/review/generate",
                       methodType: "POST",
                       body: {
-                        name: channel?.name,
-                        avatar: channel?.avatar,
-                        userHandle: channel?.userHandle,
-                        id: channel?.id,
-                        title: video.title,
-                        fileId: video.fileId,
-                        willUploadAt: video.willUploadAt,
+                        channelName: channel?.name,
+                        channelAvatar: channel?.avatar,
+                        channalUserHandle: channel?.userHandle,
+                        channelId: channel?.id,
+                        videoId: video.id,
                       },
                       cb: ({ link }: { link: string }) => {
                         window.open(link, "_blank");
