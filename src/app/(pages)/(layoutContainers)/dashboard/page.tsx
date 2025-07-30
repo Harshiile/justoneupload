@@ -111,22 +111,22 @@ const Dashboard = () => {
       },
     });
 
-    // AsyncFetcher({
-    //   url: `/api/fetch/chart?chart=1`,
-    //   cb: (data: Workspace[] | EditorContribution[]) => {
-    //     setChartData(data);
-    //   },
-    // });
+    AsyncFetcher({
+      url: `/api/fetch/chart?chart=1`,
+      cb: (data: Workspace[] | EditorContribution[]) => {
+        setChartData(data);
+      },
+    });
 
-    // AsyncFetcher({
-    //   url: "/api/videos",
-    //   cb: ({ videos }: { videos: Video[] }) => {
-    //     const review = videos.filter((v) => v.status === "reviewPending");
-    //     const upload = videos.filter((v) => v.status === "uploadPending");
-    //     setPendingVideos({ review: review, upload: upload });
-    //     setIsReviewVideos(true);
-    //   },
-    // });
+    AsyncFetcher({
+      url: "/api/videos",
+      cb: ({ videos }: { videos: Video[] }) => {
+        const review = videos.filter((v) => v.status === "reviewPending");
+        const upload = videos.filter((v) => v.status === "uploadPending");
+        setPendingVideos({ review: review, upload: upload });
+        setIsReviewVideos(true);
+      },
+    });
   }, [user]);
 
   return (

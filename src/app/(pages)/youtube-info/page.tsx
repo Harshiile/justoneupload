@@ -3,22 +3,25 @@ import { useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
 import { AsyncFetcher } from "@/lib/fetcher";
+import { PageProps } from "../../../../.next/types/app/layout";
 
-const YoutubeInfo = () => {
-  const params = useParams();
-  const router = useRouter();
+const YoutubeInfo = (props: PageProps) => {
   useEffect(() => {
-    const code = params["code"];
-    if (code) {
-      AsyncFetcher({
-        url: `/api/youtube/connect?code=${code}`,
-        methodType: "POST",
-        cb: ({ message }: { message: string }) => {
-          toast.success(message);
-          router.push("/dashboard");
-        },
-      });
-    }
+    (async () => {
+      const params = await props.searchParams;
+      const code = params.code;
+
+      if (code) {
+        AsyncFetcher({
+          url: `/api/youtube/connect?code=${code}`,
+          methodType: "POST",
+          cb: ({ message }: { message: string }) => {
+            toast.success(message);
+            // router.push("/dashboard");
+          },
+        });
+      }
+    })();
   }, []);
   return (
     <>

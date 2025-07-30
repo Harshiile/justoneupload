@@ -3,12 +3,13 @@ import { EditorWorkspaceJoinTable, WorkspaceTable } from "@/db/schema";
 import { JOUError } from "@/lib/error";
 import { and, eq, inArray } from "drizzle-orm";
 import { google, youtube_v3 } from "googleapis";
-import { GaxiosPromise } from "googleapis/build/src/apis/abusiveexperiencereport";
+// import { GA } from "googleapis/build/src/apis/abusiveexperiencereport";
 import { NextRequest, NextResponse } from "next/server";
 import { validate } from "uuid";
 import { oauth2Client } from "../../utils/secrets";
 import { getUser } from "../../utils/getUser";
 import { fetchWorkspaceMetadata } from "./utils";
+import { GaxiosPromise } from "googleapis-common";
 
 interface WorkSpaces {
   id: string;

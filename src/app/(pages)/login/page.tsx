@@ -249,10 +249,19 @@ const Login = () => {
             if (!isLogin && (!hasMinLength || !hasNumber || !hasSpecialChar))
               throw new Error("Invalid Password");
 
+            console.log({
+              name,
+              email,
+              password,
+              role,
+            });
+
             AsyncFetcher({
-              url: "/api/auth/login",
+              url: `/api/auth/${isLogin ? "login" : "signup"}`,
               methodType: "POST",
-              body: { email, password },
+              body: isLogin
+                ? { email, password }
+                : { email, password, name, userType: role },
               cb: ({ message, user }: { message: string; user: User }) => {
                 console.log(message);
                 console.log(user);

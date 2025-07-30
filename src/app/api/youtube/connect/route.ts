@@ -32,17 +32,19 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const yt = google.youtube({ version: "v3", auth: oauth2Client });
   const { id: userId } = getUser(req);
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
 
+  console.log("Code : ", code);
+
   if (!code) return JOUError(400, "Code not generated after youtube signup");
+
   try {
     const youtubeChannel = await oauth2Client
       .getToken(code!.toString())
       .catch((err) => {
-        throw new Error();
+        throw JOUError(400, "Please Try Again");
       });
     // store refreshToken on db - Workspace Table
     if (!youtubeChannel)
@@ -54,14 +56,25 @@ export async function POST(req: NextRequest) {
       refresh_token: refToken,
     });
 
+    const yt = google.youtube({ version: "v3", auth: oauth2Client });
+
     const email = (
       await google.oauth2({ version: "v2", auth: oauth2Client }).userinfo.get()
     ).data.email;
 
-    const channels = await yt.channels.list({
-      part: ["id", "snippet"],
-      mine: true,
-    });
+    console.log("Email : ", email);
+
+    const channels = await yt.channels
+      .list({
+        part: ["id", "snippet"],
+        mine: true,
+      })
+      .catch((err) => {
+        console.log("Error : ", err);
+        // return JOUError(400, err.message);
+      });
+
+    console.log("channels : ", channels);
     if (!channels)
       return JOUError(400, "Error while fetching youtube channel info");
 
@@ -70,6 +83,14 @@ export async function POST(req: NextRequest) {
 
     const { id: channelId } = channels.data.items![0];
     const { customUrl } = channels.data.items![0].snippet!;
+
+    console.log({
+      id: channelId!,
+      owner: userId,
+      userHandle: customUrl?.toString()!,
+      refreshToken: refToken!,
+      email: email!,
+    });
 
     await db
       .insert(WorkspaceTable)
